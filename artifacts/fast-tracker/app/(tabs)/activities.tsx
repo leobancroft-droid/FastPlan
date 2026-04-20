@@ -202,6 +202,7 @@ export default function ActivitiesScreen() {
     >
       {connected && (
         <>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Summary</Text>
           <NutritionTracker
             key={nutritionRefresh}
             burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
@@ -576,6 +577,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: { fontSize: 22, fontFamily: "Inter_700Bold", letterSpacing: -0.4 },
+  sectionTitle: { fontSize: 22, fontFamily: "Inter_700Bold", letterSpacing: -0.4, marginBottom: 12 },
   moreBtn: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   connectCard: {
     borderRadius: 20,
