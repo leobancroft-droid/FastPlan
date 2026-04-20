@@ -550,6 +550,12 @@ export function NutritionTracker({ burned }: Props) {
         onLongPress={() => setGoalEditOpen(true)}
         style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }]}
       >
+        {macroStreak.count > 0 && (
+          <View style={styles.macroRewardFloat} pointerEvents="none">
+            <Feather name="award" size={12} color="#ffb84d" />
+            <Text style={styles.macroRewardText}>Day {macroStreak.count}</Text>
+          </View>
+        )}
         <View style={styles.summaryTopRow}>
           <View style={styles.statBlock}>
             <Text style={[styles.statValue, { color: "#ec4899" }]}>{totals.kcal}</Text>
@@ -582,16 +588,6 @@ export function NutritionTracker({ burned }: Props) {
           <MacroCol label="Fat" current={totals.fat} goal={DEFAULT_FAT} colors={colors} />
         </View>
 
-        {macroStreak.count > 0 && (
-          <View style={styles.macroRewardWrap}>
-            <View style={styles.macroRewardChip}>
-              <Feather name="award" size={12} color="#ffb84d" />
-              <Text style={styles.macroRewardText}>
-                Macro target Day {macroStreak.count}
-              </Text>
-            </View>
-          </View>
-        )}
       </Pressable>
 
       <View style={styles.headerRow}>
@@ -1549,11 +1545,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 14,
   },
-  macroRewardWrap: {
-    alignItems: "center",
-    marginTop: 4,
-  },
-  macroRewardChip: {
+  macroRewardFloat: {
+    position: "absolute",
+    top: 12,
+    right: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
@@ -1563,6 +1558,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#ffb84d22",
     borderColor: "#ffb84d66",
+    zIndex: 5,
   },
   macroRewardText: {
     fontSize: 11,
