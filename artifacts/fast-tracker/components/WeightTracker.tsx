@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFasting, getTodayStr, getDiffDays } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
@@ -186,8 +186,20 @@ export function WeightTracker({ onCalorieGoalChange }: WeightTrackerProps = {}) 
               const dailyDelta = (diff * KCAL_PER_KG) / days;
               const raw = maint - dailyDelta;
               const clamped = Math.max(1200, Math.min(4000, Math.round(raw / 10) * 10));
-              await AsyncStorage.setItem("calorie_goal", String(clamped));
-              onCalorieGoalChange?.(clamped);
+              Alert.alert(
+                "Update calorie goal?",
+                `Update your new daily calorie intake to ${clamped} kcal now?`,
+                [
+                  { text: "No", style: "cancel" },
+                  {
+                    text: "Yes",
+                    onPress: async () => {
+                      await AsyncStorage.setItem("calorie_goal", String(clamped));
+                      onCalorieGoalChange?.(clamped);
+                    },
+                  },
+                ],
+              );
             }
           }
         }}
