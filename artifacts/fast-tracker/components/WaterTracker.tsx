@@ -1,13 +1,65 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { useFasting } from "@/context/FastingContext";
+import { useFasting, getTodayStr, getDiffDays } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
+
+const HYDRATION_THRESHOLD_ML = 2000;
+const HYDRATION_KEY = "hydration_streak_v1";
+
+interface HydrationState {
+  count: number;
+  lastDate: string | null;
+  achievedToday: boolean;
+}
 
 export function WaterTracker() {
   const colors = useColors();
   const { waterToday, waterGoal, glassSize, addGlass, removeGlass } = useFasting();
+  const [hydration, setHydration] = useState<HydrationState>({ count: 0, lastDate: null, achievedToday: false });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(HYDRATION_KEY);
+        const today = getTodayStr();
+        if (!raw) {
+          setHydration({ count: 0, lastDate: null, achievedToday: false });
+          return;
+        }
+        const parsed = JSON.parse(raw) as HydrationState;
+        if (!parsed.lastDate) {
+          setHydration({ count: 0, lastDate: null, achievedToday: false });
+          return;
+        }
+        const gap = getDiffDays(parsed.lastDate, today);
+        if (gap === 0) {
+          setHydration(parsed);
+        } else if (gap === 1) {
+          setHydration({ count: parsed.count, lastDate: parsed.lastDate, achievedToday: false });
+        } else {
+          setHydration({ count: 0, lastDate: null, achievedToday: false });
+          await AsyncStorage.setItem(HYDRATION_KEY, JSON.stringify({ count: 0, lastDate: null, achievedToday: false }));
+        }
+      } catch {}
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (waterToday < HYDRATION_THRESHOLD_ML) return;
+    if (hydration.achievedToday) return;
+    const today = getTodayStr();
+    const wasYesterday = hydration.lastDate ? getDiffDays(hydration.lastDate, today) === 1 : false;
+    const newCount = wasYesterday ? hydration.count + 1 : 1;
+    const next: HydrationState = { count: newCount, lastDate: today, achievedToday: true };
+    setHydration(next);
+    AsyncStorage.setItem(HYDRATION_KEY, JSON.stringify(next)).catch(() => {});
+    if (Platform.OS !== "web") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    }
+  }, [waterToday, hydration]);
 
   const goalGlasses = Math.max(1, Math.round(waterGoal / glassSize));
   const filledGlasses = Math.min(goalGlasses, Math.round(waterToday / glassSize));
@@ -36,6 +88,14 @@ export function WaterTracker() {
             <Feather name="droplet" size={16} color={blue} />
           </View>
           <Text style={[styles.title, { color: colors.foreground }]}>Water</Text>
+          {hydration.count > 0 && (
+            <View style={[styles.rewardChip, { backgroundColor: "#ffb84d22", borderColor: "#ffb84d66" }]}>
+              <Feather name="award" size={12} color="#ffb84d" />
+              <Text style={[styles.rewardChipText, { color: "#ffb84d" }]}>
+                Day {hydration.count}
+              </Text>
+            </View>
+          )}
         </View>
         <Text style={[styles.goal, { color: colors.mutedForeground }]}>
           Goal: {(waterGoal / 1000).toFixed(2)} L
@@ -233,5 +293,20 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     textAlign: "center",
     marginTop: 2,
+  },
+  rewardChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+    marginLeft: 6,
+  },
+  rewardChipText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.2,
   },
 });
