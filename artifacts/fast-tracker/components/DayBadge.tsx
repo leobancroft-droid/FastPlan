@@ -49,11 +49,6 @@ export function DayBadge({ type, large = false }: DayBadgeProps) {
         style={{ width: imgSize, height: imgSize }}
         resizeMode="contain"
       />
-      {large && (
-        <Text style={[styles.label, { fontSize, color: labelColor }]}>
-          {isFast ? "FAST DAY" : "EAT DAY"}
-        </Text>
-      )}
     </Animated.View>
   );
 }
