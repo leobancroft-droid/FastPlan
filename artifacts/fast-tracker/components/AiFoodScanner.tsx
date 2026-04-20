@@ -121,13 +121,10 @@ export function AiFoodScanner({ onAdded }: Props) {
       const r = await withModalDismissed(
         () =>
           ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions
-              ? ImagePicker.MediaTypeOptions.Images
-              : ("images" as any),
-            quality: 0.6,
-            base64: true,
+            mediaTypes: ["images"] as any,
+            quality: 0.5,
+            base64: false,
             allowsEditing: false,
-            cameraType: ImagePicker.CameraType.back,
           }),
         Platform.OS === "ios" ? 900 : 250,
       );
@@ -164,11 +161,9 @@ export function AiFoodScanner({ onAdded }: Props) {
       const r = await withModalDismissed(
         () =>
           ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions
-              ? ImagePicker.MediaTypeOptions.Images
-              : ("images" as any),
-            quality: 0.6,
-            base64: true,
+            mediaTypes: ["images"] as any,
+            quality: 0.5,
+            base64: false,
             allowsEditing: false,
           }),
         Platform.OS === "ios" ? 550 : 200,
