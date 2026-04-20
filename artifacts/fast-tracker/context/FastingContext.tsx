@@ -546,6 +546,14 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("emotion_log"),
       AsyncStorage.removeItem("emotion_custom"),
       AsyncStorage.removeItem("day_overrides"),
+      AsyncStorage.removeItem("nutrition_log"),
+      AsyncStorage.removeItem("calorie_goal"),
+      AsyncStorage.removeItem("food_frequency"),
+      AsyncStorage.removeItem("steps_today"),
+      AsyncStorage.removeItem("steps_date"),
+      AsyncStorage.removeItem("activities_log"),
+      AsyncStorage.removeItem("macro_streak_v1"),
+      AsyncStorage.removeItem("under_kcal_streak_v1"),
     ]);
     setHistory([]);
     setBadges(BADGES);

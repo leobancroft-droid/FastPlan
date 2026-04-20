@@ -19,21 +19,26 @@ import { useColors } from "@/hooks/useColors";
 export default function RewardsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { badges, streak, today, userProfile, completeOnboarding } = useFasting();
+  const { badges, streak, today, userProfile, completeOnboarding, resetAll } = useFasting();
   const isFastDay = today?.type === "fast";
   const [planEditorOpen, setPlanEditorOpen] = useState(false);
 
+  async function startFreshPlan() {
+    await resetAll();
+    setPlanEditorOpen(true);
+  }
+
   function openChangePlan() {
     if (Platform.OS === "web") {
-      setPlanEditorOpen(true);
+      void startFreshPlan();
       return;
     }
     Alert.alert(
       "Change Plan",
-      "Retake the quick onboarding to rebuild your fasting plan. Your streaks, badges and history will be kept.",
+      "Retaking onboarding will reset everything — streaks, badges, history, water, weight, mood, calories and activities. This cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Continue", onPress: () => setPlanEditorOpen(true) },
+        { text: "Reset & Continue", style: "destructive", onPress: () => { void startFreshPlan(); } },
       ]
     );
   }
