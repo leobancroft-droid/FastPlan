@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 4,
   },
-  title: { fontSize: 28, fontFamily: "Inter_700Bold", letterSpacing: -0.5 },
+  title: { fontSize: 22, fontFamily: "Inter_700Bold", letterSpacing: -0.4 },
   moreBtn: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   connectCard: {
     borderRadius: 20,
