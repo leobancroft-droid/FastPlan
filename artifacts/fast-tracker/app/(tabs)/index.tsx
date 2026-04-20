@@ -118,6 +118,7 @@ export default function HomeScreen() {
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
             {getDaySubtitle(isFastDay, userProfile?.tone)}
           </Text>
+          {isFastDay && <QuoteCard quote={fastQuote} isFastDay={isFastDay} />}
         </View>
 
         <StreakCounter streak={streak} longestStreak={longestStreak} isFastDay={isFastDay} />
@@ -141,17 +142,16 @@ export default function HomeScreen() {
 
         <EmotionTracker />
 
-        <View style={styles.spacing} />
-
-        {isFastDay && <QuoteCard quote={fastQuote} isFastDay={isFastDay} />}
-
         {!isFastDay && (
-          <View style={[styles.eatTips, { backgroundColor: colors.eatPrimary + "15" }]}>
-            <Text style={[styles.tipsTitle, { color: colors.eatPrimary }]}>Today's Tip</Text>
-            <Text style={[styles.tipsText, { color: textColor }]}>
-              Enjoy balanced meals. Tomorrow is a fast day — stay mindful and don't overindulge.
-            </Text>
-          </View>
+          <>
+            <View style={styles.spacing} />
+            <View style={[styles.eatTips, { backgroundColor: colors.eatPrimary + "15" }]}>
+              <Text style={[styles.tipsTitle, { color: colors.eatPrimary }]}>Today's Tip</Text>
+              <Text style={[styles.tipsText, { color: textColor }]}>
+                Enjoy balanced meals. Tomorrow is a fast day — stay mindful and don't overindulge.
+              </Text>
+            </View>
+          </>
         )}
 
         <View style={styles.spacing} />
