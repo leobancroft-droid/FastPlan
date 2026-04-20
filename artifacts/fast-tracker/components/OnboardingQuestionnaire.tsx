@@ -412,6 +412,14 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                 );
               })}
             </View>
+
+            <View style={styles.logoWrap}>
+              <Image
+                source={require("@/assets/images/fastplan-logo.png")}
+                style={styles.logoImg}
+                resizeMode="contain"
+              />
+            </View>
           </Animated.View>
           ) : null}
         </ScrollView>
@@ -510,6 +518,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_500Medium",
     marginBottom: 16,
+  },
+  logoWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  logoImg: {
+    width: 120,
+    height: 120,
   },
   options: {
     gap: 10,
