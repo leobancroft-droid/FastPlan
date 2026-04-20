@@ -56,7 +56,9 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
+    "@bacons/apple-targets": "^4.0.6",
     "expo-camera": "~17.0.10",
-    "expo-image-manipulator": "^55.0.15"
+    "expo-image-manipulator": "^55.0.15",
+    "react-native-shared-group-preferences": "^1.1.24"
   }
 }

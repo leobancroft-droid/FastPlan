@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { derivePersonalProfile, type UserProfile } from "@/lib/personalization";
+import { syncWidgetState } from "@/lib/widgetSync";
 
 export type DayType = "eat" | "fast";
 export type DayStatus = "pending" | "completed" | "skipped";
@@ -347,6 +348,20 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     }
     return count;
   }, [history]);
+
+  React.useEffect(() => {
+    if (!loaded || !today) return;
+    const d = new Date();
+    const dateLabel = d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+    const goal = weightKg ? Math.round(weightKg * 30) : 0;
+    syncWidgetState({
+      dayType: today.type === "fast" ? "fast" : "eat",
+      streak,
+      dateLabel,
+      kcalGoal: goal,
+      kcalConsumed: 0,
+    });
+  }, [loaded, today, streak, weightKg]);
 
   const longestStreak = React.useMemo((): number => {
     const completed = history
