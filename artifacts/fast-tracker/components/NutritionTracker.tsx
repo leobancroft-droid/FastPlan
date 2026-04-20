@@ -762,12 +762,8 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<FoodPreset | null>(null);
   const [servings, setServings] = useState("1");
-  const [catFilter, setCatFilter] = useState<CategoryFilter>("foods");
-  const [freqFilter, setFreqFilter] = useState<FrequencyFilter>("frequent");
   const [pending, setPending] = useState<{ id: string; preset: FoodPreset; servings: number }[]>([]);
   const [frequency, setFrequency] = useState<Record<string, number>>({});
-  const [catOpen, setCatOpen] = useState(false);
-  const [freqOpen, setFreqOpen] = useState(false);
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [cameraBusy, setCameraBusy] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
@@ -790,22 +786,12 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   }, [open]);
 
   const filtered = useMemo(() => {
-    let list = FOOD_PRESETS;
-    if (catFilter === "foods") {
-      list = list.filter((p) => p.category !== "beverage");
-    } else {
-      list = list.filter((p) => p.category === "beverage");
-    }
-    if (freqFilter === "frequent") {
-      const sorted = [...list].sort((a, b) => (frequency[b.id] ?? 0) - (frequency[a.id] ?? 0));
-      list = sorted.slice(0, Math.max(8, sorted.filter((p) => (frequency[p.id] ?? 0) > 0).length));
-    }
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = FOOD_PRESETS.filter((p) => p.label.toLowerCase().includes(q));
+      return FOOD_PRESETS.filter((p) => p.label.toLowerCase().includes(q));
     }
-    return list;
-  }, [catFilter, freqFilter, search, frequency]);
+    return [...FOOD_PRESETS].sort((a, b) => (frequency[b.id] ?? 0) - (frequency[a.id] ?? 0));
+  }, [search, frequency]);
 
   useEffect(() => {
     const q = search.trim();
@@ -1126,45 +1112,6 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
                   placeholder={`What did you have for ${mealLabel.toLowerCase()}?`}
                   placeholderTextColor={colors.mutedForeground}
                   style={[styles.searchInput, { color: colors.foreground }]}
-                />
-              </View>
-
-              <View style={styles.dropRow}>
-                <FilterDropdown
-                  label={catFilter === "foods" ? "Foods" : "Beverages"}
-                  open={catOpen}
-                  onToggle={() => {
-                    setCatOpen((v) => !v);
-                    setFreqOpen(false);
-                  }}
-                  options={[
-                    { key: "foods", label: "Foods" },
-                    { key: "beverages", label: "Beverages" },
-                  ]}
-                  onSelect={(k) => {
-                    setCatFilter(k as CategoryFilter);
-                    setCatOpen(false);
-                  }}
-                  active={catFilter}
-                  colors={colors}
-                />
-                <FilterDropdown
-                  label={freqFilter === "frequent" ? "Frequent" : "All"}
-                  open={freqOpen}
-                  onToggle={() => {
-                    setFreqOpen((v) => !v);
-                    setCatOpen(false);
-                  }}
-                  options={[
-                    { key: "frequent", label: "Frequent" },
-                    { key: "all", label: "All" },
-                  ]}
-                  onSelect={(k) => {
-                    setFreqFilter(k as FrequencyFilter);
-                    setFreqOpen(false);
-                  }}
-                  active={freqFilter}
-                  colors={colors}
                 />
               </View>
 
