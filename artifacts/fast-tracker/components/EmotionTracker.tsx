@@ -27,6 +27,14 @@ export function EmotionTracker() {
             <Feather name="heart" size={16} color={colors.primary} />
           </View>
           <Text style={[styles.title, { color: colors.foreground }]}>Mood</Text>
+          {emotionLog.length > 0 && (
+            <View style={styles.rewardChip}>
+              <Feather name="award" size={12} color="#ffb84d" />
+              <Text style={styles.rewardChipText}>
+                {emotionLog.length} logged
+              </Text>
+            </View>
+          )}
         </View>
         <Pressable onPress={() => setHistoryOpen(true)} hitSlop={10}>
           <Text style={[styles.moreBtn, { color: colors.primary }]}>History</Text>
@@ -364,6 +372,24 @@ const styles = StyleSheet.create({
   moreBtn: {
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
+  },
+  rewardChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: "#ffb84d22",
+    borderColor: "#ffb84d66",
+    marginLeft: 6,
+  },
+  rewardChipText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.2,
+    color: "#ffb84d",
   },
   tile: {
     width: 78,
