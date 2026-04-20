@@ -276,6 +276,7 @@ export default function HomeScreen() {
         <NutritionTracker
           key={nutritionRefresh}
           burned={burned}
+          summaryOnly
         />
 
         <View style={styles.spacing} />

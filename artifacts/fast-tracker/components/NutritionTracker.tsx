@@ -437,9 +437,10 @@ function diffDays(a: string, b: string): number {
 
 interface Props {
   burned: number;
+  summaryOnly?: boolean;
 }
 
-export function NutritionTracker({ burned }: Props) {
+export function NutritionTracker({ burned, summaryOnly = false }: Props) {
   const colors = useColors();
   const [foods, setFoods] = useState<FoodEntry[]>([]);
   const [goal, setGoal] = useState(DEFAULT_GOAL);
@@ -639,13 +640,16 @@ export function NutritionTracker({ burned }: Props) {
 
       </Pressable>
 
+      {!summaryOnly && (
       <View style={styles.headerRow}>
         <Text style={[styles.sectionHeading, { color: colors.foreground }]}>Calories</Text>
         <Pressable onPress={() => setDetailsOpen(true)} hitSlop={10}>
           <Text style={[styles.linkBtn, { color: colors.primary }]}>Today</Text>
         </Pressable>
       </View>
+      )}
 
+      {!summaryOnly && (
       <View style={[styles.mealsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         {MEALS.map((m, i) => {
           const mealFoods = todayFoods.filter((f) => f.meal === m.key);
@@ -701,6 +705,7 @@ export function NutritionTracker({ burned }: Props) {
           );
         })}
       </View>
+      )}
 
       <FoodPicker
         meal={pickerMeal}
