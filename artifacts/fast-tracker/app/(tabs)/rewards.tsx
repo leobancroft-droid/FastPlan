@@ -1,7 +1,9 @@
 import { Feather } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,14 +12,31 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BadgeCard } from "@/components/BadgeCard";
 import { PlanCard } from "@/components/PlanCard";
+import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
 export default function RewardsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { badges, streak, today, userProfile } = useFasting();
+  const { badges, streak, today, userProfile, completeOnboarding } = useFasting();
   const isFastDay = today?.type === "fast";
+  const [planEditorOpen, setPlanEditorOpen] = useState(false);
+
+  function openChangePlan() {
+    if (Platform.OS === "web") {
+      setPlanEditorOpen(true);
+      return;
+    }
+    Alert.alert(
+      "Change Plan",
+      "Retake the quick onboarding to rebuild your fasting plan. Your streaks, badges and history will be kept.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Continue", onPress: () => setPlanEditorOpen(true) },
+      ]
+    );
+  }
 
   const topPadding = Platform.OS === "web" ? 67 + 16 : insets.top + 16;
   const bottomPadding = Platform.OS === "web" ? 34 + 24 : 24;
@@ -42,6 +61,29 @@ export default function RewardsScreen() {
       <Text style={[styles.pageTitle, { color: colors.foreground }]}>Rewards</Text>
 
       {userProfile && <PlanCard profile={userProfile} isFastDay={isFastDay} />}
+
+      <Pressable
+        onPress={openChangePlan}
+        style={({ pressed }) => [
+          styles.changePlanBtn,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.primary + "55",
+            opacity: pressed ? 0.7 : 1,
+          },
+        ]}
+      >
+        <View style={[styles.changePlanIcon, { backgroundColor: colors.primary + "22" }]}>
+          <Feather name="refresh-cw" size={16} color={colors.primary} />
+        </View>
+        <View style={styles.changePlanText}>
+          <Text style={[styles.changePlanTitle, { color: colors.foreground }]}>Change Plan</Text>
+          <Text style={[styles.changePlanSub, { color: colors.mutedForeground }]}>
+            Retake onboarding to rebuild your fasting plan
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
+      </Pressable>
 
       <View style={[styles.progressCard, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "30" }]}>
         <View style={styles.progressHeader}>
@@ -87,6 +129,13 @@ export default function RewardsScreen() {
           Every fast day completed brings you closer to the next badge. Stay consistent!
         </Text>
       </View>
+      <OnboardingQuestionnaire
+        visible={planEditorOpen}
+        onComplete={async (answers) => {
+          await completeOnboarding(answers);
+          setPlanEditorOpen(false);
+        }}
+      />
     </ScrollView>
   );
 }
@@ -156,5 +205,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_400Regular",
     lineHeight: 21,
+  },
+  changePlanBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  changePlanIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  changePlanText: {
+    flex: 1,
+    gap: 2,
+  },
+  changePlanTitle: {
+    fontSize: 15,
+    fontFamily: "Inter_700Bold",
+  },
+  changePlanSub: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
   },
 });
