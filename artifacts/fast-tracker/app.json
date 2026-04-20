@@ -14,9 +14,22 @@
       "backgroundColor": "#1a1a2e"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "AltFast uses your camera to scan meals and food barcodes so it can log calories and macros for you.",
+        "NSPhotoLibraryUsageDescription": "AltFast needs access to your photo library so you can pick an existing meal photo to log calories.",
+        "NSMotionUsageDescription": "AltFast reads motion data to estimate your steps and active energy on Eat and Fast days.",
+        "NSHealthShareUsageDescription": "AltFast reads your steps, distance and active energy from Apple Health to track activity automatically.",
+        "NSHealthUpdateUsageDescription": "AltFast can write workouts you log into Apple Health so all your activity stays in sync."
+      }
     },
-    "android": {},
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "ACTIVITY_RECOGNITION"
+      ]
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
@@ -28,7 +41,20 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "AltFast uses your camera to scan meals and barcodes.",
+          "photosPermission": "AltFast uses your photo library to pick a meal photo to log."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "AltFast uses your camera to scan barcodes on packaged foods."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
