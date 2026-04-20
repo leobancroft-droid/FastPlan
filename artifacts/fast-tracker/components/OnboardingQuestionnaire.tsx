@@ -447,6 +447,9 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                         ≈ {Math.abs(weeklyDisp).toFixed(2)} {unit}/wk to {direction}
                       </Text>
                     )}
+                    <Text style={[styles.calorieNote, { color: colors.mutedForeground }]}>
+                      Remember — you can exceed your calorie suggestion when fasting regularly! Especially alternate day fasting!
+                    </Text>
                   </View>
                 );
               })()}
@@ -641,6 +644,14 @@ const styles = StyleSheet.create({
   calorieSub: {
     fontSize: 12,
     fontFamily: "Inter_500Medium",
+  },
+  calorieNote: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 8,
+    lineHeight: 17,
   },
   logoWrap: {
     alignItems: "center",
