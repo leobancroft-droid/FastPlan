@@ -377,7 +377,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                   <Feather name="calendar" size={20} color={colors.primary} />
                 </View>
                 <Text style={[styles.questionText, { color: colors.foreground }]}>
-                  How long do you want to take to reach your goal?
+                  Time frame to reach your goal?
                 </Text>
               </View>
               <Text style={[styles.hintText, { color: colors.mutedForeground }]}>
