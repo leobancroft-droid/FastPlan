@@ -141,6 +141,9 @@ export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
 
   return (
     <View style={styles.container}>
+      <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+        Select your fast days
+      </Text>
       <View style={[styles.rangeBar, { backgroundColor: colors.muted }]}>
         {(["1M", "3M", "6M"] as Range[]).map((r) => (
           <Pressable
@@ -368,6 +371,13 @@ function ActionBtn({ icon, label, color, active, onPress }: { icon: string; labe
 
 const styles = StyleSheet.create({
   container: { gap: 16 },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: -0.3,
+    marginBottom: 10,
+    marginTop: 4,
+  },
   rangeBar: {
     flexDirection: "row",
     borderRadius: 14,
