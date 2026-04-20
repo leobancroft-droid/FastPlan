@@ -530,7 +530,7 @@ export function NutritionTracker({ burned }: Props) {
 
           <View style={styles.statBlock}>
             <Text style={[styles.statValue, { color: "#22c55e" }]}>{burned}</Text>
-            <Text style={[styles.statLabel, { color: "#22c55e" }]}>Burnt</Text>
+            <Text style={[styles.statLabel, { color: "#22c55e" }]}>Earnt</Text>
           </View>
         </View>
 
