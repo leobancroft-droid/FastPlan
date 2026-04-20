@@ -37,9 +37,9 @@ export default function HistoryScreen() {
           <Text style={[styles.statNum, { color: colors.eatPrimary }]}>{completedEats}</Text>
           <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Eat Days</Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: colors.streakGold + "18", borderColor: colors.streakGold + "30" }]}>
-          <Feather name="zap" size={20} color={colors.streakGold} />
-          <Text style={[styles.statNum, { color: colors.streakGold }]}>{longestStreak}</Text>
+        <View style={[styles.statCard, { backgroundColor: colors.success + "20", borderColor: colors.success + "40" }]}>
+          <Feather name="zap" size={20} color={colors.success} />
+          <Text style={[styles.statNum, { color: colors.success }]}>{longestStreak}</Text>
           <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Best</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: colors.destructive + "12", borderColor: colors.destructive + "25" }]}>
