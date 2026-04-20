@@ -39,7 +39,11 @@ function formatVal(v: number): string {
   return v.toFixed(1);
 }
 
-export function WeightTracker() {
+interface WeightTrackerProps {
+  onCalorieGoalChange?: (kcal: number) => void;
+}
+
+export function WeightTracker({ onCalorieGoalChange }: WeightTrackerProps = {}) {
   const colors = useColors();
   const { weightKg, weightGoalKg, weightUnit, weightTargetDate, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate } = useFasting();
   const [editorOpen, setEditorOpen] = useState(false);
@@ -183,6 +187,7 @@ export function WeightTracker() {
               const raw = maint - dailyDelta;
               const clamped = Math.max(1200, Math.min(4000, Math.round(raw / 10) * 10));
               await AsyncStorage.setItem("calorie_goal", String(clamped));
+              onCalorieGoalChange?.(clamped);
             }
           }
         }}

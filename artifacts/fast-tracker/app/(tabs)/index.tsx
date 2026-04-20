@@ -179,7 +179,7 @@ export default function HomeScreen() {
 
         <View style={styles.spacing} />
 
-        <WeightTracker />
+        <WeightTracker onCalorieGoalChange={() => setNutritionRefresh((n) => n + 1)} />
 
         {!isFastDay && (
           <>
