@@ -123,13 +123,6 @@ export default function HomeScreen() {
 
         <StreakCounter streak={streak} longestStreak={longestStreak} isFastDay={isFastDay} />
 
-        {userProfile && (
-          <>
-            <View style={styles.spacing} />
-            <PlanCard profile={userProfile} isFastDay={isFastDay} />
-          </>
-        )}
-
         <View style={styles.spacing} />
 
         <WaterTracker />

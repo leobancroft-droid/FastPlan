@@ -9,13 +9,15 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BadgeCard } from "@/components/BadgeCard";
+import { PlanCard } from "@/components/PlanCard";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
 export default function RewardsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { badges, streak } = useFasting();
+  const { badges, streak, today, userProfile } = useFasting();
+  const isFastDay = today?.type === "fast";
 
   const topPadding = Platform.OS === "web" ? 67 + 16 : insets.top + 16;
   const bottomPadding = Platform.OS === "web" ? 34 + 24 : 24;
@@ -38,6 +40,8 @@ export default function RewardsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={[styles.pageTitle, { color: colors.foreground }]}>Rewards</Text>
+
+      {userProfile && <PlanCard profile={userProfile} isFastDay={isFastDay} />}
 
       <View style={[styles.progressCard, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "30" }]}>
         <View style={styles.progressHeader}>
