@@ -593,7 +593,7 @@ export function NutritionTracker({ burned }: Props) {
         )}
         {underStreak.count > 0 && (
           <View style={styles.underRewardFloat} pointerEvents="none">
-            <Feather name="trending-down" size={12} color="#ec4899" />
+            <Feather name="trending-down" size={12} color="#ffb84d" />
             <Text style={styles.underRewardText}>Under × {underStreak.count}</Text>
           </View>
         )}
@@ -1615,15 +1615,15 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
-    backgroundColor: "#ec489922",
-    borderColor: "#ec489966",
+    backgroundColor: "#ffb84d22",
+    borderColor: "#ffb84d66",
     zIndex: 5,
   },
   underRewardText: {
     fontSize: 11,
     fontFamily: "Inter_700Bold",
     letterSpacing: 0.2,
-    color: "#ec4899",
+    color: "#ffb84d",
   },
   macroCol: { flex: 1, gap: 6, alignItems: "center" },
   macroLabel: { fontSize: 13, fontFamily: "Inter_500Medium" },
