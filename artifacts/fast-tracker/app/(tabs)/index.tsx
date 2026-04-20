@@ -203,7 +203,7 @@ export default function HomeScreen() {
         {startDate && (
           <>
             <View style={styles.spacing} />
-            <Text style={[styles.sectionTitle, { color: textColor }]}>Today's Plan</Text>
+            <Text style={[styles.sectionTitle, { color: textColor }]}>Fasting Plan</Text>
             <PlannedCalendar startDate={startDate} history={history} />
           </>
         )}
