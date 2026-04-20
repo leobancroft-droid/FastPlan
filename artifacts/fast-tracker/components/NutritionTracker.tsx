@@ -981,7 +981,7 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
             <>
               <View style={styles.modeRow}>
                 {([
-                  { key: "camera", label: "Camera", icon: "camera", color: "#ec4899", onPress: handleCameraScan },
+                  { key: "camera", label: "AI Scan", icon: "zap", color: "#ec4899", onPress: handleCameraScan },
                   { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444", onPress: () => setBarcodeOpen(true) },
                 ] as const).map((m) => (
                   <Pressable
