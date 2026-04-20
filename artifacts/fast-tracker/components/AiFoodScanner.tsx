@@ -75,6 +75,7 @@ export function AiFoodScanner({ onAdded }: Props) {
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [meal, setMeal] = useState<MealKey>(pickMealForNow());
   const [excluded, setExcluded] = useState<Set<number>>(new Set());
+  const [pickerActive, setPickerActive] = useState(false);
 
   function reset() {
     setImageUri(null);
@@ -102,14 +103,22 @@ export function AiFoodScanner({ onAdded }: Props) {
       Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
       return;
     }
-    const r = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      quality: 0.6,
-      base64: true,
-      allowsEditing: false,
-    });
-    if (!r.canceled && r.assets?.[0]) {
-      handleAssetSelected(r.assets[0]);
+    setPickerActive(true);
+    await new Promise((r) => setTimeout(r, 400));
+    try {
+      const r = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 0.6,
+        base64: true,
+        allowsEditing: false,
+      });
+      if (!r.canceled && r.assets?.[0]) {
+        handleAssetSelected(r.assets[0]);
+      }
+    } catch (err) {
+      Alert.alert("Camera unavailable", err instanceof Error ? err.message : "Could not open the camera.");
+    } finally {
+      setPickerActive(false);
     }
   }
 
@@ -119,14 +128,22 @@ export function AiFoodScanner({ onAdded }: Props) {
       Alert.alert("Photos permission needed", "Allow photo access to scan a meal.");
       return;
     }
-    const r = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 0.6,
-      base64: true,
-      allowsEditing: false,
-    });
-    if (!r.canceled && r.assets?.[0]) {
-      handleAssetSelected(r.assets[0]);
+    setPickerActive(true);
+    await new Promise((r) => setTimeout(r, 400));
+    try {
+      const r = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        quality: 0.6,
+        base64: true,
+        allowsEditing: false,
+      });
+      if (!r.canceled && r.assets?.[0]) {
+        handleAssetSelected(r.assets[0]);
+      }
+    } catch (err) {
+      Alert.alert("Library unavailable", err instanceof Error ? err.message : "Could not open your photo library.");
+    } finally {
+      setPickerActive(false);
     }
   }
 
@@ -269,7 +286,12 @@ export function AiFoodScanner({ onAdded }: Props) {
         <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
       </Pressable>
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
+      <Modal
+        visible={open && !pickerActive}
+        transparent
+        animationType="fade"
+        onRequestClose={handleClose}
+      >
         <Pressable style={styles.backdrop} onPress={handleClose}>
           <Pressable
             style={[styles.sheet, { backgroundColor: colors.card }]}
