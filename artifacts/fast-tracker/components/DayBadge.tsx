@@ -17,11 +17,13 @@ interface DayBadgeProps {
   type: DayType;
   large?: boolean;
   completed?: boolean;
+  skipped?: boolean;
 }
 
 const COMPLETE_MONSTER = require("@/assets/images/complete-monster.png");
+const SKIPPED_MONSTER = require("@/assets/images/skipped-monster.png");
 
-export function DayBadge({ type, large = false, completed = false }: DayBadgeProps) {
+export function DayBadge({ type, large = false, completed = false, skipped = false }: DayBadgeProps) {
   const colors = useColors();
   const isFast = type === "fast";
   const scale = useSharedValue(1);
@@ -48,7 +50,7 @@ export function DayBadge({ type, large = false, completed = false }: DayBadgePro
   return (
     <Animated.View style={[animStyle, styles.wrap]}>
       <Image
-        source={completed ? COMPLETE_MONSTER : isFast ? FAST_MONSTER : EAT_MONSTER}
+        source={skipped ? SKIPPED_MONSTER : completed ? COMPLETE_MONSTER : isFast ? FAST_MONSTER : EAT_MONSTER}
         style={{ width: imgSize, height: imgSize }}
         resizeMode="contain"
       />
