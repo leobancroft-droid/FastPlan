@@ -208,7 +208,7 @@ export default function ActivitiesScreen() {
       )}
 
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Calorie Burnt</Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>Earned</Text>
         {connected && (
           <Pressable onPress={() => setStepsEditOpen(true)} hitSlop={10}>
             <Text style={[styles.moreBtn, { color: colors.primary }]}>Edit</Text>
