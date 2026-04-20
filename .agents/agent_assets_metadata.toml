@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Jo3BbHCMQgwx7XMhLKBQ2"
+uri = "file://artifacts/fast-tracker/assets/images/icon.png"
+type = "image"
+title = "altfast app icon"

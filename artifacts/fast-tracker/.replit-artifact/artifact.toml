@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "AltFast - Alternate Day Fasting"
+version = "1.0.0"
+id = "artifacts/fast-tracker"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 23565
+
+[services.development]
+run = "pnpm --filter @workspace/fast-tracker run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fast-tracker", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/fast-tracker", "run", "serve" ]
+
+[services.env]
+PORT = "23565"
+BASE_PATH = "/"
