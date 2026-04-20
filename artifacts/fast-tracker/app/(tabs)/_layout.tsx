@@ -17,7 +17,7 @@ function NativeTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="activities">
         <Icon sf={{ default: "figure.walk", selected: "figure.walk" }} />
-        <Label>Health</Label>
+        <Label>Activity</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="history">
         <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
@@ -91,7 +91,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="activities"
         options={{
-          title: "Health",
+          title: "Activity",
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="figure.walk" tintColor={color} size={24} />
