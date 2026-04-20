@@ -31,7 +31,7 @@ export function EmotionTracker() {
           <View style={[styles.iconBubble, { backgroundColor: colors.primary + "22" }]}>
             <Feather name="heart" size={16} color={colors.primary} />
           </View>
-          <Text style={[styles.title, { color: colors.foreground }]}>Feelings Record</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>Feelings</Text>
         </View>
         <Pressable onPress={() => setMore(true)} hitSlop={10}>
           <Text style={[styles.moreBtn, { color: colors.primary }]}>More</Text>
