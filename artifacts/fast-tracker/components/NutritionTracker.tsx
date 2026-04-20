@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Svg, { Path, Circle } from "react-native-svg";
 import { useColors } from "@/hooks/useColors";
+import { AiFoodScanner } from "./AiFoodScanner";
 import { BarcodeScannerModal, type ScannedProduct } from "./BarcodeScannerModal";
 
 export type MealKey = "breakfast" | "lunch" | "dinner" | "snacks";
@@ -507,6 +508,13 @@ export function NutritionTracker({ burned }: Props) {
     await AsyncStorage.setItem("nutrition_log", JSON.stringify(next.slice(0, 1000)));
   }
 
+  async function reloadFoods() {
+    try {
+      const f = await AsyncStorage.getItem("nutrition_log");
+      if (f) setFoods(JSON.parse(f));
+    } catch {}
+  }
+
   async function persistGoal(v: number) {
     setGoal(v);
     await AsyncStorage.setItem("calorie_goal", String(v));
@@ -699,6 +707,7 @@ export function NutritionTracker({ burned }: Props) {
         onClose={() => setPickerMeal(null)}
         onAdd={handleAddFood}
         recentFoods={foods}
+        onAiAdded={reloadFoods}
       />
 
       <DetailsSheet
@@ -795,11 +804,12 @@ interface PickerProps {
   onClose: () => void;
   onAdd: (preset: FoodPreset, servings: number, meal: MealKey) => void;
   recentFoods: FoodEntry[];
+  onAiAdded?: () => void;
 }
 
 type SortMode = "frequent" | "recent" | "all";
 
-function FoodPicker({ meal, onClose, onAdd, recentFoods }: PickerProps) {
+function FoodPicker({ meal, onClose, onAdd, recentFoods, onAiAdded }: PickerProps) {
   const colors = useColors();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<FoodPreset | null>(null);
@@ -1130,6 +1140,8 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods }: PickerProps) {
             </View>
           ) : (
             <>
+              <AiFoodScanner onAdded={() => { onAiAdded?.(); onClose(); }} />
+
               <View
                 style={[
                   styles.searchWrap,
