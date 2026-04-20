@@ -18,7 +18,7 @@ const colors = {
     muted: "#f0eeff",
     mutedForeground: "#9090b0",
 
-    accent: "#ff9f43",
+    accent: "#ff6b9d",
     accentForeground: "#ffffff",
 
     destructive: "#ef4444",
@@ -32,12 +32,12 @@ const colors = {
     fastText: "#e8e5ff",
     fastMuted: "#6060a0",
     fastPrimary: "#a29bfe",
-    fastAccent: "#ff9f43",
+    fastAccent: "#ff6b9d",
 
-    eatBg: "#fffbf0",
+    eatBg: "#fff0f6",
     eatCard: "#ffffff",
     eatText: "#1a1a2e",
-    eatPrimary: "#ff9f43",
+    eatPrimary: "#ff6b9d",
     eatAccent: "#6c63ff",
 
     success: "#00b894",
@@ -68,7 +68,7 @@ const colors = {
     muted: "#1e1e3a",
     mutedForeground: "#6060a0",
 
-    accent: "#ff9f43",
+    accent: "#ff6b9d",
     accentForeground: "#0d0d1a",
 
     destructive: "#ff6b6b",
@@ -82,12 +82,12 @@ const colors = {
     fastText: "#e8e5ff",
     fastMuted: "#5050a0",
     fastPrimary: "#a29bfe",
-    fastAccent: "#ff9f43",
+    fastAccent: "#ff6b9d",
 
     eatBg: "#0d0d1a",
     eatCard: "#181830",
     eatText: "#e8e5ff",
-    eatPrimary: "#ff9f43",
+    eatPrimary: "#ff6b9d",
     eatAccent: "#a29bfe",
 
     success: "#00cec9",
