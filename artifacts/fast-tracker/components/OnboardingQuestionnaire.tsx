@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -10,6 +11,9 @@ import {
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useColors } from "@/hooks/useColors";
+
+const EAT_MONSTER = require("@/assets/images/eat-monster.png");
+const FAST_MONSTER = require("@/assets/images/fast-monster.png");
 
 export type OnboardingAnswers = Record<string, string | string[]>;
 
@@ -227,18 +231,24 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
           />
         </View>
 
+        <View style={styles.monsterRow}>
+          <Image source={EAT_MONSTER} style={styles.monster} resizeMode="contain" />
+          <Image source={FAST_MONSTER} style={styles.monster} resizeMode="contain" />
+        </View>
+
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <Animated.View key={question.id} entering={FadeIn.duration(220)} exiting={FadeOut.duration(120)}>
-            <View style={[styles.iconCircle, { backgroundColor: colors.primary + "15" }]}>
-              <Feather name={question.emoji as any} size={28} color={colors.primary} />
+            <View style={styles.questionHeader}>
+              <View style={[styles.iconCircle, { backgroundColor: colors.primary + "15" }]}>
+                <Feather name={question.emoji as any} size={20} color={colors.primary} />
+              </View>
+              <Text style={[styles.questionText, { color: colors.foreground }]}>
+                {question.title}
+              </Text>
             </View>
-
-            <Text style={[styles.questionText, { color: colors.foreground }]}>
-              {question.title}
-            </Text>
 
             {question.type === "multi" && (
               <Text style={[styles.hintText, { color: colors.mutedForeground }]}>
@@ -343,25 +353,43 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFill: { height: "100%", borderRadius: 2 },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 32,
-    paddingBottom: 24,
+  monsterRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 24,
+    paddingTop: 20,
+    paddingBottom: 8,
   },
-  iconCircle: {
+  monster: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+  },
+  questionHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 16,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginTop: 4,
   },
   questionText: {
-    fontSize: 26,
+    flex: 1,
+    fontSize: 24,
     fontFamily: "Inter_700Bold",
     letterSpacing: -0.5,
-    lineHeight: 34,
-    marginBottom: 8,
+    lineHeight: 32,
   },
   hintText: {
     fontSize: 13,
