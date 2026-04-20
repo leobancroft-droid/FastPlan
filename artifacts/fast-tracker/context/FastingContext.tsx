@@ -62,12 +62,15 @@ interface FastingContextType {
   badges: Badge[];
   startDate: string | null;
   fastQuote: string;
+  onboardingComplete: boolean;
+  onboardingAnswers: Record<string, string | string[]> | null;
   markComplete: () => Promise<void>;
   markSkipped: () => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
   setStartDateExplicit: (dateStr: string) => Promise<void>;
+  completeOnboarding: (answers: Record<string, string | string[]>) => Promise<void>;
 }
 
 const FastingContext = createContext<FastingContextType | null>(null);
@@ -94,6 +97,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [history, setHistory] = useState<DayRecord[]>([]);
   const [badges, setBadges] = useState<Badge[]>(BADGES);
   const [startDate, setStartDate] = useState<string | null>(null);
+  const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [onboardingAnswers, setOnboardingAnswers] = useState<Record<string, string | string[]> | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   const fastQuote = React.useMemo(() => {
@@ -107,17 +112,30 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
+        AsyncStorage.getItem("onboarding_complete"),
+        AsyncStorage.getItem("onboarding_answers"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
       setStartDate(startRaw ?? null);
+      setOnboardingComplete(onboardRaw === "true");
+      setOnboardingAnswers(answersRaw ? JSON.parse(answersRaw) : null);
     } catch {}
     setLoaded(true);
   }
+
+  const completeOnboarding = useCallback(async (answers: Record<string, string | string[]>) => {
+    setOnboardingAnswers(answers);
+    setOnboardingComplete(true);
+    await Promise.all([
+      AsyncStorage.setItem("onboarding_answers", JSON.stringify(answers)),
+      AsyncStorage.setItem("onboarding_complete", "true"),
+    ]);
+  }, []);
 
   const getTypeForDate = useCallback((dateStr: string): DayType => {
     if (!startDate) return "eat";
@@ -219,16 +237,20 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("fasting_history"),
       AsyncStorage.removeItem("fasting_badges"),
       AsyncStorage.removeItem("fasting_start"),
+      AsyncStorage.removeItem("onboarding_complete"),
+      AsyncStorage.removeItem("onboarding_answers"),
     ]);
     setHistory([]);
     setBadges(BADGES);
     setStartDate(null);
+    setOnboardingComplete(false);
+    setOnboardingAnswers(null);
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

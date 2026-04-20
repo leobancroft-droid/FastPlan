@@ -18,6 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DayBadge } from "@/components/DayBadge";
+import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
 import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
@@ -27,13 +28,14 @@ import { useColors } from "@/hooks/useColors";
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit } = useFasting();
+  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding } = useFasting();
   const [loading, setLoading] = useState(false);
 
   const btnScale = useSharedValue(1);
   const checkScale = useSharedValue(0);
 
-  const showPicker = !startDate;
+  const showOnboarding = !onboardingComplete;
+  const showPicker = onboardingComplete && !startDate;
 
   const isFastDay = today?.type === "fast";
   const isCompleted = today?.status === "completed";
@@ -85,6 +87,10 @@ export default function HomeScreen() {
 
   return (
     <>
+      <OnboardingQuestionnaire
+        visible={showOnboarding}
+        onComplete={(answers) => completeOnboarding(answers)}
+      />
       <StartDatePicker
         visible={showPicker}
         onConfirm={(dateStr) => setStartDateExplicit(dateStr)}
