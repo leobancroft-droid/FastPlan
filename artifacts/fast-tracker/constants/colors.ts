@@ -41,11 +41,11 @@ const colors = {
     eatAccent: "#6c63ff",
 
     success: "#00b894",
-    warning: "#ffffff",
+    warning: "#1a1a2e",
     info: "#74b9ff",
 
-    streakGold: "#ffffff",
-    streakSilver: "#b2bec3",
+    streakGold: "#1a1a2e",
+    streakSilver: "#636e72",
     streakBronze: "#e17055",
   },
 
