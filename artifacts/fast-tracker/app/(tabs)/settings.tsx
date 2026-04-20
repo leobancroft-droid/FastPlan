@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Platform,
@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StartDatePicker } from "@/components/StartDatePicker";
 import { useFasting } from "@/context/FastingContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useColors } from "@/hooks/useColors";
@@ -19,8 +20,9 @@ type ThemeMode = "system" | "light" | "dark";
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { startDate, streak, longestStreak, history, resetAll } = useFasting();
+  const { startDate, streak, longestStreak, history, resetAll, setStartDateExplicit } = useFasting();
   const { themeMode, setThemeMode } = useTheme();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const topPadding = Platform.OS === "web" ? 67 + 16 : insets.top + 16;
   const bottomPadding = Platform.OS === "web" ? 34 + 24 : 24;
@@ -45,6 +47,14 @@ export default function SettingsScreen() {
   ];
 
   return (
+    <>
+      <StartDatePicker
+        visible={showDatePicker}
+        onConfirm={(dateStr) => {
+          setStartDateExplicit(dateStr);
+          setShowDatePicker(false);
+        }}
+      />
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={[
@@ -139,6 +149,14 @@ export default function SettingsScreen() {
       </View>
 
       <Pressable
+        style={[styles.changeStartBtn, { borderColor: colors.primary + "50", backgroundColor: colors.primary + "10" }]}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Feather name="calendar" size={18} color={colors.primary} />
+        <Text style={[styles.changeStartText, { color: colors.primary }]}>Change Start Date</Text>
+      </Pressable>
+
+      <Pressable
         style={[styles.resetBtn, { borderColor: colors.destructive + "50" }]}
         onPress={handleReset}
       >
@@ -146,6 +164,7 @@ export default function SettingsScreen() {
         <Text style={[styles.resetText, { color: colors.destructive }]}>Reset All Data</Text>
       </Pressable>
     </ScrollView>
+    </>
   );
 }
 
@@ -237,6 +256,16 @@ const styles = StyleSheet.create({
   infoText: { flex: 1 },
   infoTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
   infoDesc: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 19 },
+  changeStartBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    paddingVertical: 16,
+  },
+  changeStartText: { fontSize: 16, fontFamily: "Inter_600SemiBold" },
   resetBtn: {
     flexDirection: "row",
     alignItems: "center",

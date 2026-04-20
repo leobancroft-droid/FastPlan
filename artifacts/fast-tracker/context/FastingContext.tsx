@@ -66,23 +66,28 @@ interface FastingContextType {
   markSkipped: () => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
+  getTypeForDate: (dateStr: string) => DayType;
+  setStartDateExplicit: (dateStr: string) => Promise<void>;
 }
 
 const FastingContext = createContext<FastingContextType | null>(null);
 
-function getDateStr(date: Date): string {
+export function getDateStr(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-function getTodayStr(): string {
+export function getTodayStr(): string {
   return getDateStr(new Date());
 }
 
+export function getDiffDays(startDate: string, targetDate: string): number {
+  const start = new Date(startDate + "T00:00:00");
+  const target = new Date(targetDate + "T00:00:00");
+  return Math.round((target.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function getDaysSince(startDate: string): number {
-  const start = new Date(startDate);
-  const now = new Date();
-  const diff = now.getTime() - start.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  return getDiffDays(startDate, getTodayStr());
 }
 
 export function FastingProvider({ children }: { children: React.ReactNode }) {
@@ -107,60 +112,47 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
       ]);
-
-      const hist: DayRecord[] = histRaw ? JSON.parse(histRaw) : [];
-      const bdgs: Badge[] = badgeRaw ? JSON.parse(badgeRaw) : BADGES;
-      const start: string | null = startRaw ?? null;
-
-      setHistory(hist);
-      setBadges(bdgs);
-      setStartDate(start);
+      setHistory(histRaw ? JSON.parse(histRaw) : []);
+      setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
+      setStartDate(startRaw ?? null);
     } catch {}
     setLoaded(true);
   }
 
-  const getTodayType = useCallback((): DayType => {
+  const getTypeForDate = useCallback((dateStr: string): DayType => {
     if (!startDate) return "eat";
-    const days = getDaysSince(startDate);
-    return days % 2 === 0 ? "eat" : "fast";
+    const diff = getDiffDays(startDate, dateStr);
+    if (diff < 0) return "eat";
+    return diff % 2 === 0 ? "eat" : "fast";
   }, [startDate]);
+
+  const getTodayType = useCallback((): DayType => {
+    return getTypeForDate(getTodayStr());
+  }, [getTypeForDate]);
 
   const today = React.useMemo((): DayRecord | null => {
     if (!loaded) return null;
     const todayStr = getTodayStr();
     const existing = history.find((d) => d.date === todayStr);
     if (existing) return existing;
-
-    if (!startDate) {
-      return { date: todayStr, type: "eat", status: "pending" };
-    }
-    return { date: todayStr, type: getTodayType(), status: "pending" };
+    return { date: todayStr, type: startDate ? getTodayType() : "eat", status: "pending" };
   }, [history, startDate, loaded, getTodayType]);
 
   const streak = React.useMemo((): number => {
     const completed = history
       .filter((d) => d.status === "completed")
       .sort((a, b) => b.date.localeCompare(a.date));
-
     if (completed.length === 0) return 0;
-
     let count = 0;
     const todayStr = getTodayStr();
-
     for (let i = 0; i < completed.length; i++) {
       const d = completed[i];
       if (i === 0) {
-        const diff = Math.abs(
-          (new Date(todayStr).getTime() - new Date(d.date).getTime()) /
-            (1000 * 60 * 60 * 24)
-        );
+        const diff = Math.abs((new Date(todayStr).getTime() - new Date(d.date).getTime()) / (1000 * 60 * 60 * 24));
         if (diff > 2) break;
       } else {
         const prev = completed[i - 1];
-        const diff = Math.abs(
-          (new Date(prev.date).getTime() - new Date(d.date).getTime()) /
-            (1000 * 60 * 60 * 24)
-        );
+        const diff = Math.abs((new Date(prev.date).getTime() - new Date(d.date).getTime()) / (1000 * 60 * 60 * 24));
         if (diff > 2) break;
       }
       count++;
@@ -172,82 +164,52 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     const completed = history
       .filter((d) => d.status === "completed")
       .sort((a, b) => a.date.localeCompare(b.date));
-
     if (completed.length === 0) return 0;
-
     let maxStreak = 1;
     let curStreak = 1;
-
     for (let i = 1; i < completed.length; i++) {
-      const prev = completed[i - 1];
-      const cur = completed[i];
-      const diff = Math.abs(
-        (new Date(cur.date).getTime() - new Date(prev.date).getTime()) /
-          (1000 * 60 * 60 * 24)
-      );
-      if (diff <= 2) {
-        curStreak++;
-        maxStreak = Math.max(maxStreak, curStreak);
-      } else {
-        curStreak = 1;
-      }
+      const diff = Math.abs((new Date(completed[i].date).getTime() - new Date(completed[i - 1].date).getTime()) / (1000 * 60 * 60 * 24));
+      if (diff <= 2) { curStreak++; maxStreak = Math.max(maxStreak, curStreak); }
+      else curStreak = 1;
     }
     return maxStreak;
   }, [history]);
 
   async function checkAndUnlockBadges(currentStreak: number) {
-    const updatedBadges = badges.map((b) => {
-      if (!b.unlocked && currentStreak >= b.requiredStreak) {
-        return { ...b, unlocked: true, unlockedAt: new Date().toISOString() };
-      }
-      return b;
-    });
-    setBadges(updatedBadges);
-    await AsyncStorage.setItem("fasting_badges", JSON.stringify(updatedBadges));
+    const updated = badges.map((b) =>
+      !b.unlocked && currentStreak >= b.requiredStreak
+        ? { ...b, unlocked: true, unlockedAt: new Date().toISOString() }
+        : b
+    );
+    setBadges(updated);
+    await AsyncStorage.setItem("fasting_badges", JSON.stringify(updated));
   }
+
+  const setStartDateExplicit = useCallback(async (dateStr: string) => {
+    setStartDate(dateStr);
+    await AsyncStorage.setItem("fasting_start", dateStr);
+  }, []);
 
   const markComplete = useCallback(async () => {
     const todayStr = getTodayStr();
     let newStart = startDate;
-
     if (!startDate) {
       newStart = todayStr;
       setStartDate(newStart);
       await AsyncStorage.setItem("fasting_start", newStart);
     }
-
-    const type = newStart ? (getDaysSince(newStart) % 2 === 0 ? "eat" : "fast") : "eat";
-
-    const record: DayRecord = {
-      date: todayStr,
-      type,
-      status: "completed",
-      completedAt: new Date().toISOString(),
-    };
-
-    const newHistory = [...history.filter((d) => d.date !== todayStr), record];
-    newHistory.sort((a, b) => b.date.localeCompare(a.date));
-
+    const type = newStart ? (getDiffDays(newStart, todayStr) % 2 === 0 ? "eat" : "fast") : "eat";
+    const record: DayRecord = { date: todayStr, type, status: "completed", completedAt: new Date().toISOString() };
+    const newHistory = [...history.filter((d) => d.date !== todayStr), record].sort((a, b) => b.date.localeCompare(a.date));
     setHistory(newHistory);
     await AsyncStorage.setItem("fasting_history", JSON.stringify(newHistory));
-
-    const newStreak = streak + 1;
-    await checkAndUnlockBadges(newStreak);
+    await checkAndUnlockBadges(streak + 1);
   }, [history, startDate, streak, badges]);
 
   const markSkipped = useCallback(async () => {
     const todayStr = getTodayStr();
-    const type = getTodayType();
-
-    const record: DayRecord = {
-      date: todayStr,
-      type,
-      status: "skipped",
-    };
-
-    const newHistory = [...history.filter((d) => d.date !== todayStr), record];
-    newHistory.sort((a, b) => b.date.localeCompare(a.date));
-
+    const record: DayRecord = { date: todayStr, type: getTodayType(), status: "skipped" };
+    const newHistory = [...history.filter((d) => d.date !== todayStr), record].sort((a, b) => b.date.localeCompare(a.date));
     setHistory(newHistory);
     await AsyncStorage.setItem("fasting_history", JSON.stringify(newHistory));
   }, [history, getTodayType]);
@@ -266,21 +228,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider
-      value={{
-        today,
-        history,
-        streak,
-        longestStreak,
-        badges,
-        startDate,
-        fastQuote,
-        markComplete,
-        markSkipped,
-        resetAll,
-        getTodayType,
-      }}
-    >
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit }}>
       {children}
     </FastingContext.Provider>
   );
