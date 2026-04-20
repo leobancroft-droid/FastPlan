@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Alert,
   Platform,
@@ -19,6 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DayBadge } from "@/components/DayBadge";
+import { NutritionTracker } from "@/components/NutritionTracker";
 import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
 import { PlanReadyIntro } from "@/components/PlanReadyIntro";
 import { StartDatePicker } from "@/components/StartDatePicker";
@@ -35,6 +37,36 @@ export default function HomeScreen() {
   const { today, streak, longestStreak, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate } = useFasting();
   const scrollRef = useRef<ScrollView>(null);
   const [loading, setLoading] = useState(false);
+  const [burned, setBurned] = useState(0);
+  const [nutritionRefresh, setNutritionRefresh] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const [s, sDate, a] = await Promise.all([
+            AsyncStorage.getItem("steps_today"),
+            AsyncStorage.getItem("steps_date"),
+            AsyncStorage.getItem("activities_log"),
+          ]);
+          if (cancelled) return;
+          const d = new Date();
+          const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+          const steps = s && sDate === today ? Number(s) || 0 : 0;
+          const stepKcal = Math.round(steps * 0.04);
+          const acts: { kcal: number; date: string }[] = a ? JSON.parse(a) : [];
+          const actKcal = acts
+            .filter((x) => x.date === today)
+            .reduce((sum, x) => sum + (x.kcal || 0), 0);
+          setBurned(stepKcal + actKcal);
+        } catch {}
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [nutritionRefresh])
+  );
 
   const btnScale = useSharedValue(1);
   const checkScale = useSharedValue(0);
@@ -223,7 +255,7 @@ export default function HomeScreen() {
 
         <View style={styles.spacing} />
 
-        <WeightTracker onCalorieGoalChange={() => {}} />
+        <WeightTracker onCalorieGoalChange={() => setNutritionRefresh((n) => n + 1)} />
 
         {!isFastDay && (
           <>
@@ -236,6 +268,15 @@ export default function HomeScreen() {
             </View>
           </>
         )}
+
+        <View style={styles.spacing} />
+
+        <Text style={[styles.sectionTitle, { color: textColor }]}>Summary</Text>
+
+        <NutritionTracker
+          key={nutritionRefresh}
+          burned={burned}
+        />
 
         <View style={styles.spacing} />
 
