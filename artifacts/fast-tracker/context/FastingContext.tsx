@@ -71,6 +71,7 @@ interface FastingContextType {
   markPlanIntroSeen: () => Promise<void>;
   markComplete: () => Promise<void>;
   markSkipped: () => Promise<void>;
+  setDayStatus: (dateStr: string, status: DayStatus | "clear") => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
@@ -239,6 +240,26 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     await checkAndUnlockBadges(streak + 1);
   }, [history, startDate, streak, badges]);
 
+  const setDayStatus = useCallback(async (dateStr: string, status: DayStatus | "clear") => {
+    const filtered = history.filter((d) => d.date !== dateStr);
+    let newHistory: DayRecord[];
+    if (status === "clear" || status === "pending") {
+      newHistory = filtered;
+    } else {
+      const type: DayType = startDate ? (getDiffDays(startDate, dateStr) % 2 === 0 ? "eat" : "fast") : "eat";
+      const record: DayRecord = {
+        date: dateStr,
+        type,
+        status,
+        completedAt: status === "completed" ? new Date().toISOString() : undefined,
+      };
+      newHistory = [...filtered, record];
+    }
+    newHistory.sort((a, b) => b.date.localeCompare(a.date));
+    setHistory(newHistory);
+    await AsyncStorage.setItem("fasting_history", JSON.stringify(newHistory));
+  }, [history, startDate]);
+
   const markSkipped = useCallback(async () => {
     const todayStr = getTodayStr();
     const record: DayRecord = { date: todayStr, type: getTodayType(), status: "skipped" };
@@ -267,7 +288,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );
