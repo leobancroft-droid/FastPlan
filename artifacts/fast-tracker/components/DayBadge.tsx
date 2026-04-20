@@ -16,9 +16,12 @@ const FAST_MONSTER = require("@/assets/images/fast-monster.png");
 interface DayBadgeProps {
   type: DayType;
   large?: boolean;
+  completed?: boolean;
 }
 
-export function DayBadge({ type, large = false }: DayBadgeProps) {
+const COMPLETE_MONSTER = require("@/assets/images/complete-monster.png");
+
+export function DayBadge({ type, large = false, completed = false }: DayBadgeProps) {
   const colors = useColors();
   const isFast = type === "fast";
   const scale = useSharedValue(1);
@@ -45,7 +48,7 @@ export function DayBadge({ type, large = false }: DayBadgeProps) {
   return (
     <Animated.View style={[animStyle, styles.wrap]}>
       <Image
-        source={isFast ? FAST_MONSTER : EAT_MONSTER}
+        source={completed ? COMPLETE_MONSTER : isFast ? FAST_MONSTER : EAT_MONSTER}
         style={{ width: imgSize, height: imgSize }}
         resizeMode="contain"
       />

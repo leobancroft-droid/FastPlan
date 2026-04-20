@@ -157,9 +157,9 @@ export default function HomeScreen() {
         <Text style={[styles.dateLabel, { color: mutedColor }]}>{todayLabel}</Text>
 
         <View style={styles.hero}>
-          <DayBadge type={today?.type ?? "eat"} large />
+          <DayBadge type={today?.type ?? "eat"} large completed={isCompleted} />
           <Text style={[styles.dayTitle, { color: textColor }]}>
-            {isFastDay ? "Fast Day" : "Eat Day"}
+            {isCompleted ? "Day Complete" : isFastDay ? "Fast Day" : "Eat Day"}
           </Text>
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
             {getDaySubtitle(isFastDay, userProfile?.tone)}
