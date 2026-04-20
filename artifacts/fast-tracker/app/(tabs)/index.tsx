@@ -129,11 +129,11 @@ export default function HomeScreen() {
 
         <View style={styles.spacing} />
 
-        <WeightTracker />
+        <EmotionTracker />
 
         <View style={styles.spacing} />
 
-        <EmotionTracker />
+        <WeightTracker />
 
         {!isFastDay && (
           <>
