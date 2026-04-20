@@ -170,9 +170,9 @@ export function AiFoodScanner({ onAdded }: Props) {
     try {
       const manipulated = await ImageManipulator.manipulateAsync(
         asset.uri,
-        [{ resize: { width: 1024 } }],
+        [{ resize: { width: 768 } }],
         {
-          compress: 0.7,
+          compress: 0.6,
           format: ImageManipulator.SaveFormat.JPEG,
           base64: true,
         }
@@ -196,26 +196,43 @@ export function AiFoodScanner({ onAdded }: Props) {
 
   async function runScan(base64: string, mimeType: string) {
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
     try {
       const res = await fetch(`${getApiBase()}/scan-food`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageBase64: base64, mimeType }),
+        signal: controller.signal,
       });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(text || `HTTP ${res.status}`);
+      let data: ScanResponse | { error?: string } | null = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
       }
-      const data = (await res.json()) as ScanResponse;
-      setResult(data);
-      if (Platform.OS !== "web") {
+      if (!res.ok) {
+        const errMsg =
+          (data && typeof data === "object" && "error" in data && data.error) ||
+          `Server error (${res.status})`;
+        throw new Error(String(errMsg));
+      }
+      const ok = (data && "items" in data ? data : { items: [], note: "" }) as ScanResponse;
+      setResult(ok);
+      if (Platform.OS !== "web" && ok.items.length > 0) {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Could not analyze the photo.";
-      Alert.alert("Scan failed", msg.length > 200 ? msg.slice(0, 200) + "…" : msg);
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      const msg = isAbort
+        ? "The scan timed out. Please try again with a clearer photo."
+        : err instanceof Error
+          ? err.message
+          : "Could not analyze the photo.";
+      Alert.alert("Scan failed", msg.length > 220 ? msg.slice(0, 220) + "…" : msg);
       setResult(null);
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }

@@ -43,8 +43,8 @@ router.post("/scan-food", async (req: Request, res: Response) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      max_completion_tokens: 2048,
+      model: "gpt-5-mini",
+      max_completion_tokens: 8000,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
@@ -58,12 +58,22 @@ router.post("/scan-food", async (req: Request, res: Response) => {
       ],
     });
 
-    const raw = response.choices[0]?.message?.content ?? "{}";
+    const raw = response.choices[0]?.message?.content ?? "";
+    const finish = response.choices[0]?.finish_reason;
+    if (!raw.trim()) {
+      logger.warn({ finish, usage: response.usage }, "scan-food: empty model response");
+      return res.status(502).json({
+        error:
+          finish === "length"
+            ? "The model ran out of tokens before answering. Try a simpler photo."
+            : "The AI returned an empty response. Please try again.",
+      });
+    }
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      logger.warn({ raw }, "scan-food: model returned invalid JSON");
+      logger.warn({ raw: raw.slice(0, 500) }, "scan-food: model returned invalid JSON");
       return res.status(502).json({ error: "Could not parse AI response" });
     }
 
@@ -94,8 +104,9 @@ router.post("/scan-food", async (req: Request, res: Response) => {
     const note = typeof obj.note === "string" ? obj.note.slice(0, 240) : "";
     return res.json({ items, note });
   } catch (err) {
-    logger.error({ err }, "scan-food failed");
-    return res.status(500).json({ error: "Scan failed. Please try again." });
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.error({ err: msg }, "scan-food failed");
+    return res.status(500).json({ error: `Scan failed: ${msg.slice(0, 180)}` });
   }
 });
 
