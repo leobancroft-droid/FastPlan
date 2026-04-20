@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NutritionTracker } from "@/components/NutritionTracker";
+import { AiFoodScanner } from "@/components/AiFoodScanner";
 import { useColors } from "@/hooks/useColors";
 
 interface Activity {
@@ -74,6 +75,7 @@ export default function ActivitiesScreen() {
   const [loaded, setLoaded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [stepsEditOpen, setStepsEditOpen] = useState(false);
+  const [nutritionRefresh, setNutritionRefresh] = useState(0);
 
   const todayStr = getTodayStr();
 
@@ -298,7 +300,12 @@ export default function ActivitiesScreen() {
             ))}
           </ScrollView>
 
-          <NutritionTracker burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)} />
+          <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
+
+          <NutritionTracker
+            key={nutritionRefresh}
+            burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
+          />
 
           <Pressable
             onPress={() => {
