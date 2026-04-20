@@ -85,6 +85,39 @@ export interface DayRecord {
   completedAt?: string;
 }
 
+export type FastStatus = "scheduled" | "active" | "completed" | "broken" | "skipped";
+export type FastPresetKey = "16:8" | "18:6" | "20:4" | "24" | "36" | "48" | "72" | "custom";
+
+export interface ScheduledFast {
+  id: string;
+  presetKey: FastPresetKey;
+  presetLabel: string;
+  plannedStart: string;
+  plannedEnd: string;
+  status: FastStatus;
+  actualStart?: string;
+  actualEnd?: string;
+  notes?: string;
+}
+
+export interface FastPreset {
+  key: FastPresetKey;
+  label: string;
+  hours: number;
+  description: string;
+  category: "beginner" | "intermediate" | "extended";
+}
+
+export const FAST_PRESETS: FastPreset[] = [
+  { key: "16:8", label: "16:8", hours: 16, description: "16 hour fast, 8 hour eating window", category: "beginner" },
+  { key: "18:6", label: "18:6", hours: 18, description: "18 hour fast, 6 hour eating window", category: "beginner" },
+  { key: "20:4", label: "20:4 Warrior", hours: 20, description: "20 hour fast, 4 hour eating window", category: "intermediate" },
+  { key: "24", label: "24h OMAD", hours: 24, description: "One meal a day", category: "intermediate" },
+  { key: "36", label: "36 hour", hours: 36, description: "Day-long extended fast", category: "extended" },
+  { key: "48", label: "48 hour", hours: 48, description: "Two-day extended fast", category: "extended" },
+  { key: "72", label: "72 hour", hours: 72, description: "Three-day extended fast", category: "extended" },
+];
+
 export interface Badge {
   id: string;
   name: string;
@@ -123,6 +156,16 @@ const FAST_QUOTES = [
 ];
 
 interface FastingContextType {
+  scheduledFasts: ScheduledFast[];
+  activeFast: ScheduledFast | null;
+  nextUpcomingFast: ScheduledFast | null;
+  scheduleFast: (presetKey: FastPresetKey, presetLabel: string, plannedStart: Date, hours: number) => Promise<ScheduledFast>;
+  startFastNow: (presetKey: FastPresetKey, presetLabel: string, hours: number) => Promise<ScheduledFast>;
+  startScheduledFast: (id: string) => Promise<void>;
+  endActiveFast: (broken?: boolean) => Promise<void>;
+  cancelFast: (id: string) => Promise<void>;
+  updateFast: (id: string, patch: Partial<ScheduledFast>) => Promise<void>;
+  fastsCompleted: number;
   today: DayRecord | null;
   history: DayRecord[];
   streak: number;
@@ -201,7 +244,14 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [emotionLog, setEmotionLog] = useState<EmotionEntry[]>([]);
   const [customEmotions, setCustomEmotions] = useState<EmotionPreset[]>([]);
   const [dayOverrides, setDayOverrides] = useState<Record<string, DayType>>({});
+  const [scheduledFasts, setScheduledFasts] = useState<ScheduledFast[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
   const glassSize = 250;
 
   const userProfile = useMemo(() => derivePersonalProfile(onboardingAnswers), [onboardingAnswers]);
@@ -256,9 +306,115 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       if (emoLogRaw) setEmotionLog(JSON.parse(emoLogRaw));
       if (emoCustomRaw) setCustomEmotions(JSON.parse(emoCustomRaw));
       if (overridesRaw) setDayOverrides(JSON.parse(overridesRaw));
+      const fastsRaw = await AsyncStorage.getItem("scheduled_fasts");
+      if (fastsRaw) {
+        try {
+          setScheduledFasts(JSON.parse(fastsRaw));
+        } catch {}
+      }
     } catch {}
     setLoaded(true);
   }
+
+  const persistScheduledFasts = useCallback(async (next: ScheduledFast[]) => {
+    setScheduledFasts(next);
+    await AsyncStorage.setItem("scheduled_fasts", JSON.stringify(next));
+  }, []);
+
+  const activeFast = useMemo(() => {
+    return scheduledFasts.find((f) => f.status === "active") ?? null;
+  }, [scheduledFasts]);
+
+  const nextUpcomingFast = useMemo(() => {
+    const upcoming = scheduledFasts
+      .filter((f) => f.status === "scheduled")
+      .sort((a, b) => new Date(a.plannedStart).getTime() - new Date(b.plannedStart).getTime());
+    return upcoming[0] ?? null;
+  }, [scheduledFasts]);
+
+  const fastsCompleted = useMemo(() => {
+    return scheduledFasts.filter((f) => f.status === "completed").length;
+  }, [scheduledFasts]);
+
+  const scheduleFast = useCallback(async (presetKey: FastPresetKey, presetLabel: string, plannedStart: Date, hours: number) => {
+    const fast: ScheduledFast = {
+      id: `f-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      presetKey,
+      presetLabel,
+      plannedStart: plannedStart.toISOString(),
+      plannedEnd: new Date(plannedStart.getTime() + hours * 60 * 60 * 1000).toISOString(),
+      status: "scheduled",
+    };
+    await persistScheduledFasts([...scheduledFasts, fast]);
+    return fast;
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  const startFastNow = useCallback(async (presetKey: FastPresetKey, presetLabel: string, hours: number) => {
+    const startIso = new Date().toISOString();
+    const endIso = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+    const ended = scheduledFasts.map((f) =>
+      f.status === "active" ? { ...f, status: "broken" as FastStatus, actualEnd: startIso } : f
+    );
+    const fast: ScheduledFast = {
+      id: `f-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      presetKey,
+      presetLabel,
+      plannedStart: startIso,
+      plannedEnd: endIso,
+      status: "active",
+      actualStart: startIso,
+    };
+    await persistScheduledFasts([...ended, fast]);
+    return fast;
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  const startScheduledFast = useCallback(async (id: string) => {
+    const startIso = new Date().toISOString();
+    const next = scheduledFasts.map((f) => {
+      if (f.id === id) return { ...f, status: "active" as FastStatus, actualStart: startIso };
+      if (f.status === "active") return { ...f, status: "broken" as FastStatus, actualEnd: startIso };
+      return f;
+    });
+    await persistScheduledFasts(next);
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  const endActiveFast = useCallback(async (broken: boolean = false) => {
+    const endIso = new Date().toISOString();
+    const next = scheduledFasts.map((f) =>
+      f.status === "active"
+        ? {
+            ...f,
+            status: (broken ? "broken" : "completed") as FastStatus,
+            actualEnd: endIso,
+          }
+        : f
+    );
+    await persistScheduledFasts(next);
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  const cancelFast = useCallback(async (id: string) => {
+    const next = scheduledFasts.filter((f) => f.id !== id);
+    await persistScheduledFasts(next);
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  const updateFast = useCallback(async (id: string, patch: Partial<ScheduledFast>) => {
+    const next = scheduledFasts.map((f) => (f.id === id ? { ...f, ...patch } : f));
+    await persistScheduledFasts(next);
+  }, [scheduledFasts, persistScheduledFasts]);
+
+  // Auto-mark missed scheduled fasts as skipped if their plannedEnd is in the past
+  useEffect(() => {
+    if (!loaded) return;
+    const stale = scheduledFasts.filter(
+      (f) => f.status === "scheduled" && new Date(f.plannedEnd).getTime() < now - 60 * 60 * 1000
+    );
+    if (stale.length > 0) {
+      const next = scheduledFasts.map((f) =>
+        stale.find((s) => s.id === f.id) ? { ...f, status: "skipped" as FastStatus } : f
+      );
+      persistScheduledFasts(next);
+    }
+  }, [now, loaded, scheduledFasts, persistScheduledFasts]);
 
   const completeOnboarding = useCallback(async (answers: Record<string, string | string[]>) => {
     setOnboardingAnswers(answers);
@@ -519,7 +675,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("emotion_log"),
       AsyncStorage.removeItem("emotion_custom"),
       AsyncStorage.removeItem("day_overrides"),
+      AsyncStorage.removeItem("scheduled_fasts"),
     ]);
+    setScheduledFasts([]);
     setHistory([]);
     setBadges(BADGES);
     setStartDate(null);
@@ -539,7 +697,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, dayOverrides, toggleDayType, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ scheduledFasts, activeFast, nextUpcomingFast, scheduleFast, startFastNow, startScheduledFast, endActiveFast, cancelFast, updateFast, fastsCompleted, today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, dayOverrides, toggleDayType, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

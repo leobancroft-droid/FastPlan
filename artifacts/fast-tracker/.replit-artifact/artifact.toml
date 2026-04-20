@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/"
-title = "AltFast - Alternate Day Fasting"
+title = "AltFast - Schedule your fasts"
 version = "1.0.0"
 id = "artifacts/fast-tracker"
 router = "expo-domain"
