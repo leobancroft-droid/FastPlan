@@ -95,7 +95,7 @@ export function WeightTracker({ onCalorieGoalChange }: WeightTrackerProps = {}) 
           <Text style={[styles.title, { color: colors.foreground }]}>Weight</Text>
         </View>
         <Pressable onPress={() => setEditorOpen(true)} hitSlop={10}>
-          <Text style={[styles.moreBtn, { color: colors.success }]}>More</Text>
+          <Text style={[styles.moreBtn, { color: colors.success }]}>Target</Text>
         </Pressable>
       </View>
 
