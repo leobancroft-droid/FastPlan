@@ -53,7 +53,7 @@ const colors = {
     text: "#e8e5ff",
     tint: "#a29bfe",
 
-    background: "#0d0d1a",
+    background: "#1a0f2e",
     foreground: "#e8e5ff",
 
     card: "#181830",
