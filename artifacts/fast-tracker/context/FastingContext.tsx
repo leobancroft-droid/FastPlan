@@ -4,8 +4,10 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
+import { derivePersonalProfile, type UserProfile } from "@/lib/personalization";
 
 export type DayType = "eat" | "fast";
 export type DayStatus = "pending" | "completed" | "skipped";
@@ -64,6 +66,7 @@ interface FastingContextType {
   fastQuote: string;
   onboardingComplete: boolean;
   onboardingAnswers: Record<string, string | string[]> | null;
+  userProfile: UserProfile | null;
   markComplete: () => Promise<void>;
   markSkipped: () => Promise<void>;
   resetAll: () => Promise<void>;
@@ -100,6 +103,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [onboardingAnswers, setOnboardingAnswers] = useState<Record<string, string | string[]> | null>(null);
   const [loaded, setLoaded] = useState(false);
+
+  const userProfile = useMemo(() => derivePersonalProfile(onboardingAnswers), [onboardingAnswers]);
 
   const fastQuote = React.useMemo(() => {
     const idx = Math.floor(Math.random() * FAST_QUOTES.length);
@@ -250,7 +255,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

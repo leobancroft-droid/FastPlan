@@ -19,6 +19,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DayBadge } from "@/components/DayBadge";
 import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
+import { PlanCard } from "@/components/PlanCard";
 import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
@@ -28,7 +29,7 @@ import { useColors } from "@/hooks/useColors";
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding } = useFasting();
+  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile } = useFasting();
   const [loading, setLoading] = useState(false);
 
   const btnScale = useSharedValue(1);
@@ -109,13 +110,18 @@ export default function HomeScreen() {
             {isFastDay ? "Fast Day" : "Eat Day"}
           </Text>
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
-            {isFastDay
-              ? "No calories today. You've got this."
-              : "Enjoy your food mindfully today."}
+            {getDaySubtitle(isFastDay, userProfile?.tone)}
           </Text>
         </View>
 
         <StreakCounter streak={streak} longestStreak={longestStreak} isFastDay={isFastDay} />
+
+        {userProfile && (
+          <>
+            <View style={styles.spacing} />
+            <PlanCard profile={userProfile} isFastDay={isFastDay} />
+          </>
+        )}
 
         <View style={styles.spacing} />
 
@@ -170,6 +176,17 @@ export default function HomeScreen() {
       </ScrollView>
     </>
   );
+}
+
+function getDaySubtitle(isFastDay: boolean, tone: "supportive" | "balanced" | "strict" | undefined): string {
+  if (isFastDay) {
+    if (tone === "strict") return "Zero calories. Stay disciplined and execute the plan.";
+    if (tone === "balanced") return "Stay focused. You committed to today — see it through.";
+    return "No calories today. Be kind to yourself — you've got this.";
+  }
+  if (tone === "strict") return "Refuel with intention. Tomorrow's fast starts at midnight.";
+  if (tone === "balanced") return "Eat well today. Tomorrow's fast will be easier for it.";
+  return "Enjoy your food mindfully. You earned this day.";
 }
 
 const styles = StyleSheet.create({
