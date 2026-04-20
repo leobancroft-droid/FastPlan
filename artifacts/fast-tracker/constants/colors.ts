@@ -48,6 +48,57 @@ const colors = {
     streakSilver: "#b2bec3",
     streakBronze: "#e17055",
   },
+
+  dark: {
+    text: "#e8e5ff",
+    tint: "#a29bfe",
+
+    background: "#0d0d1a",
+    foreground: "#e8e5ff",
+
+    card: "#181830",
+    cardForeground: "#e8e5ff",
+
+    primary: "#a29bfe",
+    primaryForeground: "#0d0d1a",
+
+    secondary: "#1e1e3a",
+    secondaryForeground: "#c4bffe",
+
+    muted: "#1e1e3a",
+    mutedForeground: "#6060a0",
+
+    accent: "#ff9f43",
+    accentForeground: "#0d0d1a",
+
+    destructive: "#ff6b6b",
+    destructiveForeground: "#0d0d1a",
+
+    border: "#2a2a50",
+    input: "#2a2a50",
+
+    fastBg: "#0a0a18",
+    fastCard: "#141430",
+    fastText: "#e8e5ff",
+    fastMuted: "#5050a0",
+    fastPrimary: "#a29bfe",
+    fastAccent: "#ff9f43",
+
+    eatBg: "#130e00",
+    eatCard: "#1c1600",
+    eatText: "#f5e6c8",
+    eatPrimary: "#ff9f43",
+    eatAccent: "#a29bfe",
+
+    success: "#00cec9",
+    warning: "#fdcb6e",
+    info: "#74b9ff",
+
+    streakGold: "#f9ca24",
+    streakSilver: "#b2bec3",
+    streakBronze: "#e17055",
+  },
+
   radius: 16,
 };
 
