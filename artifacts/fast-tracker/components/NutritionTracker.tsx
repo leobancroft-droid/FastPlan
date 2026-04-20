@@ -510,8 +510,8 @@ export function NutritionTracker({ burned }: Props) {
       >
         <View style={styles.summaryTopRow}>
           <View style={styles.statBlock}>
-            <Text style={[styles.statValue, { color: colors.foreground }]}>{totals.kcal}</Text>
-            <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Eaten</Text>
+            <Text style={[styles.statValue, { color: "#ec4899" }]}>{totals.kcal}</Text>
+            <Text style={[styles.statLabel, { color: "#ec4899" }]}>Eaten</Text>
           </View>
 
           <View style={styles.gaugeWrap}>
@@ -529,8 +529,8 @@ export function NutritionTracker({ burned }: Props) {
           </View>
 
           <View style={styles.statBlock}>
-            <Text style={[styles.statValue, { color: colors.foreground }]}>{burned}</Text>
-            <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Burnt</Text>
+            <Text style={[styles.statValue, { color: "#22c55e" }]}>{burned}</Text>
+            <Text style={[styles.statLabel, { color: "#22c55e" }]}>Burnt</Text>
           </View>
         </View>
 
