@@ -143,7 +143,7 @@ export default function HomeScreen() {
       });
     }
     buttons.push({
-      text: "Reset to Pending",
+      text: "Reset Day",
       onPress: async () => {
         if (Platform.OS !== "web") await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         await setDayStatus(todayStr, "clear");
