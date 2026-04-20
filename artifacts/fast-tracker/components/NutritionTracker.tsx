@@ -497,13 +497,6 @@ export function NutritionTracker({ burned }: Props) {
 
   return (
     <View style={{ gap: 16 }}>
-      <View style={styles.headerRow}>
-        <Text style={[styles.sectionHeading, { color: colors.foreground }]}>Summary</Text>
-        <Pressable onPress={() => setDetailsOpen(true)} hitSlop={10}>
-          <Text style={[styles.linkBtn, { color: colors.primary }]}>Details</Text>
-        </Pressable>
-      </View>
-
       <Pressable
         onLongPress={() => setGoalEditOpen(true)}
         style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }]}
