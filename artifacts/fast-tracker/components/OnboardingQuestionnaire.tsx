@@ -439,7 +439,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                     <Text style={[styles.calorieLabel, { color: "#fff" }]}>
                       Suggested daily intake
                     </Text>
-                    <Text style={[styles.calorieValue, { color: colors.foreground }]}>
+                    <Text style={[styles.calorieValue, { color: "#ec4899" }]}>
                       {clamped} kcal
                     </Text>
                     {direction !== "maintain" && (
