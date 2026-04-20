@@ -10,7 +10,13 @@ interface PlanReadyIntroProps {
 }
 
 export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
-  const colors = useColors();
+  const c = useColors();
+  const colors = {
+    background: c.fastBg,
+    foreground: c.fastText,
+    mutedForeground: c.fastMuted,
+    primary: c.fastPrimary,
+  };
 
   return (
     <Modal visible={visible} animationType="fade" transparent={false}>

@@ -143,7 +143,16 @@ interface OnboardingQuestionnaireProps {
 }
 
 export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuestionnaireProps) {
-  const colors = useColors();
+  const c = useColors();
+  const colors = {
+    background: c.fastBg,
+    card: c.fastCard,
+    foreground: c.fastText,
+    mutedForeground: c.fastMuted,
+    border: c.border,
+    muted: c.muted,
+    primary: c.fastPrimary,
+  };
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
 
