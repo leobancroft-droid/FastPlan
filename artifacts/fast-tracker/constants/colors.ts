@@ -31,7 +31,7 @@ const colors = {
     fastCard: "#252547",
     fastText: "#e8e5ff",
     fastMuted: "#6060a0",
-    fastPrimary: "#a29bfe",
+    fastPrimary: "#7c3aed",
     fastAccent: "#ff6b9d",
 
     eatBg: "#fff0f6",
@@ -81,7 +81,7 @@ const colors = {
     fastCard: "#181830",
     fastText: "#e8e5ff",
     fastMuted: "#5050a0",
-    fastPrimary: "#a29bfe",
+    fastPrimary: "#7c3aed",
     fastAccent: "#ff6b9d",
 
     eatBg: "#0d0d1a",
