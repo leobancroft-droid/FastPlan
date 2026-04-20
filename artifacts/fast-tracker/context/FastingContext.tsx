@@ -119,6 +119,8 @@ interface FastingContextType {
   removeEmotionEntry: (entryId: string) => Promise<void>;
   addCustomEmotion: (label: string, emoji: string) => Promise<void>;
   removeCustomEmotion: (presetId: string) => Promise<void>;
+  dayOverrides: Record<string, DayType>;
+  toggleDayType: (dateStr: string) => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
@@ -161,6 +163,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [weightUnit, setWeightUnitState] = useState<"kg" | "lb">("kg");
   const [emotionLog, setEmotionLog] = useState<EmotionEntry[]>([]);
   const [customEmotions, setCustomEmotions] = useState<EmotionPreset[]>([]);
+  const [dayOverrides, setDayOverrides] = useState<Record<string, DayType>>({});
   const [loaded, setLoaded] = useState(false);
   const glassSize = 250;
 
@@ -177,7 +180,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw, emoLogRaw, emoCustomRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw, emoLogRaw, emoCustomRaw, overridesRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
@@ -191,6 +194,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem("weight_unit"),
         AsyncStorage.getItem("emotion_log"),
         AsyncStorage.getItem("emotion_custom"),
+        AsyncStorage.getItem("day_overrides"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
@@ -214,6 +218,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       if (wUnitRaw === "kg" || wUnitRaw === "lb") setWeightUnitState(wUnitRaw);
       if (emoLogRaw) setEmotionLog(JSON.parse(emoLogRaw));
       if (emoCustomRaw) setCustomEmotions(JSON.parse(emoCustomRaw));
+      if (overridesRaw) setDayOverrides(JSON.parse(overridesRaw));
     } catch {}
     setLoaded(true);
   }
@@ -233,11 +238,39 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const getTypeForDate = useCallback((dateStr: string): DayType => {
+    if (dayOverrides[dateStr]) return dayOverrides[dateStr];
     if (!startDate) return "eat";
     const diff = getDiffDays(startDate, dateStr);
     if (diff < 0) return "eat";
     return diff % 2 === 0 ? "eat" : "fast";
-  }, [startDate]);
+  }, [startDate, dayOverrides]);
+
+  const toggleDayType = useCallback(async (dateStr: string) => {
+    const baseType: DayType = (() => {
+      if (!startDate) return "eat";
+      const diff = getDiffDays(startDate, dateStr);
+      if (diff < 0) return "eat";
+      return diff % 2 === 0 ? "eat" : "fast";
+    })();
+    const current = dayOverrides[dateStr] ?? baseType;
+    const flipped: DayType = current === "eat" ? "fast" : "eat";
+
+    const nextOverrides = { ...dayOverrides };
+    if (flipped === baseType) {
+      delete nextOverrides[dateStr];
+    } else {
+      nextOverrides[dateStr] = flipped;
+    }
+    setDayOverrides(nextOverrides);
+    await AsyncStorage.setItem("day_overrides", JSON.stringify(nextOverrides));
+
+    const existing = history.find((d) => d.date === dateStr);
+    if (existing && existing.type !== flipped) {
+      const updated = history.map((d) => (d.date === dateStr ? { ...d, type: flipped } : d));
+      setHistory(updated);
+      await AsyncStorage.setItem("fasting_history", JSON.stringify(updated));
+    }
+  }, [startDate, dayOverrides, history]);
 
   const getTodayType = useCallback((): DayType => {
     return getTypeForDate(getTodayStr());
@@ -311,13 +344,13 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       setStartDate(newStart);
       await AsyncStorage.setItem("fasting_start", newStart);
     }
-    const type = newStart ? (getDiffDays(newStart, todayStr) % 2 === 0 ? "eat" : "fast") : "eat";
+    const type = dayOverrides[todayStr] ?? (newStart ? (getDiffDays(newStart, todayStr) % 2 === 0 ? "eat" : "fast") : "eat");
     const record: DayRecord = { date: todayStr, type, status: "completed", completedAt: new Date().toISOString() };
     const newHistory = [...history.filter((d) => d.date !== todayStr), record].sort((a, b) => b.date.localeCompare(a.date));
     setHistory(newHistory);
     await AsyncStorage.setItem("fasting_history", JSON.stringify(newHistory));
     await checkAndUnlockBadges(streak + 1);
-  }, [history, startDate, streak, badges]);
+  }, [history, startDate, streak, badges, dayOverrides]);
 
   const persistWater = useCallback(async (ml: number) => {
     const today = getTodayStr();
@@ -408,7 +441,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     if (status === "clear" || status === "pending") {
       newHistory = filtered;
     } else {
-      const type: DayType = startDate ? (getDiffDays(startDate, dateStr) % 2 === 0 ? "eat" : "fast") : "eat";
+      const type: DayType = getTypeForDate(dateStr);
       const record: DayRecord = {
         date: dateStr,
         type,
@@ -420,7 +453,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     newHistory.sort((a, b) => b.date.localeCompare(a.date));
     setHistory(newHistory);
     await AsyncStorage.setItem("fasting_history", JSON.stringify(newHistory));
-  }, [history, startDate]);
+  }, [history, getTypeForDate]);
 
   const markSkipped = useCallback(async () => {
     const todayStr = getTodayStr();
@@ -445,6 +478,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("weight_unit"),
       AsyncStorage.removeItem("emotion_log"),
       AsyncStorage.removeItem("emotion_custom"),
+      AsyncStorage.removeItem("day_overrides"),
     ]);
     setHistory([]);
     setBadges(BADGES);
@@ -459,12 +493,13 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     setWeightUnitState("kg");
     setEmotionLog([]);
     setCustomEmotions([]);
+    setDayOverrides({});
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, dayOverrides, toggleDayType, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

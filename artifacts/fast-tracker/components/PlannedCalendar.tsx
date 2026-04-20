@@ -39,7 +39,13 @@ function addMonths(dateStr: string, months: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function buildMonthGroups(startDate: string, endDateStr: string, todayStr: string, recordMap: Record<string, DayRecord>): MonthGroup[] {
+function buildMonthGroups(
+  startDate: string,
+  endDateStr: string,
+  todayStr: string,
+  recordMap: Record<string, DayRecord>,
+  resolveType: (dateStr: string) => DayType,
+): MonthGroup[] {
   const start = new Date(startDate + "T00:00:00");
   const end = new Date(endDateStr + "T00:00:00");
 
@@ -64,7 +70,7 @@ function buildMonthGroups(startDate: string, endDateStr: string, todayStr: strin
       }
       const diff = getDiffDays(startDate, dateStr);
       const isBeforeStart = diff < 0;
-      const type: DayType = isBeforeStart ? "eat" : diff % 2 === 0 ? "eat" : "fast";
+      const type: DayType = isBeforeStart ? "eat" : resolveType(dateStr);
       days.push({
         dateStr,
         day: d,
@@ -89,7 +95,7 @@ const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
   const colors = useColors();
   const { isDark } = useTheme();
-  const { setDayStatus } = useFasting();
+  const { setDayStatus, getTypeForDate, toggleDayType } = useFasting();
   const [range, setRange] = useState<Range>("1M");
   const [selected, setSelected] = useState<CalendarDay | null>(null);
   const todayStr = getTodayStr();
@@ -103,8 +109,8 @@ export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
   const endDateStr = useMemo(() => addMonths(startDate, RANGE_MONTHS[range]), [startDate, range]);
 
   const groups = useMemo(
-    () => buildMonthGroups(startDate, endDateStr, todayStr, recordMap),
-    [startDate, endDateStr, todayStr, recordMap]
+    () => buildMonthGroups(startDate, endDateStr, todayStr, recordMap, getTypeForDate),
+    [startDate, endDateStr, todayStr, recordMap, getTypeForDate]
   );
 
   const opacity = isDark
@@ -115,6 +121,13 @@ export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
     if (!selected) return;
     await setDayStatus(selected.dateStr, status);
     setSelected(null);
+  }
+
+  async function handleSwitch() {
+    if (!selected) return;
+    await toggleDayType(selected.dateStr);
+    const newType: DayType = selected.type === "eat" ? "fast" : "eat";
+    setSelected({ ...selected, type: newType });
   }
 
   return (
@@ -227,6 +240,7 @@ export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
         day={selected}
         onClose={() => setSelected(null)}
         onAction={handleAction}
+        onSwitch={handleSwitch}
         isFuture={selected?.isFuture ?? false}
       />
     </View>
@@ -237,10 +251,11 @@ interface DayActionModalProps {
   day: CalendarDay | null;
   onClose: () => void;
   onAction: (status: "completed" | "skipped" | "clear") => void;
+  onSwitch: () => void;
   isFuture: boolean;
 }
 
-function DayActionModal({ day, onClose, onAction, isFuture }: DayActionModalProps) {
+function DayActionModal({ day, onClose, onAction, onSwitch, isFuture }: DayActionModalProps) {
   const colors = useColors();
   if (!day) return null;
 
@@ -299,6 +314,18 @@ function DayActionModal({ day, onClose, onAction, isFuture }: DayActionModalProp
                 />
               )}
             </View>
+          )}
+
+          {!day.isBeforeStart && (
+            <Pressable
+              style={[styles.switchBtn, { backgroundColor: (isEat ? colors.fastPrimary : colors.eatPrimary) + "18", borderColor: isEat ? colors.fastPrimary : colors.eatPrimary }]}
+              onPress={onSwitch}
+            >
+              <Feather name="repeat" size={16} color={isEat ? colors.fastPrimary : colors.eatPrimary} />
+              <Text style={[styles.switchBtnText, { color: isEat ? colors.fastPrimary : colors.eatPrimary }]}>
+                Switch to {isEat ? "Fast" : "Eat"} Day
+              </Text>
+            </Pressable>
           )}
 
           <Pressable style={[styles.closeBtn, { backgroundColor: colors.muted }]} onPress={onClose}>
@@ -480,6 +507,21 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontFamily: "Inter_600SemiBold",
+  },
+  switchBtn: {
+    alignSelf: "stretch",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 13,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    marginTop: 4,
+  },
+  switchBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_700Bold",
   },
   closeBtn: {
     alignSelf: "stretch",
