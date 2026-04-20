@@ -45,7 +45,7 @@ function todayStr(): string {
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen } = useFasting();
+  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit } = useFasting();
   const [loading, setLoading] = useState(false);
   const [burned, setBurned] = useState(0);
   const [nutritionRefresh, setNutritionRefresh] = useState(0);
@@ -179,7 +179,15 @@ export default function HomeScreen() {
     <>
       <OnboardingQuestionnaire
         visible={showOnboarding}
-        onComplete={(answers) => completeOnboarding(answers)}
+        onComplete={async (answers) => {
+          const wKg = typeof answers.weightKg === "string" ? parseFloat(answers.weightKg) : NaN;
+          const gKg = typeof answers.weightGoalKg === "string" ? parseFloat(answers.weightGoalKg) : NaN;
+          const u = answers.weightUnit === "lb" ? "lb" : "kg";
+          if (!isNaN(wKg)) await setWeightKg(wKg);
+          if (!isNaN(gKg)) await setWeightGoalKg(gKg);
+          await setWeightUnit(u);
+          await completeOnboarding(answers);
+        }}
       />
       <PlanReadyIntro visible={showPlanIntro} onContinue={markPlanIntroSeen} />
       <StartDatePicker

@@ -2,11 +2,14 @@ import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -161,22 +164,32 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
   };
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
+  const [unit, setUnit] = useState<"kg" | "lb">("kg");
+  const [currentWeight, setCurrentWeight] = useState("");
+  const [targetWeight, setTargetWeight] = useState("");
 
-  const question = QUESTIONS[step];
-  const total = QUESTIONS.length;
+  const total = QUESTIONS.length + 1;
+  const isWeightStep = step === QUESTIONS.length;
+  const question = isWeightStep ? null : QUESTIONS[step];
   const progress = ((step + 1) / total) * 100;
 
-  const currentAnswer = answers[question.id];
-  const isAnswered =
-    question.type === "multi"
+  const currentAnswer = question ? answers[question.id] : undefined;
+  const curNum = parseFloat(currentWeight);
+  const tgtNum = parseFloat(targetWeight);
+  const weightsValid = !isNaN(curNum) && curNum > 0 && !isNaN(tgtNum) && tgtNum > 0;
+  const isAnswered = isWeightStep
+    ? weightsValid
+    : question?.type === "multi"
       ? Array.isArray(currentAnswer) && currentAnswer.length > 0
       : typeof currentAnswer === "string" && currentAnswer.length > 0;
 
   function selectSingle(opt: string) {
+    if (!question) return;
     setAnswers((a) => ({ ...a, [question.id]: opt }));
   }
 
   function toggleMulti(opt: string) {
+    if (!question) return;
     setAnswers((a) => {
       const existing = Array.isArray(a[question.id]) ? (a[question.id] as string[]) : [];
       let updated: string[];
@@ -194,7 +207,14 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
     if (step < total - 1) {
       setStep((s) => s + 1);
     } else {
-      onComplete(answers);
+      const curKg = unit === "lb" ? curNum / 2.2046226218 : curNum;
+      const tgtKg = unit === "lb" ? tgtNum / 2.2046226218 : tgtNum;
+      onComplete({
+        ...answers,
+        weightKg: String(Math.round(curKg * 10) / 10),
+        weightGoalKg: String(Math.round(tgtKg * 10) / 10),
+        weightUnit: unit,
+      });
     }
   }
 
@@ -204,6 +224,10 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Pressable
@@ -244,6 +268,91 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {isWeightStep ? (
+            <Animated.View key="weights" entering={FadeIn.duration(220)} exiting={FadeOut.duration(120)}>
+              <View style={styles.questionHeader}>
+                <View style={[styles.iconCircle, { backgroundColor: colors.primary + "15" }]}>
+                  <Feather name="trending-down" size={20} color={colors.primary} />
+                </View>
+                <Text style={[styles.questionText, { color: colors.foreground }]}>
+                  Your weight & target
+                </Text>
+              </View>
+              <Text style={[styles.hintText, { color: colors.mutedForeground }]}>
+                We'll use this to build your bespoke plan and calorie targets.
+              </Text>
+
+              <View style={styles.unitToggle}>
+                {(["kg", "lb"] as const).map((u) => {
+                  const active = unit === u;
+                  return (
+                    <Pressable
+                      key={u}
+                      onPress={() => setUnit(u)}
+                      style={[
+                        styles.unitBtn,
+                        {
+                          backgroundColor: active ? colors.primary : colors.card,
+                          borderColor: active ? colors.primary : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.unitBtnText,
+                          { color: active ? "#fff" : colors.foreground },
+                        ]}
+                      >
+                        {u.toUpperCase()}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <View style={styles.weightField}>
+                <Text style={[styles.weightLabel, { color: colors.mutedForeground }]}>
+                  Current weight ({unit})
+                </Text>
+                <TextInput
+                  value={currentWeight}
+                  onChangeText={setCurrentWeight}
+                  keyboardType="decimal-pad"
+                  placeholder={unit === "kg" ? "70" : "154"}
+                  placeholderTextColor={colors.mutedForeground}
+                  style={[
+                    styles.weightInput,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                      color: colors.foreground,
+                    },
+                  ]}
+                />
+              </View>
+
+              <View style={styles.weightField}>
+                <Text style={[styles.weightLabel, { color: colors.mutedForeground }]}>
+                  Target weight ({unit})
+                </Text>
+                <TextInput
+                  value={targetWeight}
+                  onChangeText={setTargetWeight}
+                  keyboardType="decimal-pad"
+                  placeholder={unit === "kg" ? "65" : "143"}
+                  placeholderTextColor={colors.mutedForeground}
+                  style={[
+                    styles.weightInput,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                      color: colors.foreground,
+                    },
+                  ]}
+                />
+              </View>
+            </Animated.View>
+          ) : question ? (
           <Animated.View key={question.id} entering={FadeIn.duration(220)} exiting={FadeOut.duration(120)}>
             <View style={styles.questionHeader}>
               <View style={[styles.iconCircle, { backgroundColor: colors.primary + "15" }]}>
@@ -304,6 +413,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
               })}
             </View>
           </Animated.View>
+          ) : null}
         </ScrollView>
 
         <View style={[styles.footer, { backgroundColor: colors.background }]}>
@@ -334,6 +444,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
           </Pressable>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -434,5 +545,38 @@ const styles = StyleSheet.create({
   nextBtnText: {
     fontSize: 17,
     fontFamily: "Inter_700Bold",
+  },
+  unitToggle: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 20,
+  },
+  unitBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    alignItems: "center",
+  },
+  unitBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1,
+  },
+  weightField: {
+    marginBottom: 16,
+  },
+  weightLabel: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    marginBottom: 8,
+  },
+  weightInput: {
+    fontSize: 22,
+    fontFamily: "Inter_600SemiBold",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
   },
 });
