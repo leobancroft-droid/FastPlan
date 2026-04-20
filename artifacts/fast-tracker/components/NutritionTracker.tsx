@@ -45,60 +45,362 @@ interface FoodPreset {
 }
 
 const FOOD_PRESETS: FoodPreset[] = [
+  // ── Eggs & breakfast
   { id: "pb_ball", label: "Peanut butter protein ball", emoji: "🍪", serving: "1 ball", kcal: 140, carbs: 12, protein: 8, fat: 8 },
+  { id: "egg", label: "Egg", emoji: "🥚", serving: "1 large", kcal: 70, carbs: 0, protein: 6, fat: 5 },
+  { id: "egg_boiled", label: "Egg, boiled", emoji: "🥚", serving: "1 large (50 g)", kcal: 78, carbs: 1, protein: 6, fat: 5 },
+  { id: "egg_fried", label: "Egg, fried", emoji: "🍳", serving: "1 large", kcal: 90, carbs: 0, protein: 6, fat: 7 },
+  { id: "egg_scrambled", label: "Scrambled eggs", emoji: "🍳", serving: "2 eggs", kcal: 200, carbs: 2, protein: 14, fat: 14 },
+  { id: "omelette", label: "Omelette, plain", emoji: "🍳", serving: "2 eggs", kcal: 220, carbs: 1, protein: 14, fat: 17 },
+  { id: "oatmeal", label: "Oatmeal", emoji: "🥣", serving: "1 cup cooked", kcal: 150, carbs: 27, protein: 5, fat: 3 },
+  { id: "porridge", label: "Porridge with milk", emoji: "🥣", serving: "1 bowl", kcal: 220, carbs: 36, protein: 9, fat: 5 },
+  { id: "muesli", label: "Muesli", emoji: "🥣", serving: "1/2 cup", kcal: 290, carbs: 50, protein: 8, fat: 6 },
+  { id: "granola", label: "Granola", emoji: "🥣", serving: "1/2 cup", kcal: 250, carbs: 36, protein: 6, fat: 10 },
+  { id: "cereal_corn", label: "Corn flakes", emoji: "🥣", serving: "1 cup", kcal: 100, carbs: 24, protein: 2, fat: 0 },
+  { id: "cereal_choco", label: "Chocolate cereal", emoji: "🥣", serving: "1 cup", kcal: 150, carbs: 32, protein: 2, fat: 2 },
+  { id: "pancakes", label: "Pancakes", emoji: "🥞", serving: "2 medium", kcal: 350, carbs: 44, protein: 8, fat: 14 },
+  { id: "waffles", label: "Waffles", emoji: "🧇", serving: "1 waffle", kcal: 220, carbs: 30, protein: 5, fat: 8 },
+  { id: "french_toast", label: "French toast", emoji: "🍞", serving: "1 slice", kcal: 150, carbs: 16, protein: 5, fat: 7 },
+  { id: "bagel", label: "Bagel, plain", emoji: "🥯", serving: "1 medium", kcal: 270, carbs: 53, protein: 11, fat: 2 },
+  { id: "bagel_cc", label: "Bagel with cream cheese", emoji: "🥯", serving: "1 bagel", kcal: 370, carbs: 54, protein: 13, fat: 11 },
+  { id: "croissant", label: "Croissant", emoji: "🥐", serving: "1 medium", kcal: 230, carbs: 26, protein: 5, fat: 12 },
+  { id: "muffin_blueberry", label: "Blueberry muffin", emoji: "🧁", serving: "1 muffin", kcal: 380, carbs: 53, protein: 5, fat: 16 },
+  { id: "danish", label: "Danish pastry", emoji: "🥐", serving: "1 piece", kcal: 280, carbs: 30, protein: 4, fat: 16 },
+
+  // ── Bread, grains, pasta, rice
+  { id: "toast", label: "Toast, white", emoji: "🍞", serving: "1 slice", kcal: 80, carbs: 15, protein: 3, fat: 1 },
+  { id: "toast_wheat", label: "Toast, whole wheat", emoji: "🍞", serving: "1 slice", kcal: 70, carbs: 12, protein: 4, fat: 1 },
+  { id: "baguette", label: "Baguette", emoji: "🥖", serving: "2 inch piece", kcal: 90, carbs: 18, protein: 3, fat: 1 },
+  { id: "tortilla_corn", label: "Corn tortilla", emoji: "🫓", serving: "1 tortilla", kcal: 60, carbs: 12, protein: 2, fat: 1 },
+  { id: "tortilla_flour", label: "Flour tortilla", emoji: "🫓", serving: "1 large", kcal: 140, carbs: 24, protein: 4, fat: 3 },
+  { id: "rice_white", label: "Rice, white cooked", emoji: "🍚", serving: "1 cup", kcal: 205, carbs: 45, protein: 4, fat: 0 },
+  { id: "rice_brown", label: "Rice, brown cooked", emoji: "🍚", serving: "1 cup", kcal: 215, carbs: 45, protein: 5, fat: 2 },
+  { id: "rice_basmati", label: "Basmati rice", emoji: "🍚", serving: "1 cup", kcal: 200, carbs: 44, protein: 4, fat: 0 },
+  { id: "rice_fried", label: "Fried rice", emoji: "🍚", serving: "1 cup", kcal: 230, carbs: 35, protein: 7, fat: 8 },
+  { id: "quinoa", label: "Quinoa, cooked", emoji: "🥣", serving: "1 cup", kcal: 222, carbs: 39, protein: 8, fat: 4 },
+  { id: "couscous", label: "Couscous, cooked", emoji: "🥣", serving: "1 cup", kcal: 175, carbs: 36, protein: 6, fat: 0 },
+  { id: "pasta", label: "Pasta, cooked", emoji: "🍝", serving: "1 cup", kcal: 220, carbs: 43, protein: 8, fat: 1 },
+  { id: "spaghetti_bolognese", label: "Spaghetti bolognese", emoji: "🍝", serving: "1 plate", kcal: 540, carbs: 65, protein: 28, fat: 18 },
+  { id: "spaghetti_carbonara", label: "Spaghetti carbonara", emoji: "🍝", serving: "1 plate", kcal: 620, carbs: 60, protein: 26, fat: 30 },
+  { id: "lasagna", label: "Lasagna", emoji: "🍝", serving: "1 piece", kcal: 410, carbs: 33, protein: 24, fat: 20 },
+  { id: "mac_cheese", label: "Mac & cheese", emoji: "🧀", serving: "1 cup", kcal: 310, carbs: 41, protein: 13, fat: 11 },
+  { id: "noodles_ramen", label: "Ramen noodles", emoji: "🍜", serving: "1 bowl", kcal: 380, carbs: 54, protein: 10, fat: 14 },
+  { id: "noodles_pho", label: "Pho", emoji: "🍜", serving: "1 bowl", kcal: 350, carbs: 45, protein: 25, fat: 6 },
+  { id: "noodles_lo_mein", label: "Lo mein", emoji: "🍜", serving: "1 cup", kcal: 290, carbs: 42, protein: 10, fat: 9 },
+
+  // ── Fruits
   { id: "apple", label: "Apple", emoji: "🍎", serving: "1 medium", kcal: 95, carbs: 25, protein: 0, fat: 0 },
   { id: "banana", label: "Banana", emoji: "🍌", serving: "1 medium", kcal: 105, carbs: 27, protein: 1, fat: 0 },
   { id: "orange", label: "Orange", emoji: "🍊", serving: "1 medium", kcal: 62, carbs: 15, protein: 1, fat: 0 },
-  { id: "berries", label: "Mixed berries", emoji: "🫐", serving: "1 cup", kcal: 80, carbs: 19, protein: 1, fat: 0 },
-  { id: "egg", label: "Egg", emoji: "🥚", serving: "1 large", kcal: 70, carbs: 0, protein: 6, fat: 5 },
-  { id: "oatmeal", label: "Oatmeal", emoji: "🥣", serving: "1 cup", kcal: 150, carbs: 27, protein: 5, fat: 3 },
-  { id: "greek_yogurt", label: "Greek yogurt", emoji: "🥛", serving: "1 cup", kcal: 100, carbs: 6, protein: 17, fat: 0 },
-  { id: "coffee", label: "Coffee, black", emoji: "☕", serving: "1 cup (237 mL)", kcal: 5, carbs: 0, protein: 0, fat: 0, category: "beverage" },
-  { id: "tea", label: "Green tea", emoji: "🍵", serving: "1 cup", kcal: 2, carbs: 0, protein: 0, fat: 0, category: "beverage" },
-  { id: "toast", label: "Toast", emoji: "🍞", serving: "1 slice", kcal: 80, carbs: 15, protein: 3, fat: 1 },
-  { id: "avocado_toast", label: "Avocado toast", emoji: "🥑", serving: "1 slice", kcal: 195, carbs: 18, protein: 5, fat: 12 },
-  { id: "pancakes", label: "Pancakes", emoji: "🥞", serving: "2 medium", kcal: 350, carbs: 44, protein: 8, fat: 14 },
-  { id: "chicken", label: "Chicken breast", emoji: "🍗", serving: "100 g", kcal: 165, carbs: 0, protein: 31, fat: 4 },
-  { id: "salmon", label: "Salmon", emoji: "🐟", serving: "100 g", kcal: 208, carbs: 0, protein: 22, fat: 13 },
-  { id: "tuna", label: "Tuna", emoji: "🐟", serving: "100 g", kcal: 132, carbs: 0, protein: 28, fat: 1 },
-  { id: "rice", label: "Rice, cooked", emoji: "🍚", serving: "1 cup", kcal: 205, carbs: 45, protein: 4, fat: 0 },
-  { id: "pasta", label: "Pasta, cooked", emoji: "🍝", serving: "1 cup", kcal: 220, carbs: 43, protein: 8, fat: 1 },
-  { id: "salad", label: "Garden salad", emoji: "🥗", serving: "1 bowl", kcal: 120, carbs: 12, protein: 4, fat: 7 },
-  { id: "sandwich", label: "Sandwich", emoji: "🥪", serving: "1 whole", kcal: 320, carbs: 35, protein: 18, fat: 12 },
-  { id: "wrap", label: "Wrap", emoji: "🌯", serving: "1 whole", kcal: 350, carbs: 38, protein: 16, fat: 14 },
-  { id: "soup", label: "Soup", emoji: "🍲", serving: "1 bowl", kcal: 180, carbs: 22, protein: 8, fat: 6 },
-  { id: "burger", label: "Burger", emoji: "🍔", serving: "1 whole", kcal: 354, carbs: 30, protein: 20, fat: 17 },
-  { id: "pizza", label: "Pizza", emoji: "🍕", serving: "1 slice", kcal: 285, carbs: 36, protein: 12, fat: 10 },
-  { id: "tacos", label: "Tacos", emoji: "🌮", serving: "2 tacos", kcal: 340, carbs: 32, protein: 18, fat: 16 },
-  { id: "sushi", label: "Sushi roll", emoji: "🍣", serving: "1 roll", kcal: 250, carbs: 38, protein: 9, fat: 7 },
-  { id: "steak", label: "Steak", emoji: "🥩", serving: "150 g", kcal: 380, carbs: 0, protein: 38, fat: 25 },
-  { id: "tofu", label: "Tofu", emoji: "🍱", serving: "100 g", kcal: 144, carbs: 3, protein: 17, fat: 9 },
-  { id: "potato", label: "Baked potato", emoji: "🥔", serving: "1 medium", kcal: 160, carbs: 37, protein: 4, fat: 0 },
+  { id: "pear", label: "Pear", emoji: "🍐", serving: "1 medium", kcal: 100, carbs: 27, protein: 1, fat: 0 },
+  { id: "peach", label: "Peach", emoji: "🍑", serving: "1 medium", kcal: 60, carbs: 15, protein: 1, fat: 0 },
+  { id: "plum", label: "Plum", emoji: "🍑", serving: "1 medium", kcal: 30, carbs: 8, protein: 0, fat: 0 },
+  { id: "grapes", label: "Grapes", emoji: "🍇", serving: "1 cup", kcal: 104, carbs: 27, protein: 1, fat: 0 },
+  { id: "strawberries", label: "Strawberries", emoji: "🍓", serving: "1 cup", kcal: 50, carbs: 12, protein: 1, fat: 0 },
+  { id: "blueberries", label: "Blueberries", emoji: "🫐", serving: "1 cup", kcal: 84, carbs: 21, protein: 1, fat: 0 },
+  { id: "raspberries", label: "Raspberries", emoji: "🫐", serving: "1 cup", kcal: 64, carbs: 15, protein: 1, fat: 1 },
+  { id: "blackberries", label: "Blackberries", emoji: "🫐", serving: "1 cup", kcal: 62, carbs: 14, protein: 2, fat: 1 },
+  { id: "berries_mix", label: "Mixed berries", emoji: "🫐", serving: "1 cup", kcal: 80, carbs: 19, protein: 1, fat: 0 },
+  { id: "pineapple", label: "Pineapple", emoji: "🍍", serving: "1 cup", kcal: 82, carbs: 22, protein: 1, fat: 0 },
+  { id: "mango", label: "Mango", emoji: "🥭", serving: "1 cup", kcal: 99, carbs: 25, protein: 1, fat: 1 },
+  { id: "watermelon", label: "Watermelon", emoji: "🍉", serving: "1 cup", kcal: 46, carbs: 12, protein: 1, fat: 0 },
+  { id: "melon", label: "Honeydew melon", emoji: "🍈", serving: "1 cup", kcal: 60, carbs: 16, protein: 1, fat: 0 },
+  { id: "cantaloupe", label: "Cantaloupe", emoji: "🍈", serving: "1 cup", kcal: 53, carbs: 13, protein: 1, fat: 0 },
+  { id: "kiwi", label: "Kiwi", emoji: "🥝", serving: "1 medium", kcal: 42, carbs: 10, protein: 1, fat: 0 },
+  { id: "cherries", label: "Cherries", emoji: "🍒", serving: "1 cup", kcal: 87, carbs: 22, protein: 1, fat: 0 },
+  { id: "lemon", label: "Lemon", emoji: "🍋", serving: "1 medium", kcal: 17, carbs: 5, protein: 1, fat: 0 },
+  { id: "lime", label: "Lime", emoji: "🍋", serving: "1 medium", kcal: 20, carbs: 7, protein: 0, fat: 0 },
+  { id: "avocado", label: "Avocado", emoji: "🥑", serving: "1/2 fruit", kcal: 160, carbs: 9, protein: 2, fat: 15 },
+  { id: "pomegranate", label: "Pomegranate", emoji: "🍎", serving: "1 medium", kcal: 234, carbs: 53, protein: 5, fat: 3 },
+  { id: "raisins", label: "Raisins", emoji: "🍇", serving: "1/4 cup", kcal: 108, carbs: 29, protein: 1, fat: 0 },
+  { id: "dates", label: "Dates, dried", emoji: "🌴", serving: "2 dates", kcal: 133, carbs: 36, protein: 1, fat: 0 },
+  { id: "fruit_salad", label: "Fruit salad", emoji: "🍓", serving: "1 cup", kcal: 130, carbs: 33, protein: 2, fat: 0 },
+  { id: "honey", label: "Honey", emoji: "🍯", serving: "1 tbsp", kcal: 64, carbs: 17, protein: 0, fat: 0 },
+
+  // ── Vegetables
   { id: "broccoli", label: "Broccoli", emoji: "🥦", serving: "1 cup", kcal: 55, carbs: 11, protein: 4, fat: 1 },
+  { id: "cauliflower", label: "Cauliflower", emoji: "🥦", serving: "1 cup", kcal: 27, carbs: 5, protein: 2, fat: 0 },
+  { id: "spinach", label: "Spinach", emoji: "🥬", serving: "1 cup raw", kcal: 7, carbs: 1, protein: 1, fat: 0 },
+  { id: "kale", label: "Kale", emoji: "🥬", serving: "1 cup raw", kcal: 33, carbs: 7, protein: 3, fat: 1 },
+  { id: "lettuce", label: "Lettuce", emoji: "🥬", serving: "1 cup", kcal: 8, carbs: 2, protein: 1, fat: 0 },
+  { id: "cabbage", label: "Cabbage", emoji: "🥬", serving: "1 cup", kcal: 22, carbs: 5, protein: 1, fat: 0 },
+  { id: "carrot", label: "Carrot", emoji: "🥕", serving: "1 medium", kcal: 25, carbs: 6, protein: 1, fat: 0 },
+  { id: "celery", label: "Celery", emoji: "🥬", serving: "1 stalk", kcal: 6, carbs: 1, protein: 0, fat: 0 },
+  { id: "cucumber", label: "Cucumber", emoji: "🥒", serving: "1 cup", kcal: 16, carbs: 4, protein: 1, fat: 0 },
+  { id: "pickle", label: "Pickle", emoji: "🥒", serving: "1 medium", kcal: 12, carbs: 3, protein: 0, fat: 0 },
+  { id: "tomato", label: "Tomato", emoji: "🍅", serving: "1 medium", kcal: 22, carbs: 5, protein: 1, fat: 0 },
+  { id: "tomato_cherry", label: "Cherry tomatoes", emoji: "🍅", serving: "1 cup", kcal: 27, carbs: 6, protein: 1, fat: 0 },
+  { id: "bell_pepper", label: "Bell pepper", emoji: "🫑", serving: "1 medium", kcal: 30, carbs: 7, protein: 1, fat: 0 },
+  { id: "onion", label: "Onion", emoji: "🧅", serving: "1 medium", kcal: 44, carbs: 10, protein: 1, fat: 0 },
+  { id: "garlic", label: "Garlic", emoji: "🧄", serving: "1 clove", kcal: 4, carbs: 1, protein: 0, fat: 0 },
+  { id: "mushrooms", label: "Mushrooms", emoji: "🍄", serving: "1 cup", kcal: 21, carbs: 3, protein: 3, fat: 0 },
+  { id: "zucchini", label: "Zucchini", emoji: "🥒", serving: "1 cup", kcal: 19, carbs: 4, protein: 1, fat: 0 },
+  { id: "eggplant", label: "Eggplant", emoji: "🍆", serving: "1 cup", kcal: 35, carbs: 8, protein: 1, fat: 0 },
+  { id: "asparagus", label: "Asparagus", emoji: "🌿", serving: "1 cup", kcal: 27, carbs: 5, protein: 3, fat: 0 },
+  { id: "green_beans", label: "Green beans", emoji: "🌿", serving: "1 cup", kcal: 31, carbs: 7, protein: 2, fat: 0 },
+  { id: "peas", label: "Peas", emoji: "🟢", serving: "1 cup", kcal: 117, carbs: 21, protein: 8, fat: 0 },
+  { id: "corn", label: "Corn", emoji: "🌽", serving: "1 cup", kcal: 144, carbs: 31, protein: 5, fat: 2 },
+  { id: "potato_baked", label: "Baked potato", emoji: "🥔", serving: "1 medium", kcal: 160, carbs: 37, protein: 4, fat: 0 },
+  { id: "potato_mashed", label: "Mashed potatoes", emoji: "🥔", serving: "1 cup", kcal: 240, carbs: 35, protein: 4, fat: 9 },
+  { id: "sweet_potato", label: "Sweet potato", emoji: "🍠", serving: "1 medium", kcal: 112, carbs: 26, protein: 2, fat: 0 },
+  { id: "salad_garden", label: "Garden salad", emoji: "🥗", serving: "1 bowl", kcal: 120, carbs: 12, protein: 4, fat: 7 },
+  { id: "salad_caesar", label: "Caesar salad", emoji: "🥗", serving: "1 bowl", kcal: 320, carbs: 12, protein: 8, fat: 27 },
+  { id: "salad_greek", label: "Greek salad", emoji: "🥗", serving: "1 bowl", kcal: 220, carbs: 12, protein: 7, fat: 16 },
+  { id: "salad_chicken", label: "Chicken salad", emoji: "🥗", serving: "1 bowl", kcal: 380, carbs: 14, protein: 28, fat: 22 },
+
+  // ── Protein: meat, fish, seafood
+  { id: "chicken_breast", label: "Chicken breast, grilled", emoji: "🍗", serving: "100 g", kcal: 165, carbs: 0, protein: 31, fat: 4 },
+  { id: "chicken_thigh", label: "Chicken thigh", emoji: "🍗", serving: "100 g", kcal: 209, carbs: 0, protein: 26, fat: 11 },
+  { id: "chicken_wings", label: "Chicken wings", emoji: "🍗", serving: "4 wings", kcal: 320, carbs: 0, protein: 30, fat: 22 },
+  { id: "chicken_nuggets", label: "Chicken nuggets", emoji: "🍗", serving: "6 pieces", kcal: 280, carbs: 18, protein: 14, fat: 17 },
+  { id: "turkey", label: "Turkey breast, sliced", emoji: "🦃", serving: "100 g", kcal: 135, carbs: 2, protein: 30, fat: 1 },
+  { id: "beef_ground", label: "Ground beef, 90/10", emoji: "🥩", serving: "100 g", kcal: 217, carbs: 0, protein: 26, fat: 12 },
+  { id: "steak", label: "Steak, ribeye", emoji: "🥩", serving: "150 g", kcal: 380, carbs: 0, protein: 38, fat: 25 },
+  { id: "pork_chop", label: "Pork chop", emoji: "🥩", serving: "100 g", kcal: 231, carbs: 0, protein: 26, fat: 14 },
+  { id: "bacon", label: "Bacon", emoji: "🥓", serving: "2 strips", kcal: 90, carbs: 0, protein: 6, fat: 7 },
+  { id: "ham", label: "Ham, sliced", emoji: "🍖", serving: "2 slices", kcal: 70, carbs: 1, protein: 11, fat: 2 },
+  { id: "sausage", label: "Sausage", emoji: "🌭", serving: "1 link", kcal: 170, carbs: 1, protein: 9, fat: 14 },
+  { id: "hotdog", label: "Hot dog", emoji: "🌭", serving: "1 with bun", kcal: 290, carbs: 24, protein: 11, fat: 17 },
+  { id: "salmon", label: "Salmon, grilled", emoji: "🐟", serving: "100 g", kcal: 208, carbs: 0, protein: 22, fat: 13 },
+  { id: "tuna", label: "Tuna, canned in water", emoji: "🐟", serving: "100 g", kcal: 132, carbs: 0, protein: 28, fat: 1 },
+  { id: "shrimp", label: "Shrimp", emoji: "🦐", serving: "100 g", kcal: 99, carbs: 1, protein: 24, fat: 0 },
+  { id: "cod", label: "Cod, baked", emoji: "🐟", serving: "100 g", kcal: 105, carbs: 0, protein: 23, fat: 1 },
+  { id: "tilapia", label: "Tilapia", emoji: "🐟", serving: "100 g", kcal: 128, carbs: 0, protein: 26, fat: 3 },
+  { id: "fish_fingers", label: "Fish fingers", emoji: "🐟", serving: "4 pieces", kcal: 280, carbs: 24, protein: 12, fat: 14 },
+  { id: "fish_chips", label: "Fish & chips", emoji: "🍟", serving: "1 plate", kcal: 840, carbs: 90, protein: 35, fat: 38 },
+  { id: "tofu", label: "Tofu", emoji: "🍱", serving: "100 g", kcal: 144, carbs: 3, protein: 17, fat: 9 },
+  { id: "tempeh", label: "Tempeh", emoji: "🍱", serving: "100 g", kcal: 192, carbs: 8, protein: 20, fat: 11 },
+  { id: "beans_black", label: "Black beans", emoji: "🫘", serving: "1 cup cooked", kcal: 227, carbs: 41, protein: 15, fat: 1 },
+  { id: "beans_kidney", label: "Kidney beans", emoji: "🫘", serving: "1 cup cooked", kcal: 215, carbs: 37, protein: 13, fat: 1 },
+  { id: "beans_chickpeas", label: "Chickpeas", emoji: "🫘", serving: "1 cup cooked", kcal: 269, carbs: 45, protein: 15, fat: 4 },
+  { id: "lentils", label: "Lentils, cooked", emoji: "🫘", serving: "1 cup", kcal: 230, carbs: 40, protein: 18, fat: 1 },
+  { id: "hummus", label: "Hummus", emoji: "🫘", serving: "2 tbsp", kcal: 70, carbs: 6, protein: 2, fat: 5 },
+
+  // ── Dairy
+  { id: "milk_whole", label: "Milk, whole", emoji: "🥛", serving: "1 cup", kcal: 150, carbs: 12, protein: 8, fat: 8, category: "beverage" },
+  { id: "milk_skim", label: "Milk, skim", emoji: "🥛", serving: "1 cup", kcal: 83, carbs: 12, protein: 8, fat: 0, category: "beverage" },
+  { id: "milk_almond", label: "Almond milk", emoji: "🥛", serving: "1 cup", kcal: 39, carbs: 4, protein: 1, fat: 3, category: "beverage" },
+  { id: "milk_oat", label: "Oat milk", emoji: "🥛", serving: "1 cup", kcal: 120, carbs: 16, protein: 3, fat: 5, category: "beverage" },
+  { id: "milk_soy", label: "Soy milk", emoji: "🥛", serving: "1 cup", kcal: 100, carbs: 8, protein: 7, fat: 4, category: "beverage" },
+  { id: "yogurt_greek", label: "Greek yogurt, plain", emoji: "🥛", serving: "1 cup", kcal: 100, carbs: 6, protein: 17, fat: 0 },
+  { id: "yogurt_fruit", label: "Yogurt, flavored", emoji: "🥛", serving: "1 cup", kcal: 180, carbs: 33, protein: 9, fat: 2 },
+  { id: "cottage_cheese", label: "Cottage cheese", emoji: "🥣", serving: "1/2 cup", kcal: 110, carbs: 5, protein: 12, fat: 5 },
+  { id: "cream_cheese", label: "Cream cheese", emoji: "🧀", serving: "2 tbsp", kcal: 100, carbs: 1, protein: 2, fat: 10 },
+  { id: "cheddar", label: "Cheddar cheese", emoji: "🧀", serving: "28 g", kcal: 113, carbs: 0, protein: 7, fat: 9 },
+  { id: "mozzarella", label: "Mozzarella", emoji: "🧀", serving: "28 g", kcal: 85, carbs: 1, protein: 6, fat: 6 },
+  { id: "parmesan", label: "Parmesan", emoji: "🧀", serving: "1 tbsp", kcal: 22, carbs: 0, protein: 2, fat: 1 },
+  { id: "feta", label: "Feta", emoji: "🧀", serving: "28 g", kcal: 75, carbs: 1, protein: 4, fat: 6 },
+  { id: "butter", label: "Butter", emoji: "🧈", serving: "1 tbsp", kcal: 102, carbs: 0, protein: 0, fat: 12 },
+
+  // ── Snacks, nuts, seeds
   { id: "almonds", label: "Almonds", emoji: "🌰", serving: "28 g", kcal: 160, carbs: 6, protein: 6, fat: 14 },
+  { id: "walnuts", label: "Walnuts", emoji: "🌰", serving: "28 g", kcal: 185, carbs: 4, protein: 4, fat: 18 },
+  { id: "cashews", label: "Cashews", emoji: "🌰", serving: "28 g", kcal: 157, carbs: 9, protein: 5, fat: 12 },
+  { id: "pistachios", label: "Pistachios", emoji: "🌰", serving: "28 g", kcal: 159, carbs: 8, protein: 6, fat: 13 },
+  { id: "peanuts", label: "Peanuts", emoji: "🥜", serving: "28 g", kcal: 161, carbs: 5, protein: 7, fat: 14 },
   { id: "peanut_butter", label: "Peanut butter", emoji: "🥜", serving: "2 tbsp", kcal: 190, carbs: 6, protein: 8, fat: 16 },
-  { id: "cheese", label: "Cheese", emoji: "🧀", serving: "28 g", kcal: 110, carbs: 1, protein: 7, fat: 9 },
-  { id: "milk", label: "Milk", emoji: "🥛", serving: "1 cup", kcal: 150, carbs: 12, protein: 8, fat: 8, category: "beverage" },
-  { id: "smoothie", label: "Smoothie", emoji: "🥤", serving: "16 oz", kcal: 250, carbs: 45, protein: 8, fat: 4, category: "beverage" },
-  { id: "protein_shake", label: "Protein shake", emoji: "🥤", serving: "1 scoop", kcal: 120, carbs: 3, protein: 24, fat: 2, category: "beverage" },
-  { id: "orange_juice", label: "Orange juice", emoji: "🧃", serving: "1 cup", kcal: 110, carbs: 26, protein: 2, fat: 0, category: "beverage" },
-  { id: "soda", label: "Soda", emoji: "🥤", serving: "12 oz", kcal: 140, carbs: 39, protein: 0, fat: 0, category: "beverage" },
-  { id: "banana_boiled_egg", label: "Egg, boiled", emoji: "🥚", serving: "1 egg, regular (60 g)", kcal: 93, carbs: 0, protein: 6, fat: 7 },
-  { id: "egg_fried", label: "Egg, fried", emoji: "🍳", serving: "1 egg, large (46 g)", kcal: 90, carbs: 0, protein: 6, fat: 7 },
-  { id: "scrambled_eggs", label: "Scrambled Eggs", emoji: "🍳", serving: "1 egg (47 g)", kcal: 100, carbs: 1, protein: 7, fat: 7 },
-  { id: "strawberries", label: "Strawberries", emoji: "🍓", serving: "1 fruit (12 g)", kcal: 4, carbs: 1, protein: 0, fat: 0 },
-  { id: "blueberries", label: "Blueberries", emoji: "🫐", serving: "1 serving (68 g)", kcal: 39, carbs: 10, protein: 0, fat: 0 },
-  { id: "honey", label: "Honey", emoji: "🍯", serving: "1 tbsp (21 g)", kcal: 64, carbs: 17, protein: 0, fat: 0 },
-  { id: "chocolate", label: "Dark chocolate", emoji: "🍫", serving: "1 oz", kcal: 170, carbs: 13, protein: 2, fat: 12 },
-  { id: "ice_cream", label: "Ice cream", emoji: "🍦", serving: "1 scoop", kcal: 140, carbs: 17, protein: 2, fat: 7 },
-  { id: "cookie", label: "Cookie", emoji: "🍪", serving: "1 cookie", kcal: 150, carbs: 22, protein: 2, fat: 7 },
-  { id: "donut", label: "Donut", emoji: "🍩", serving: "1 donut", kcal: 250, carbs: 31, protein: 3, fat: 13 },
-  { id: "fries", label: "French fries", emoji: "🍟", serving: "1 medium", kcal: 365, carbs: 48, protein: 4, fat: 17 },
-  { id: "popcorn", label: "Popcorn", emoji: "🍿", serving: "3 cups", kcal: 95, carbs: 19, protein: 3, fat: 1 },
-  { id: "wine", label: "Wine", emoji: "🍷", serving: "5 oz", kcal: 125, carbs: 4, protein: 0, fat: 0 },
-  { id: "beer", label: "Beer", emoji: "🍺", serving: "12 oz", kcal: 150, carbs: 13, protein: 2, fat: 0 },
+  { id: "almond_butter", label: "Almond butter", emoji: "🥜", serving: "2 tbsp", kcal: 196, carbs: 6, protein: 7, fat: 18 },
+  { id: "trail_mix", label: "Trail mix", emoji: "🥜", serving: "1/4 cup", kcal: 175, carbs: 16, protein: 5, fat: 11 },
+  { id: "chia_seeds", label: "Chia seeds", emoji: "🌱", serving: "1 tbsp", kcal: 60, carbs: 5, protein: 2, fat: 4 },
+  { id: "flax_seeds", label: "Flax seeds", emoji: "🌱", serving: "1 tbsp", kcal: 55, carbs: 3, protein: 2, fat: 4 },
+  { id: "chips_potato", label: "Potato chips", emoji: "🍟", serving: "28 g", kcal: 152, carbs: 15, protein: 2, fat: 10 },
+  { id: "chips_tortilla", label: "Tortilla chips", emoji: "🌽", serving: "28 g", kcal: 138, carbs: 18, protein: 2, fat: 7 },
+  { id: "pretzels", label: "Pretzels", emoji: "🥨", serving: "28 g", kcal: 110, carbs: 23, protein: 3, fat: 1 },
+  { id: "popcorn", label: "Popcorn, air-popped", emoji: "🍿", serving: "3 cups", kcal: 95, carbs: 19, protein: 3, fat: 1 },
+  { id: "popcorn_butter", label: "Popcorn, buttered", emoji: "🍿", serving: "3 cups", kcal: 165, carbs: 19, protein: 3, fat: 9 },
+  { id: "granola_bar", label: "Granola bar", emoji: "🍫", serving: "1 bar", kcal: 130, carbs: 22, protein: 2, fat: 5 },
+  { id: "protein_bar", label: "Protein bar", emoji: "🍫", serving: "1 bar", kcal: 200, carbs: 22, protein: 20, fat: 7 },
+  { id: "rice_cake", label: "Rice cake", emoji: "🍘", serving: "1 cake", kcal: 35, carbs: 7, protein: 1, fat: 0 },
+  { id: "crackers", label: "Crackers", emoji: "🥨", serving: "5 crackers", kcal: 80, carbs: 11, protein: 2, fat: 4 },
+  { id: "olives", label: "Olives", emoji: "🫒", serving: "10 olives", kcal: 50, carbs: 3, protein: 0, fat: 5 },
+
+  // ── Sweets, desserts
+  { id: "chocolate_dark", label: "Dark chocolate", emoji: "🍫", serving: "1 oz", kcal: 170, carbs: 13, protein: 2, fat: 12 },
+  { id: "chocolate_milk_bar", label: "Milk chocolate bar", emoji: "🍫", serving: "1 bar (40 g)", kcal: 215, carbs: 24, protein: 3, fat: 12 },
+  { id: "ice_cream", label: "Ice cream, vanilla", emoji: "🍦", serving: "1/2 cup", kcal: 140, carbs: 17, protein: 2, fat: 7 },
+  { id: "ice_cream_choc", label: "Chocolate ice cream", emoji: "🍦", serving: "1/2 cup", kcal: 155, carbs: 19, protein: 3, fat: 8 },
+  { id: "frozen_yogurt", label: "Frozen yogurt", emoji: "🍨", serving: "1/2 cup", kcal: 110, carbs: 19, protein: 3, fat: 3 },
+  { id: "cookie", label: "Cookie, chocolate chip", emoji: "🍪", serving: "1 cookie", kcal: 150, carbs: 22, protein: 2, fat: 7 },
+  { id: "brownie", label: "Brownie", emoji: "🍫", serving: "1 piece", kcal: 240, carbs: 36, protein: 3, fat: 11 },
+  { id: "donut", label: "Donut, glazed", emoji: "🍩", serving: "1 donut", kcal: 250, carbs: 31, protein: 3, fat: 13 },
+  { id: "cupcake", label: "Cupcake", emoji: "🧁", serving: "1 cupcake", kcal: 305, carbs: 50, protein: 3, fat: 11 },
+  { id: "cake_choc", label: "Chocolate cake", emoji: "🍰", serving: "1 slice", kcal: 350, carbs: 50, protein: 5, fat: 15 },
+  { id: "cheesecake", label: "Cheesecake", emoji: "🍰", serving: "1 slice", kcal: 401, carbs: 33, protein: 7, fat: 27 },
+  { id: "pie_apple", label: "Apple pie", emoji: "🥧", serving: "1 slice", kcal: 296, carbs: 43, protein: 3, fat: 14 },
+  { id: "candy_bar", label: "Candy bar", emoji: "🍫", serving: "1 standard", kcal: 240, carbs: 32, protein: 4, fat: 12 },
+  { id: "gummy_bears", label: "Gummy bears", emoji: "🍬", serving: "10 pieces", kcal: 87, carbs: 22, protein: 1, fat: 0 },
+  { id: "marshmallow", label: "Marshmallow", emoji: "🍡", serving: "1 large", kcal: 23, carbs: 6, protein: 0, fat: 0 },
+  { id: "pancake_syrup", label: "Maple syrup", emoji: "🍯", serving: "1 tbsp", kcal: 52, carbs: 13, protein: 0, fat: 0 },
+
+  // ── Sandwiches, wraps, common meals
+  { id: "sandwich_pb_j", label: "Peanut butter & jelly", emoji: "🥪", serving: "1 sandwich", kcal: 380, carbs: 50, protein: 12, fat: 16 },
+  { id: "sandwich_turkey", label: "Turkey sandwich", emoji: "🥪", serving: "1 sandwich", kcal: 320, carbs: 35, protein: 22, fat: 10 },
+  { id: "sandwich_ham", label: "Ham & cheese sandwich", emoji: "🥪", serving: "1 sandwich", kcal: 340, carbs: 32, protein: 20, fat: 14 },
+  { id: "sandwich_blt", label: "BLT sandwich", emoji: "🥪", serving: "1 sandwich", kcal: 410, carbs: 32, protein: 18, fat: 24 },
+  { id: "sandwich_grilled_cheese", label: "Grilled cheese", emoji: "🧀", serving: "1 sandwich", kcal: 400, carbs: 35, protein: 14, fat: 23 },
+  { id: "wrap_chicken", label: "Chicken wrap", emoji: "🌯", serving: "1 wrap", kcal: 420, carbs: 38, protein: 28, fat: 17 },
+  { id: "wrap_veggie", label: "Veggie wrap", emoji: "🌯", serving: "1 wrap", kcal: 320, carbs: 42, protein: 11, fat: 12 },
+  { id: "burrito_bean", label: "Bean burrito", emoji: "🌯", serving: "1 burrito", kcal: 380, carbs: 56, protein: 13, fat: 11 },
+  { id: "quesadilla", label: "Cheese quesadilla", emoji: "🌮", serving: "1 large", kcal: 530, carbs: 41, protein: 22, fat: 30 },
+  { id: "tacos", label: "Tacos, beef", emoji: "🌮", serving: "2 tacos", kcal: 340, carbs: 32, protein: 18, fat: 16 },
+  { id: "burger", label: "Hamburger", emoji: "🍔", serving: "1 whole", kcal: 354, carbs: 30, protein: 20, fat: 17 },
+  { id: "cheeseburger", label: "Cheeseburger", emoji: "🍔", serving: "1 whole", kcal: 450, carbs: 31, protein: 25, fat: 24 },
+  { id: "pizza", label: "Pizza, cheese", emoji: "🍕", serving: "1 slice", kcal: 285, carbs: 36, protein: 12, fat: 10 },
+  { id: "pizza_pepperoni", label: "Pizza, pepperoni", emoji: "🍕", serving: "1 slice", kcal: 313, carbs: 36, protein: 13, fat: 13 },
+  { id: "sushi_roll", label: "Sushi roll", emoji: "🍣", serving: "1 roll (8 pcs)", kcal: 250, carbs: 38, protein: 9, fat: 7 },
+  { id: "sushi_salmon_nigiri", label: "Salmon nigiri", emoji: "🍣", serving: "2 pieces", kcal: 100, carbs: 14, protein: 6, fat: 2 },
+  { id: "soup_chicken_noodle", label: "Chicken noodle soup", emoji: "🍲", serving: "1 bowl", kcal: 175, carbs: 22, protein: 12, fat: 4 },
+  { id: "soup_tomato", label: "Tomato soup", emoji: "🍲", serving: "1 bowl", kcal: 160, carbs: 28, protein: 4, fat: 4 },
+  { id: "chili", label: "Chili con carne", emoji: "🌶️", serving: "1 cup", kcal: 280, carbs: 22, protein: 22, fat: 12 },
+  { id: "stir_fry", label: "Chicken stir fry", emoji: "🥡", serving: "1 plate", kcal: 410, carbs: 32, protein: 30, fat: 18 },
+  { id: "curry_chicken", label: "Chicken curry", emoji: "🍛", serving: "1 cup", kcal: 320, carbs: 14, protein: 28, fat: 17 },
+  { id: "curry_veg", label: "Vegetable curry", emoji: "🍛", serving: "1 cup", kcal: 220, carbs: 28, protein: 7, fat: 10 },
+  { id: "fried_rice_chicken", label: "Chicken fried rice", emoji: "🍚", serving: "1 cup", kcal: 333, carbs: 42, protein: 13, fat: 12 },
+  { id: "dumplings", label: "Dumplings, steamed", emoji: "🥟", serving: "5 pieces", kcal: 220, carbs: 24, protein: 11, fat: 10 },
+  { id: "spring_roll", label: "Spring roll", emoji: "🥢", serving: "1 roll", kcal: 100, carbs: 12, protein: 2, fat: 5 },
+  { id: "kebab", label: "Kebab", emoji: "🥙", serving: "1 medium", kcal: 510, carbs: 40, protein: 28, fat: 28 },
+  { id: "falafel", label: "Falafel", emoji: "🥙", serving: "3 balls", kcal: 200, carbs: 22, protein: 8, fat: 10 },
+  { id: "shawarma", label: "Chicken shawarma", emoji: "🥙", serving: "1 wrap", kcal: 480, carbs: 42, protein: 30, fat: 20 },
+
+  // ── Fast food
+  { id: "ff_big_mac", label: "Big Mac", emoji: "🍔", serving: "1 burger", kcal: 563, carbs: 45, protein: 26, fat: 33 },
+  { id: "ff_quarter_pounder", label: "Quarter Pounder w/ Cheese", emoji: "🍔", serving: "1 burger", kcal: 520, carbs: 42, protein: 30, fat: 26 },
+  { id: "ff_whopper", label: "Whopper", emoji: "🍔", serving: "1 burger", kcal: 657, carbs: 49, protein: 28, fat: 40 },
+  { id: "ff_chicken_sandwich", label: "Chicken sandwich (fast food)", emoji: "🥪", serving: "1 sandwich", kcal: 440, carbs: 38, protein: 28, fat: 19 },
+  { id: "ff_mc_nuggets", label: "Chicken McNuggets", emoji: "🍗", serving: "10 pieces", kcal: 420, carbs: 26, protein: 23, fat: 25 },
+  { id: "ff_fries_med", label: "French fries, medium", emoji: "🍟", serving: "1 medium", kcal: 365, carbs: 48, protein: 4, fat: 17 },
+  { id: "ff_fries_large", label: "French fries, large", emoji: "🍟", serving: "1 large", kcal: 510, carbs: 67, protein: 6, fat: 24 },
+  { id: "ff_onion_rings", label: "Onion rings", emoji: "🧅", serving: "1 medium", kcal: 410, carbs: 50, protein: 6, fat: 21 },
+  { id: "ff_milkshake", label: "Milkshake, vanilla", emoji: "🥤", serving: "16 oz", kcal: 530, carbs: 86, protein: 12, fat: 15, category: "beverage" },
+  { id: "ff_chipotle_bowl", label: "Burrito bowl (Chipotle-style)", emoji: "🥗", serving: "1 bowl", kcal: 700, carbs: 75, protein: 32, fat: 28 },
+  { id: "ff_subway_6", label: "6\" Subway turkey sub", emoji: "🥪", serving: "1 sub", kcal: 280, carbs: 47, protein: 18, fat: 4 },
+
+  // ── Beverages: coffee, tea, juices
   { id: "water", label: "Water", emoji: "💧", serving: "1 cup", kcal: 0, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "sparkling_water", label: "Sparkling water", emoji: "💧", serving: "12 oz", kcal: 0, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "coffee_black", label: "Coffee, black", emoji: "☕", serving: "1 cup", kcal: 5, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "espresso", label: "Espresso", emoji: "☕", serving: "1 shot", kcal: 3, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "latte", label: "Latte", emoji: "☕", serving: "12 oz", kcal: 180, carbs: 17, protein: 12, fat: 7, category: "beverage" },
+  { id: "cappuccino", label: "Cappuccino", emoji: "☕", serving: "8 oz", kcal: 120, carbs: 12, protein: 8, fat: 4, category: "beverage" },
+  { id: "mocha", label: "Mocha", emoji: "☕", serving: "12 oz", kcal: 290, carbs: 35, protein: 13, fat: 12, category: "beverage" },
+  { id: "iced_coffee", label: "Iced coffee", emoji: "🧋", serving: "16 oz", kcal: 100, carbs: 20, protein: 4, fat: 2, category: "beverage" },
+  { id: "tea_green", label: "Green tea", emoji: "🍵", serving: "1 cup", kcal: 2, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "tea_black", label: "Black tea", emoji: "🍵", serving: "1 cup", kcal: 2, carbs: 1, protein: 0, fat: 0, category: "beverage" },
+  { id: "tea_chai", label: "Chai latte", emoji: "🍵", serving: "12 oz", kcal: 200, carbs: 32, protein: 7, fat: 5, category: "beverage" },
+  { id: "matcha_latte", label: "Matcha latte", emoji: "🍵", serving: "12 oz", kcal: 200, carbs: 26, protein: 9, fat: 7, category: "beverage" },
+  { id: "boba", label: "Bubble tea", emoji: "🧋", serving: "16 oz", kcal: 350, carbs: 70, protein: 4, fat: 6, category: "beverage" },
+  { id: "smoothie", label: "Fruit smoothie", emoji: "🥤", serving: "16 oz", kcal: 250, carbs: 45, protein: 8, fat: 4, category: "beverage" },
+  { id: "protein_shake", label: "Protein shake", emoji: "🥤", serving: "1 scoop", kcal: 120, carbs: 3, protein: 24, fat: 2, category: "beverage" },
+  { id: "oj", label: "Orange juice", emoji: "🧃", serving: "1 cup", kcal: 110, carbs: 26, protein: 2, fat: 0, category: "beverage" },
+  { id: "apple_juice", label: "Apple juice", emoji: "🧃", serving: "1 cup", kcal: 114, carbs: 28, protein: 0, fat: 0, category: "beverage" },
+  { id: "cranberry_juice", label: "Cranberry juice", emoji: "🧃", serving: "1 cup", kcal: 116, carbs: 31, protein: 0, fat: 0, category: "beverage" },
+  { id: "lemonade", label: "Lemonade", emoji: "🧃", serving: "1 cup", kcal: 99, carbs: 26, protein: 0, fat: 0, category: "beverage" },
+  { id: "soda_cola", label: "Cola", emoji: "🥤", serving: "12 oz", kcal: 140, carbs: 39, protein: 0, fat: 0, category: "beverage" },
+  { id: "soda_diet", label: "Diet cola", emoji: "🥤", serving: "12 oz", kcal: 0, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "energy_drink", label: "Energy drink", emoji: "⚡", serving: "8 oz", kcal: 110, carbs: 28, protein: 0, fat: 0, category: "beverage" },
+  { id: "sports_drink", label: "Sports drink", emoji: "🥤", serving: "12 oz", kcal: 80, carbs: 21, protein: 0, fat: 0, category: "beverage" },
+  { id: "kombucha", label: "Kombucha", emoji: "🥤", serving: "16 oz", kcal: 60, carbs: 14, protein: 0, fat: 0, category: "beverage" },
+  { id: "coconut_water", label: "Coconut water", emoji: "🥥", serving: "1 cup", kcal: 46, carbs: 9, protein: 2, fat: 0, category: "beverage" },
+
+  // ── Alcohol
+  { id: "beer", label: "Beer, regular", emoji: "🍺", serving: "12 oz", kcal: 150, carbs: 13, protein: 2, fat: 0, category: "beverage" },
+  { id: "beer_light", label: "Light beer", emoji: "🍺", serving: "12 oz", kcal: 103, carbs: 6, protein: 1, fat: 0, category: "beverage" },
+  { id: "beer_ipa", label: "IPA beer", emoji: "🍺", serving: "12 oz", kcal: 200, carbs: 19, protein: 2, fat: 0, category: "beverage" },
+  { id: "wine_red", label: "Red wine", emoji: "🍷", serving: "5 oz", kcal: 125, carbs: 4, protein: 0, fat: 0, category: "beverage" },
+  { id: "wine_white", label: "White wine", emoji: "🍷", serving: "5 oz", kcal: 121, carbs: 4, protein: 0, fat: 0, category: "beverage" },
+  { id: "champagne", label: "Champagne", emoji: "🍾", serving: "5 oz", kcal: 119, carbs: 5, protein: 0, fat: 0, category: "beverage" },
+  { id: "cocktail_margarita", label: "Margarita", emoji: "🍹", serving: "1 standard", kcal: 280, carbs: 18, protein: 0, fat: 0, category: "beverage" },
+  { id: "cocktail_mojito", label: "Mojito", emoji: "🍹", serving: "1 standard", kcal: 168, carbs: 12, protein: 0, fat: 0, category: "beverage" },
+  { id: "cocktail_negroni", label: "Negroni", emoji: "🍸", serving: "1 standard", kcal: 215, carbs: 11, protein: 0, fat: 0, category: "beverage" },
+  { id: "cocktail_old_fashioned", label: "Old fashioned", emoji: "🥃", serving: "1 standard", kcal: 154, carbs: 4, protein: 0, fat: 0, category: "beverage" },
+  { id: "spirits_vodka", label: "Vodka shot", emoji: "🥃", serving: "1.5 oz", kcal: 97, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "spirits_whiskey", label: "Whiskey", emoji: "🥃", serving: "1.5 oz", kcal: 105, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "spirits_tequila", label: "Tequila shot", emoji: "🥃", serving: "1.5 oz", kcal: 96, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "spirits_rum", label: "Rum", emoji: "🥃", serving: "1.5 oz", kcal: 97, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+
+  // ── Condiments, dressings, oils
+  { id: "olive_oil", label: "Olive oil", emoji: "🫒", serving: "1 tbsp", kcal: 119, carbs: 0, protein: 0, fat: 14 },
+  { id: "ketchup", label: "Ketchup", emoji: "🍅", serving: "1 tbsp", kcal: 17, carbs: 4, protein: 0, fat: 0 },
+  { id: "mustard", label: "Mustard", emoji: "🟡", serving: "1 tsp", kcal: 3, carbs: 0, protein: 0, fat: 0 },
+  { id: "mayo", label: "Mayonnaise", emoji: "🥚", serving: "1 tbsp", kcal: 94, carbs: 0, protein: 0, fat: 10 },
+  { id: "soy_sauce", label: "Soy sauce", emoji: "🍱", serving: "1 tbsp", kcal: 8, carbs: 1, protein: 1, fat: 0 },
+  { id: "sriracha", label: "Sriracha", emoji: "🌶️", serving: "1 tsp", kcal: 5, carbs: 1, protein: 0, fat: 0 },
+  { id: "ranch", label: "Ranch dressing", emoji: "🥗", serving: "2 tbsp", kcal: 145, carbs: 2, protein: 1, fat: 15 },
+  { id: "vinaigrette", label: "Vinaigrette", emoji: "🥗", serving: "2 tbsp", kcal: 80, carbs: 2, protein: 0, fat: 8 },
+  { id: "guacamole", label: "Guacamole", emoji: "🥑", serving: "2 tbsp", kcal: 50, carbs: 3, protein: 1, fat: 4 },
+  { id: "salsa", label: "Salsa", emoji: "🍅", serving: "2 tbsp", kcal: 10, carbs: 2, protein: 0, fat: 0 },
+  { id: "sugar", label: "Sugar, granulated", emoji: "🍬", serving: "1 tsp", kcal: 16, carbs: 4, protein: 0, fat: 0 },
 ];
+
+async function searchOpenFoodFacts(query: string, signal?: AbortSignal): Promise<FoodPreset[]> {
+  const url =
+    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}` +
+    `&search_simple=1&action=process&json=1&page_size=20` +
+    `&fields=code,product_name,brands,nutriments,serving_size,categories_tags,image_small_url`;
+  const res = await fetch(url, { signal });
+  if (!res.ok) return [];
+  const data = (await res.json()) as {
+    products?: Array<{
+      code?: string;
+      product_name?: string;
+      brands?: string;
+      serving_size?: string;
+      categories_tags?: string[];
+      nutriments?: Record<string, number | string | undefined>;
+    }>;
+  };
+  const products = data.products ?? [];
+  const out: FoodPreset[] = [];
+  const seen = new Set<string>();
+  for (const p of products) {
+    const name = (p.product_name || "").trim();
+    if (!name) continue;
+    const n = p.nutriments || {};
+    const kcalServ = numFrom(n["energy-kcal_serving"]) ?? numFrom(n["energy-kcal_value"]);
+    const kcal100 = numFrom(n["energy-kcal_100g"]);
+    const kcal = kcalServ ?? kcal100;
+    if (kcal == null || kcal <= 0 || kcal > 2000) continue;
+    const useServing = kcalServ != null;
+    const carbs = useServing
+      ? numFrom(n["carbohydrates_serving"]) ?? 0
+      : numFrom(n["carbohydrates_100g"]) ?? 0;
+    const protein = useServing
+      ? numFrom(n["proteins_serving"]) ?? 0
+      : numFrom(n["proteins_100g"]) ?? 0;
+    const fat = useServing
+      ? numFrom(n["fat_serving"]) ?? 0
+      : numFrom(n["fat_100g"]) ?? 0;
+    const serving = useServing
+      ? (p.serving_size?.trim() || "1 serving")
+      : "100 g";
+    const tags = (p.categories_tags ?? []).join(" ");
+    const isBeverage =
+      /beverages|drinks|sodas|waters|juices|coffees|teas|alcoholic/.test(tags);
+    const label = p.brands ? `${name} · ${p.brands.split(",")[0].trim()}` : name;
+    const key = label.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      id: `off_${p.code ?? key}`,
+      label: label.length > 60 ? label.slice(0, 57) + "…" : label,
+      emoji: isBeverage ? "🥤" : "🍽️",
+      serving,
+      kcal: Math.round(kcal),
+      carbs: Math.round(carbs),
+      protein: Math.round(protein),
+      fat: Math.round(fat),
+      category: isBeverage ? "beverage" : "food",
+    });
+    if (out.length >= 15) break;
+  }
+  return out;
+}
+
+function numFrom(v: number | string | undefined): number | null {
+  if (v == null) return null;
+  const n = typeof v === "number" ? v : parseFloat(v);
+  return Number.isFinite(n) ? n : null;
+}
 
 const MEALS: { key: MealKey; label: string; emoji: string; share: number }[] = [
   { key: "breakfast", label: "Breakfast", emoji: "☕", share: 0.3 },
@@ -419,6 +721,8 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const [freqOpen, setFreqOpen] = useState(false);
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [cameraBusy, setCameraBusy] = useState(false);
+  const [remoteResults, setRemoteResults] = useState<FoodPreset[]>([]);
+  const [remoteLoading, setRemoteLoading] = useState(false);
 
   const open = meal !== null;
   const mealLabel = MEALS.find((m) => m.key === meal)?.label ?? "";
@@ -452,6 +756,31 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     }
     return list;
   }, [catFilter, freqFilter, search, frequency]);
+
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 3) {
+      setRemoteResults([]);
+      setRemoteLoading(false);
+      return;
+    }
+    setRemoteLoading(true);
+    const controller = new AbortController();
+    const handle = setTimeout(async () => {
+      try {
+        const results = await searchOpenFoodFacts(q, controller.signal);
+        setRemoteResults(results);
+      } catch {
+        setRemoteResults([]);
+      } finally {
+        setRemoteLoading(false);
+      }
+    }, 450);
+    return () => {
+      controller.abort();
+      clearTimeout(handle);
+    };
+  }, [search]);
 
   function reset() {
     setSearch("");
@@ -746,9 +1075,11 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
               </View>
 
               <ScrollView style={styles.pickerScroll} keyboardShouldPersistTaps="handled">
-                {filtered.length === 0 && (
+                {filtered.length === 0 && remoteResults.length === 0 && !remoteLoading && (
                   <Text style={[styles.empty, { color: colors.mutedForeground }]}>
-                    No results. Try another search.
+                    {search.trim().length >= 3
+                      ? "No results. Try another search."
+                      : "Type at least 3 characters to search the food library."}
                   </Text>
                 )}
                 {filtered.map((p) => {
@@ -795,6 +1126,73 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
                     </View>
                   );
                 })}
+
+                {search.trim().length >= 3 && (
+                  <>
+                    {(remoteResults.length > 0 || remoteLoading) && (
+                      <Text
+                        style={{
+                          paddingHorizontal: 14,
+                          paddingTop: 14,
+                          paddingBottom: 6,
+                          fontSize: 12,
+                          fontWeight: "600",
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          color: colors.mutedForeground,
+                        }}
+                      >
+                        {remoteLoading ? "Searching food library…" : "More from food library"}
+                      </Text>
+                    )}
+                    {remoteResults
+                      .filter(
+                        (r) =>
+                          !filtered.some(
+                            (f) => f.label.toLowerCase() === r.label.toLowerCase(),
+                          ),
+                      )
+                      .map((p) => {
+                        const pendingCount = pending.filter((x) => x.preset.id === p.id).length;
+                        return (
+                          <View
+                            key={p.id}
+                            style={[styles.foodRow, { borderBottomColor: colors.border }]}
+                          >
+                            <Pressable
+                              onPress={() => setSelected(p)}
+                              style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 14 }}
+                            >
+                              <View style={{ flex: 1 }}>
+                                <Text style={[styles.foodLabel, { color: colors.foreground }]} numberOfLines={1}>
+                                  {p.label}
+                                  {pendingCount > 0 && (
+                                    <Text style={{ color: colors.primary }}> · {pendingCount} added</Text>
+                                  )}
+                                </Text>
+                                <Text style={[styles.foodSub, { color: colors.mutedForeground }]}>
+                                  {p.serving}
+                                </Text>
+                              </View>
+                              <Text style={[styles.foodKcal, { color: colors.foreground }]}>{p.kcal} kcal</Text>
+                            </Pressable>
+                            <Pressable
+                              onPress={() => handleQuickAdd(p)}
+                              hitSlop={6}
+                              style={({ pressed }) => [
+                                styles.plusBtn,
+                                { borderColor: colors.primary },
+                                pressed && { opacity: 0.6 },
+                              ]}
+                            >
+                              <Feather name="plus" size={18} color={colors.primary} />
+                            </Pressable>
+                          </View>
+                        );
+                      })}
+                  </>
+                )}
+
                 <View style={{ height: 80 }} />
               </ScrollView>
 
