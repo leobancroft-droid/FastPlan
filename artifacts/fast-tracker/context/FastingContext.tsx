@@ -446,10 +446,13 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   }, [emotionLog]);
 
   const removeEmotionEntry = useCallback(async (entryId: string) => {
-    const next = emotionLog.filter((e) => e.id !== entryId);
-    setEmotionLog(next);
-    await AsyncStorage.setItem("emotion_log", JSON.stringify(next));
-  }, [emotionLog]);
+    let snapshot: EmotionEntry[] = [];
+    setEmotionLog((prev) => {
+      snapshot = prev.filter((e) => e.id !== entryId);
+      return snapshot;
+    });
+    await AsyncStorage.setItem("emotion_log", JSON.stringify(snapshot));
+  }, []);
 
   const addCustomEmotion = useCallback(async (label: string, emoji: string) => {
     const trimmed = label.trim().slice(0, 20);
