@@ -84,9 +84,9 @@ const colors = {
     fastPrimary: "#7c3aed",
     fastAccent: "#ff6b9d",
 
-    eatBg: "#1a0f2e",
-    eatCard: "#181830",
-    eatText: "#e8e5ff",
+    eatBg: "#3a0a24",
+    eatCard: "#4a1334",
+    eatText: "#ffe8f2",
     eatPrimary: "#ff6b9d",
     eatAccent: "#a29bfe",
 
