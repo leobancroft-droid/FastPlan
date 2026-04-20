@@ -597,7 +597,7 @@ export function NutritionTracker({ burned }: Props) {
                   pressed && { opacity: 0.7 },
                 ]}
               >
-                <Feather name="plus" size={20} color="#1a1a2e" />
+                <Feather name="plus" size={22} color="#22c55e" />
               </Pressable>
             </View>
           );
@@ -1489,8 +1489,6 @@ const styles = StyleSheet.create({
   addBtn: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
