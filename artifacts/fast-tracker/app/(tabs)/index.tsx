@@ -248,6 +248,8 @@ export default function HomeScreen() {
 
         <View style={styles.spacing} />
 
+        <Text style={[styles.sectionTitle, { color: textColor }]}>Summary</Text>
+
         <NutritionTracker
           key={nutritionRefresh}
           burned={burned}
