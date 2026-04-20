@@ -38,18 +38,24 @@ function ClassicTabLayout() {
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
+  const barBg = isDark ? colors.background : "#ffffff";
+  const activeColor = isDark ? colors.foreground : "#1a1a2e";
+  const inactiveColor = isDark ? colors.mutedForeground : "#9090b0";
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
+        tabBarActiveTintColor: activeColor,
+        tabBarInactiveTintColor: inactiveColor,
+        tabBarShowLabel: true,
         headerShown: false,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: isIOS ? "transparent" : colors.background,
-          borderTopWidth: isWeb ? 1 : 0,
-          borderTopColor: colors.border,
+          backgroundColor: isIOS ? "transparent" : barBg,
+          borderTopWidth: 0,
+          borderTopColor: "transparent",
           elevation: 0,
+          shadowOpacity: 0,
           ...(isWeb ? { height: 84 } : {}),
         },
         tabBarBackground: () =>
@@ -61,7 +67,7 @@ function ClassicTabLayout() {
             />
           ) : isWeb ? (
             <View
-              style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: barBg }]}
             />
           ) : null,
       }}
