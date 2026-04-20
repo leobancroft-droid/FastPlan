@@ -155,7 +155,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
     mutedForeground: c.fastMuted,
     border: c.border,
     muted: c.muted,
-    primary: c.fastPrimary,
+    primary: c.success,
   };
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
