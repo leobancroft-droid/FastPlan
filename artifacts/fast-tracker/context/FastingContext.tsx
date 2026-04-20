@@ -67,6 +67,8 @@ interface FastingContextType {
   onboardingComplete: boolean;
   onboardingAnswers: Record<string, string | string[]> | null;
   userProfile: UserProfile | null;
+  planIntroSeen: boolean;
+  markPlanIntroSeen: () => Promise<void>;
   markComplete: () => Promise<void>;
   markSkipped: () => Promise<void>;
   resetAll: () => Promise<void>;
@@ -102,6 +104,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [onboardingAnswers, setOnboardingAnswers] = useState<Record<string, string | string[]> | null>(null);
+  const [planIntroSeen, setPlanIntroSeen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const userProfile = useMemo(() => derivePersonalProfile(onboardingAnswers), [onboardingAnswers]);
@@ -117,18 +120,20 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
         AsyncStorage.getItem("onboarding_complete"),
         AsyncStorage.getItem("onboarding_answers"),
+        AsyncStorage.getItem("plan_intro_seen"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
       setStartDate(startRaw ?? null);
       setOnboardingComplete(onboardRaw === "true");
       setOnboardingAnswers(answersRaw ? JSON.parse(answersRaw) : null);
+      setPlanIntroSeen(introRaw === "true");
     } catch {}
     setLoaded(true);
   }
@@ -140,6 +145,11 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.setItem("onboarding_answers", JSON.stringify(answers)),
       AsyncStorage.setItem("onboarding_complete", "true"),
     ]);
+  }, []);
+
+  const markPlanIntroSeen = useCallback(async () => {
+    setPlanIntroSeen(true);
+    await AsyncStorage.setItem("plan_intro_seen", "true");
   }, []);
 
   const getTypeForDate = useCallback((dateStr: string): DayType => {
@@ -244,18 +254,20 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("fasting_start"),
       AsyncStorage.removeItem("onboarding_complete"),
       AsyncStorage.removeItem("onboarding_answers"),
+      AsyncStorage.removeItem("plan_intro_seen"),
     ]);
     setHistory([]);
     setBadges(BADGES);
     setStartDate(null);
     setOnboardingComplete(false);
     setOnboardingAnswers(null);
+    setPlanIntroSeen(false);
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

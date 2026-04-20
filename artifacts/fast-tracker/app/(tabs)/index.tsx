@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DayBadge } from "@/components/DayBadge";
 import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
 import { PlanCard } from "@/components/PlanCard";
+import { PlanReadyIntro } from "@/components/PlanReadyIntro";
 import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
@@ -29,14 +30,15 @@ import { useColors } from "@/hooks/useColors";
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile } = useFasting();
+  const { today, streak, longestStreak, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen } = useFasting();
   const [loading, setLoading] = useState(false);
 
   const btnScale = useSharedValue(1);
   const checkScale = useSharedValue(0);
 
   const showOnboarding = !onboardingComplete;
-  const showPicker = onboardingComplete && !startDate;
+  const showPlanIntro = onboardingComplete && !planIntroSeen;
+  const showPicker = onboardingComplete && planIntroSeen && !startDate;
 
   const isFastDay = today?.type === "fast";
   const isCompleted = today?.status === "completed";
@@ -92,6 +94,7 @@ export default function HomeScreen() {
         visible={showOnboarding}
         onComplete={(answers) => completeOnboarding(answers)}
       />
+      <PlanReadyIntro visible={showPlanIntro} onContinue={markPlanIntroSeen} />
       <StartDatePicker
         visible={showPicker}
         onConfirm={(dateStr) => setStartDateExplicit(dateStr)}
