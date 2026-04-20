@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { NutritionTracker } from "@/components/NutritionTracker";
 import { useColors } from "@/hooks/useColors";
 
 interface Activity {
@@ -296,6 +297,8 @@ export default function ActivitiesScreen() {
               </Pressable>
             ))}
           </ScrollView>
+
+          <NutritionTracker burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)} />
 
           <Pressable
             onPress={() => {
