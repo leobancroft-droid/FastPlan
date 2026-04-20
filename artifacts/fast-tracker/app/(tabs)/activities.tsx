@@ -212,7 +212,7 @@ export default function ActivitiesScreen() {
       )}
 
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.foreground }]}>Earned</Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>Steps</Text>
         {connected && (
           <Pressable onPress={() => setStepsEditOpen(true)} hitSlop={10}>
             <Text style={[styles.moreBtn, { color: colors.primary }]}>Add</Text>
@@ -267,6 +267,10 @@ export default function ActivitiesScreen() {
                 ]}
               />
             </View>
+          </View>
+
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.foreground }]}>Add Workout</Text>
           </View>
 
           <ScrollView
