@@ -26,7 +26,7 @@ export function EmotionTracker() {
           <View style={[styles.iconBubble, { backgroundColor: colors.primary + "22" }]}>
             <Feather name="heart" size={16} color={colors.primary} />
           </View>
-          <Text style={[styles.title, { color: colors.foreground }]}>Feelings</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>Mood</Text>
         </View>
         <Pressable onPress={() => setHistoryOpen(true)} hitSlop={10}>
           <Text style={[styles.moreBtn, { color: colors.primary }]}>History</Text>
@@ -59,7 +59,7 @@ export function EmotionTracker() {
               if (Platform.OS === "web") {
                 removeEmotionEntry(entry.id);
               } else {
-                Alert.alert("Remove feeling", `Remove ${entry.label}?`, [
+                Alert.alert("Remove mood", `Remove ${entry.label}?`, [
                   { text: "Cancel", style: "cancel" },
                   { text: "Remove", style: "destructive", onPress: () => removeEmotionEntry(entry.id) },
                 ]);
@@ -129,7 +129,7 @@ function EmotionPicker({ open, onClose }: PickerProps) {
           <View style={styles.sheetHandle} />
 
           <View style={styles.pickerHeader}>
-            <Text style={[styles.pickerTitle, { color: colors.foreground }]}>Add feelings</Text>
+            <Text style={[styles.pickerTitle, { color: colors.foreground }]}>Add mood</Text>
             <Pressable onPress={onClose} hitSlop={10}>
               <Text style={[styles.doneText, { color: colors.primary }]}>Done</Text>
             </Pressable>
@@ -222,7 +222,7 @@ function EmotionsManager({ open, onClose }: ManagerProps) {
             <ScrollView style={styles.scrollArea} contentContainerStyle={{ gap: 16, paddingBottom: 8 }}>
               {grouped.length === 0 && (
                 <Text style={[styles.empty, { color: colors.mutedForeground }]}>
-                  No feelings logged yet. Tap Add to start tracking.
+                  No moods logged yet. Tap Add to start tracking.
                 </Text>
               )}
               {grouped.map(([date, entries]) => (
