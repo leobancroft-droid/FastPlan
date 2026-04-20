@@ -96,9 +96,9 @@ export function AiFoodScanner({ onAdded }: Props) {
     setOpen(true);
   }
 
-  async function withModalDismissed<T>(fn: () => Promise<T>): Promise<T | undefined> {
+  async function withModalDismissed<T>(fn: () => Promise<T>, waitMs: number): Promise<T | undefined> {
     setOpen(false);
-    await new Promise((r) => setTimeout(r, Platform.OS === "ios" ? 550 : 200));
+    await new Promise((r) => setTimeout(r, waitMs));
     try {
       return await fn();
     } finally {
@@ -109,21 +109,36 @@ export function AiFoodScanner({ onAdded }: Props) {
   async function pickFromCamera() {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
+      Alert.alert(
+        "Camera permission needed",
+        perm.canAskAgain
+          ? "Allow camera access to scan a meal."
+          : "Camera access is blocked. Enable it in Settings → AltFast → Camera.",
+      );
       return;
     }
     try {
-      const r = await withModalDismissed(() =>
-        ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions
-            ? ImagePicker.MediaTypeOptions.Images
-            : ("images" as any),
-          quality: 0.6,
-          base64: true,
-          allowsEditing: false,
-        }),
+      const r = await withModalDismissed(
+        () =>
+          ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions
+              ? ImagePicker.MediaTypeOptions.Images
+              : ("images" as any),
+            quality: 0.6,
+            base64: true,
+            allowsEditing: false,
+            cameraType: ImagePicker.CameraType.back,
+          }),
+        Platform.OS === "ios" ? 900 : 250,
       );
-      if (r && !r.canceled && r.assets?.[0]) {
+      if (r === undefined) {
+        Alert.alert(
+          "Camera unavailable",
+          "The camera couldn't open. If you're testing in a simulator, the camera isn't available there — please try on a real device.",
+        );
+        return;
+      }
+      if (!r.canceled && r.assets?.[0]) {
         await handleAssetSelected(r.assets[0]);
       }
     } catch (err) {
@@ -137,19 +152,26 @@ export function AiFoodScanner({ onAdded }: Props) {
   async function pickFromLibrary() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Photos permission needed", "Allow photo access to scan a meal.");
+      Alert.alert(
+        "Photos permission needed",
+        perm.canAskAgain
+          ? "Allow photo access to scan a meal."
+          : "Photo access is blocked. Enable it in Settings → AltFast → Photos.",
+      );
       return;
     }
     try {
-      const r = await withModalDismissed(() =>
-        ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions
-            ? ImagePicker.MediaTypeOptions.Images
-            : ("images" as any),
-          quality: 0.6,
-          base64: true,
-          allowsEditing: false,
-        }),
+      const r = await withModalDismissed(
+        () =>
+          ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions
+              ? ImagePicker.MediaTypeOptions.Images
+              : ("images" as any),
+            quality: 0.6,
+            base64: true,
+            allowsEditing: false,
+          }),
+        Platform.OS === "ios" ? 550 : 200,
       );
       if (r && !r.canceled && r.assets?.[0]) {
         await handleAssetSelected(r.assets[0]);
