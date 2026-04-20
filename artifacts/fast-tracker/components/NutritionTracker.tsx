@@ -524,7 +524,7 @@ export function NutritionTracker({ burned }: Props) {
               <Text style={[styles.gaugeValue, { color: colors.foreground }]}>
                 {remaining.toLocaleString()}
               </Text>
-              <Text style={[styles.gaugeLabel, { color: colors.mutedForeground }]}>Remaining</Text>
+              <Text style={[styles.gaugeLabel, { color: colors.mutedForeground }]}>To Eat</Text>
             </View>
           </View>
 
