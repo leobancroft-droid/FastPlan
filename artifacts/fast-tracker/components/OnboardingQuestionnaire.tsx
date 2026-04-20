@@ -234,8 +234,8 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
         </View>
 
         <View style={styles.monsterRow}>
-          <Image source={EAT_MONSTER} style={styles.monster} resizeMode="contain" />
           <Image source={FAST_MONSTER} style={styles.monster} resizeMode="contain" />
+          <Image source={EAT_MONSTER} style={styles.monster} resizeMode="contain" />
           <Image source={COMPLETE_MONSTER} style={styles.monster} resizeMode="contain" />
           <Image source={SKIPPED_MONSTER} style={styles.monster} resizeMode="contain" />
         </View>
