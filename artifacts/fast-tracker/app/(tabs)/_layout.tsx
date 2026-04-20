@@ -21,7 +21,7 @@ function NativeTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="history">
         <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
-        <Label>History</Label>
+        <Label>Fasting</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="rewards">
         <Icon sf={{ default: "trophy", selected: "trophy.fill" }} />
@@ -103,7 +103,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: "History",
+          title: "Fasting",
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="calendar" tintColor={color} size={24} />
