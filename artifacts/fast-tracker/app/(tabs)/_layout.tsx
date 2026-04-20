@@ -15,6 +15,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "moon.stars", selected: "moon.stars.fill" }} />
         <Label>Today</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="activities">
+        <Icon sf={{ default: "figure.walk", selected: "figure.walk" }} />
+        <Label>Activity</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="history">
         <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
         <Label>History</Label>
@@ -81,6 +85,18 @@ function ClassicTabLayout() {
               <SymbolView name="moon.stars" tintColor={color} size={24} />
             ) : (
               <Feather name="moon" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="activities"
+        options={{
+          title: "Activity",
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="figure.walk" tintColor={color} size={24} />
+            ) : (
+              <Feather name="activity" size={22} color={color} />
             ),
         }}
       />
