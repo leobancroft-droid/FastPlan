@@ -262,7 +262,7 @@ export default function ActivitiesScreen() {
               <View
                 style={[
                   styles.progressFill,
-                  { width: `${stepsProgress * 100}%`, backgroundColor: colors.primary },
+                  { width: `${stepsProgress * 100}%`, backgroundColor: "#ec4899" },
                 ]}
               />
             </View>
