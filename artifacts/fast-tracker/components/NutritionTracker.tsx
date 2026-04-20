@@ -597,7 +597,7 @@ export function NutritionTracker({ burned }: Props) {
                   pressed && { opacity: 0.7 },
                 ]}
               >
-                <Feather name="plus" size={22} color="#22c55e" />
+                <Feather name="plus" size={22} color="#a29bfe" />
               </Pressable>
             </View>
           );
