@@ -228,7 +228,7 @@ export function NutritionTracker({ burned }: Props) {
 
           <View style={styles.statBlock}>
             <Text style={[styles.statValue, { color: colors.foreground }]}>{burned}</Text>
-            <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Burned</Text>
+            <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>Burnt</Text>
           </View>
         </View>
 
