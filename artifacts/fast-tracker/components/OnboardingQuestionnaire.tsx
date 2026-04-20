@@ -436,7 +436,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                       { backgroundColor: colors.primary + "14", borderColor: colors.primary + "55" },
                     ]}
                   >
-                    <Text style={[styles.calorieLabel, { color: colors.mutedForeground }]}>
+                    <Text style={[styles.calorieLabel, { color: "#fff" }]}>
                       Suggested daily intake
                     </Text>
                     <Text style={[styles.calorieValue, { color: colors.foreground }]}>
@@ -447,7 +447,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                         ≈ {Math.abs(weeklyDisp).toFixed(2)} {unit}/wk to {direction}
                       </Text>
                     )}
-                    <Text style={[styles.calorieNote, { color: colors.mutedForeground }]}>
+                    <Text style={[styles.calorieNote, { color: "#fff" }]}>
                       Remember — you can exceed your calorie suggestion when fasting regularly! Especially alternate day fasting!
                     </Text>
                   </View>
