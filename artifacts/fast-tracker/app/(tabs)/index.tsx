@@ -27,7 +27,7 @@ import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
 import { PlanCard } from "@/components/PlanCard";
 import { PlannedCalendar } from "@/components/PlannedCalendar";
 import { PlanReadyIntro } from "@/components/PlanReadyIntro";
-import { QuoteCard } from "@/components/QuoteCard";
+import { AffirmationWidget } from "@/components/AffirmationWidget";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
 import { WaterTracker } from "@/components/WaterTracker";
@@ -158,15 +158,16 @@ export default function HomeScreen() {
         <Text style={[styles.dateLabel, { color: mutedColor }]}>{todayLabel}</Text>
 
         <View style={styles.hero}>
-          <DayBadge type={today?.type ?? "eat"} large />
           <Text style={[styles.dayTitle, { color: textColor }]}>
             {isFastDay ? "Fast Day" : "Eat Day"}
           </Text>
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
             {getDaySubtitle(isFastDay, userProfile?.tone)}
           </Text>
-          <QuoteCard quote={fastQuote} isFastDay={isFastDay} />
         </View>
+
+        <View style={styles.spacing} />
+        <AffirmationWidget quote={fastQuote} isFastDay={isFastDay} />
 
         <StreakCounter streak={streak} longestStreak={longestStreak} isFastDay={isFastDay} />
 
