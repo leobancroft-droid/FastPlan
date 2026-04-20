@@ -201,10 +201,13 @@ export default function ActivitiesScreen() {
       showsVerticalScrollIndicator={false}
     >
       {connected && (
-        <NutritionTracker
-          key={nutritionRefresh}
-          burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
-        />
+        <>
+          <NutritionTracker
+            key={nutritionRefresh}
+            burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
+          />
+          <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
+        </>
       )}
 
       <View style={styles.header}>
@@ -306,8 +309,6 @@ export default function ActivitiesScreen() {
               </Pressable>
             ))}
           </ScrollView>
-
-          <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
 
           <Pressable
             onPress={() => {
