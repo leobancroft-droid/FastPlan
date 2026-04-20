@@ -26,6 +26,7 @@ import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
 import { WaterTracker } from "@/components/WaterTracker";
 import { WeightTracker } from "@/components/WeightTracker";
+import { EmotionTracker } from "@/components/EmotionTracker";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -135,6 +136,10 @@ export default function HomeScreen() {
         <View style={styles.spacing} />
 
         <WeightTracker />
+
+        <View style={styles.spacing} />
+
+        <EmotionTracker />
 
         <View style={styles.spacing} />
 

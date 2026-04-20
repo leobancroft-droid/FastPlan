@@ -12,6 +12,35 @@ import { derivePersonalProfile, type UserProfile } from "@/lib/personalization";
 export type DayType = "eat" | "fast";
 export type DayStatus = "pending" | "completed" | "skipped";
 
+export interface EmotionPreset {
+  id: string;
+  label: string;
+  emoji: string;
+  custom?: boolean;
+}
+
+export interface EmotionEntry {
+  id: string;
+  presetId: string;
+  label: string;
+  emoji: string;
+  date: string;
+  timestamp: string;
+}
+
+export const DEFAULT_EMOTIONS: EmotionPreset[] = [
+  { id: "cravings", label: "Cravings", emoji: "🍕" },
+  { id: "exhausted", label: "Exhausted", emoji: "😞" },
+  { id: "binge", label: "Binge Eating", emoji: "🍔" },
+  { id: "energized", label: "Energized", emoji: "⚡" },
+  { id: "hungry", label: "Hungry", emoji: "🍽️" },
+  { id: "strong", label: "Strong", emoji: "💪" },
+  { id: "focused", label: "Focused", emoji: "🎯" },
+  { id: "anxious", label: "Anxious", emoji: "😰" },
+  { id: "calm", label: "Calm", emoji: "😌" },
+  { id: "proud", label: "Proud", emoji: "🎉" },
+];
+
 export interface DayRecord {
   date: string;
   type: DayType;
@@ -84,6 +113,12 @@ interface FastingContextType {
   setWeightKg: (kg: number | null) => Promise<void>;
   setWeightGoalKg: (kg: number | null) => Promise<void>;
   setWeightUnit: (unit: "kg" | "lb") => Promise<void>;
+  emotionLog: EmotionEntry[];
+  customEmotions: EmotionPreset[];
+  logEmotion: (preset: EmotionPreset) => Promise<void>;
+  removeEmotionEntry: (entryId: string) => Promise<void>;
+  addCustomEmotion: (label: string, emoji: string) => Promise<void>;
+  removeCustomEmotion: (presetId: string) => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
@@ -124,6 +159,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [weightKg, setWeightKgState] = useState<number | null>(null);
   const [weightGoalKg, setWeightGoalKgState] = useState<number | null>(null);
   const [weightUnit, setWeightUnitState] = useState<"kg" | "lb">("kg");
+  const [emotionLog, setEmotionLog] = useState<EmotionEntry[]>([]);
+  const [customEmotions, setCustomEmotions] = useState<EmotionPreset[]>([]);
   const [loaded, setLoaded] = useState(false);
   const glassSize = 250;
 
@@ -140,7 +177,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw, emoLogRaw, emoCustomRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
@@ -152,6 +189,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem("weight_kg"),
         AsyncStorage.getItem("weight_goal_kg"),
         AsyncStorage.getItem("weight_unit"),
+        AsyncStorage.getItem("emotion_log"),
+        AsyncStorage.getItem("emotion_custom"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
@@ -173,6 +212,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       if (wRaw) setWeightKgState(Number(wRaw));
       if (wGoalRaw) setWeightGoalKgState(Number(wGoalRaw));
       if (wUnitRaw === "kg" || wUnitRaw === "lb") setWeightUnitState(wUnitRaw);
+      if (emoLogRaw) setEmotionLog(JSON.parse(emoLogRaw));
+      if (emoCustomRaw) setCustomEmotions(JSON.parse(emoCustomRaw));
     } catch {}
     setLoaded(true);
   }
@@ -320,6 +361,47 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem("weight_unit", unit);
   }, []);
 
+  const logEmotion = useCallback(async (preset: EmotionPreset) => {
+    const entry: EmotionEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      presetId: preset.id,
+      label: preset.label,
+      emoji: preset.emoji,
+      date: getTodayStr(),
+      timestamp: new Date().toISOString(),
+    };
+    const next = [entry, ...emotionLog].slice(0, 500);
+    setEmotionLog(next);
+    await AsyncStorage.setItem("emotion_log", JSON.stringify(next));
+  }, [emotionLog]);
+
+  const removeEmotionEntry = useCallback(async (entryId: string) => {
+    const next = emotionLog.filter((e) => e.id !== entryId);
+    setEmotionLog(next);
+    await AsyncStorage.setItem("emotion_log", JSON.stringify(next));
+  }, [emotionLog]);
+
+  const addCustomEmotion = useCallback(async (label: string, emoji: string) => {
+    const trimmed = label.trim().slice(0, 20);
+    const trimmedEmoji = emoji.trim().slice(0, 4) || "✨";
+    if (!trimmed) return;
+    const preset: EmotionPreset = {
+      id: `custom-${Date.now()}`,
+      label: trimmed,
+      emoji: trimmedEmoji,
+      custom: true,
+    };
+    const next = [...customEmotions, preset];
+    setCustomEmotions(next);
+    await AsyncStorage.setItem("emotion_custom", JSON.stringify(next));
+  }, [customEmotions]);
+
+  const removeCustomEmotion = useCallback(async (presetId: string) => {
+    const next = customEmotions.filter((e) => e.id !== presetId);
+    setCustomEmotions(next);
+    await AsyncStorage.setItem("emotion_custom", JSON.stringify(next));
+  }, [customEmotions]);
+
   const setDayStatus = useCallback(async (dateStr: string, status: DayStatus | "clear") => {
     const filtered = history.filter((d) => d.date !== dateStr);
     let newHistory: DayRecord[];
@@ -361,6 +443,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("weight_kg"),
       AsyncStorage.removeItem("weight_goal_kg"),
       AsyncStorage.removeItem("weight_unit"),
+      AsyncStorage.removeItem("emotion_log"),
+      AsyncStorage.removeItem("emotion_custom"),
     ]);
     setHistory([]);
     setBadges(BADGES);
@@ -373,12 +457,14 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     setWeightKgState(null);
     setWeightGoalKgState(null);
     setWeightUnitState("kg");
+    setEmotionLog([]);
+    setCustomEmotions([]);
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );
