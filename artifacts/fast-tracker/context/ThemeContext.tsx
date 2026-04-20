@@ -1,47 +1,14 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
-
-type ThemeMode = "system" | "light" | "dark";
+import React, { createContext, useContext } from "react";
 
 interface ThemeContextType {
-  themeMode: ThemeMode;
   isDark: boolean;
-  setThemeMode: (mode: ThemeMode) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  themeMode: "system",
-  isDark: false,
-  setThemeMode: () => {},
-});
+const ThemeContext = createContext<ThemeContextType>({ isDark: true });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const systemScheme = useColorScheme();
-  const [themeMode, setThemeModeState] = useState<ThemeMode>("system");
-
-  useEffect(() => {
-    AsyncStorage.getItem("theme_mode").then((val) => {
-      if (val === "light" || val === "dark") {
-        setThemeModeState(val);
-      } else {
-        setThemeModeState("system");
-        AsyncStorage.setItem("theme_mode", "system");
-      }
-    });
-  }, []);
-
-  const isDark =
-    themeMode === "dark" ||
-    (themeMode === "system" && systemScheme === "dark");
-
-  async function setThemeMode(mode: ThemeMode) {
-    setThemeModeState(mode);
-    await AsyncStorage.setItem("theme_mode", mode);
-  }
-
   return (
-    <ThemeContext.Provider value={{ themeMode, isDark, setThemeMode }}>
+    <ThemeContext.Provider value={{ isDark: true }}>
       {children}
     </ThemeContext.Provider>
   );

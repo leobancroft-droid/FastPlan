@@ -12,16 +12,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { useFasting } from "@/context/FastingContext";
-import { useTheme } from "@/context/ThemeContext";
 import { useColors } from "@/hooks/useColors";
-
-type ThemeMode = "system" | "light" | "dark";
 
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { startDate, streak, longestStreak, history, resetAll, setStartDateExplicit } = useFasting();
-  const { themeMode, setThemeMode } = useTheme();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const topPadding = Platform.OS === "web" ? 67 + 16 : insets.top + 16;
@@ -39,12 +35,6 @@ export default function SettingsScreen() {
   }
 
   const completedDays = history.filter((d) => d.status === "completed").length;
-
-  const themeModes: { key: ThemeMode; label: string; icon: React.ComponentProps<typeof Feather>["name"] }[] = [
-    { key: "light", label: "Light", icon: "sun" },
-    { key: "system", label: "System", icon: "smartphone" },
-    { key: "dark", label: "Dark", icon: "moon" },
-  ];
 
   return (
     <>
@@ -64,47 +54,6 @@ export default function SettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={[styles.pageTitle, { color: colors.foreground }]}>Settings</Text>
-
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>APPEARANCE</Text>
-        <View style={[styles.themeSegment, { backgroundColor: colors.muted }]}>
-          {themeModes.map(({ key, label, icon }) => {
-            const isActive = themeMode === key;
-            return (
-              <Pressable
-                key={key}
-                style={[
-                  styles.themeOption,
-                  isActive && {
-                    backgroundColor: colors.card,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.12,
-                    shadowRadius: 4,
-                    elevation: 2,
-                  },
-                ]}
-                onPress={() => setThemeMode(key)}
-              >
-                <Feather
-                  name={icon}
-                  size={15}
-                  color={isActive ? colors.primary : colors.mutedForeground}
-                />
-                <Text
-                  style={[
-                    styles.themeLabel,
-                    { color: isActive ? colors.primary : colors.mutedForeground },
-                    isActive && { fontFamily: "Inter_600SemiBold" },
-                  ]}
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
 
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>YOUR STATS</Text>
