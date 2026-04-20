@@ -32,7 +32,7 @@ import { StreakCounter } from "@/components/StreakCounter";
 import { WaterTracker } from "@/components/WaterTracker";
 import { WeightTracker } from "@/components/WeightTracker";
 import { EmotionTracker } from "@/components/EmotionTracker";
-import { useFasting } from "@/context/FastingContext";
+import { useFasting, getTodayStr } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
 const KCAL_PER_STEP = 0.04;
@@ -45,7 +45,7 @@ function todayStr(): string {
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen } = useFasting();
+  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen } = useFasting();
   const [loading, setLoading] = useState(false);
   const [burned, setBurned] = useState(0);
   const [nutritionRefresh, setNutritionRefresh] = useState(0);
@@ -119,6 +119,44 @@ export default function HomeScreen() {
     setLoading(false);
   }
 
+  function handleStatusChange() {
+    if (!isCompleted && !isSkipped) return;
+    const todayStr = getTodayStr();
+    const buttons: { text: string; style?: "cancel" | "destructive"; onPress?: () => void }[] = [];
+    if (isCompleted) {
+      buttons.push({
+        text: "Mark as Skipped",
+        style: "destructive",
+        onPress: async () => {
+          if (Platform.OS !== "web") await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          await setDayStatus(todayStr, "skipped");
+        },
+      });
+    }
+    if (isSkipped) {
+      buttons.push({
+        text: "Mark as Complete",
+        onPress: async () => {
+          if (Platform.OS !== "web") await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          await setDayStatus(todayStr, "completed");
+        },
+      });
+    }
+    buttons.push({
+      text: "Reset to Pending",
+      onPress: async () => {
+        if (Platform.OS !== "web") await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        await setDayStatus(todayStr, "clear");
+      },
+    });
+    buttons.push({ text: "Cancel", style: "cancel" });
+    Alert.alert(
+      "Change today's status",
+      `Today is currently marked as ${isCompleted ? "complete" : "skipped"}.`,
+      buttons,
+    );
+  }
+
   function handleSkip() {
     if (isCompleted || isSkipped) return;
     Alert.alert("Skip Today?", "Skipping will reset your streak. Are you sure?", [
@@ -157,15 +195,25 @@ export default function HomeScreen() {
         <Text style={[styles.dateLabel, { color: mutedColor }]}>{todayLabel}</Text>
 
         <View style={styles.hero}>
-          <DayBadge type={today?.type ?? "eat"} large completed={isCompleted} skipped={isSkipped} />
-          {(isCompleted || isSkipped) && (
-            <Text style={[styles.dayPrefix, { color: primaryColor }]}>
-              {isFastDay ? "FAST DAY" : "EAT DAY"}
+          <Pressable
+            onPress={handleStatusChange}
+            disabled={!isCompleted && !isSkipped}
+            hitSlop={10}
+            style={({ pressed }) => [{ alignItems: "center", gap: 12, opacity: pressed && (isCompleted || isSkipped) ? 0.7 : 1 }]}
+          >
+            <DayBadge type={today?.type ?? "eat"} large completed={isCompleted} skipped={isSkipped} />
+            {(isCompleted || isSkipped) && (
+              <Text style={[styles.dayPrefix, { color: primaryColor }]}>
+                {isFastDay ? "FAST DAY" : "EAT DAY"}
+              </Text>
+            )}
+            <Text style={[styles.dayTitle, { color: textColor }]}>
+              {isSkipped ? "Day Skipped" : isCompleted ? "Day Complete" : isFastDay ? "Fast Day" : "Eat Day"}
             </Text>
-          )}
-          <Text style={[styles.dayTitle, { color: textColor }]}>
-            {isSkipped ? "Day Skipped" : isCompleted ? "Day Complete" : isFastDay ? "Fast Day" : "Eat Day"}
-          </Text>
+            {(isCompleted || isSkipped) && (
+              <Text style={[styles.dayHint, { color: mutedColor }]}>Tap to change status</Text>
+            )}
+          </Pressable>
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
             {getDaySubtitle(isFastDay, userProfile?.tone)}
           </Text>
@@ -284,6 +332,7 @@ const styles = StyleSheet.create({
   dateLabel: { fontSize: 13, fontFamily: "Inter_500Medium", textAlign: "center", marginBottom: 24, letterSpacing: 0.5 },
   hero: { alignItems: "center", marginBottom: 32, gap: 12 },
   dayPrefix: { fontSize: 12, fontFamily: "Inter_700Bold", letterSpacing: 1.5, marginTop: -4, marginBottom: -4 },
+  dayHint: { fontSize: 12, fontFamily: "Inter_500Medium", marginTop: -4, opacity: 0.7 },
   dayTitle: { fontSize: 36, fontFamily: "Inter_700Bold", letterSpacing: -0.5 },
   daySubtitle: { fontSize: 15, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 22, paddingHorizontal: 16 },
   spacing: { height: 20 },
