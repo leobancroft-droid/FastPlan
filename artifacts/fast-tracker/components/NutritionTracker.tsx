@@ -38,6 +38,7 @@ interface FoodPreset {
   carbs: number;
   protein: number;
   fat: number;
+  category?: "food" | "beverage";
 }
 
 const FOOD_PRESETS: FoodPreset[] = [
@@ -49,8 +50,8 @@ const FOOD_PRESETS: FoodPreset[] = [
   { id: "egg", label: "Egg", emoji: "🥚", serving: "1 large", kcal: 70, carbs: 0, protein: 6, fat: 5 },
   { id: "oatmeal", label: "Oatmeal", emoji: "🥣", serving: "1 cup", kcal: 150, carbs: 27, protein: 5, fat: 3 },
   { id: "greek_yogurt", label: "Greek yogurt", emoji: "🥛", serving: "1 cup", kcal: 100, carbs: 6, protein: 17, fat: 0 },
-  { id: "coffee", label: "Coffee, black", emoji: "☕", serving: "1 cup", kcal: 5, carbs: 0, protein: 0, fat: 0 },
-  { id: "tea", label: "Green tea", emoji: "🍵", serving: "1 cup", kcal: 2, carbs: 0, protein: 0, fat: 0 },
+  { id: "coffee", label: "Coffee, black", emoji: "☕", serving: "1 cup (237 mL)", kcal: 5, carbs: 0, protein: 0, fat: 0, category: "beverage" },
+  { id: "tea", label: "Green tea", emoji: "🍵", serving: "1 cup", kcal: 2, carbs: 0, protein: 0, fat: 0, category: "beverage" },
   { id: "toast", label: "Toast", emoji: "🍞", serving: "1 slice", kcal: 80, carbs: 15, protein: 3, fat: 1 },
   { id: "avocado_toast", label: "Avocado toast", emoji: "🥑", serving: "1 slice", kcal: 195, carbs: 18, protein: 5, fat: 12 },
   { id: "pancakes", label: "Pancakes", emoji: "🥞", serving: "2 medium", kcal: 350, carbs: 44, protein: 8, fat: 14 },
@@ -74,9 +75,17 @@ const FOOD_PRESETS: FoodPreset[] = [
   { id: "almonds", label: "Almonds", emoji: "🌰", serving: "28 g", kcal: 160, carbs: 6, protein: 6, fat: 14 },
   { id: "peanut_butter", label: "Peanut butter", emoji: "🥜", serving: "2 tbsp", kcal: 190, carbs: 6, protein: 8, fat: 16 },
   { id: "cheese", label: "Cheese", emoji: "🧀", serving: "28 g", kcal: 110, carbs: 1, protein: 7, fat: 9 },
-  { id: "milk", label: "Milk", emoji: "🥛", serving: "1 cup", kcal: 150, carbs: 12, protein: 8, fat: 8 },
-  { id: "smoothie", label: "Smoothie", emoji: "🥤", serving: "16 oz", kcal: 250, carbs: 45, protein: 8, fat: 4 },
-  { id: "protein_shake", label: "Protein shake", emoji: "🥤", serving: "1 scoop", kcal: 120, carbs: 3, protein: 24, fat: 2 },
+  { id: "milk", label: "Milk", emoji: "🥛", serving: "1 cup", kcal: 150, carbs: 12, protein: 8, fat: 8, category: "beverage" },
+  { id: "smoothie", label: "Smoothie", emoji: "🥤", serving: "16 oz", kcal: 250, carbs: 45, protein: 8, fat: 4, category: "beverage" },
+  { id: "protein_shake", label: "Protein shake", emoji: "🥤", serving: "1 scoop", kcal: 120, carbs: 3, protein: 24, fat: 2, category: "beverage" },
+  { id: "orange_juice", label: "Orange juice", emoji: "🧃", serving: "1 cup", kcal: 110, carbs: 26, protein: 2, fat: 0, category: "beverage" },
+  { id: "soda", label: "Soda", emoji: "🥤", serving: "12 oz", kcal: 140, carbs: 39, protein: 0, fat: 0, category: "beverage" },
+  { id: "banana_boiled_egg", label: "Egg, boiled", emoji: "🥚", serving: "1 egg, regular (60 g)", kcal: 93, carbs: 0, protein: 6, fat: 7 },
+  { id: "egg_fried", label: "Egg, fried", emoji: "🍳", serving: "1 egg, large (46 g)", kcal: 90, carbs: 0, protein: 6, fat: 7 },
+  { id: "scrambled_eggs", label: "Scrambled Eggs", emoji: "🍳", serving: "1 egg (47 g)", kcal: 100, carbs: 1, protein: 7, fat: 7 },
+  { id: "strawberries", label: "Strawberries", emoji: "🍓", serving: "1 fruit (12 g)", kcal: 4, carbs: 1, protein: 0, fat: 0 },
+  { id: "blueberries", label: "Blueberries", emoji: "🫐", serving: "1 serving (68 g)", kcal: 39, carbs: 10, protein: 0, fat: 0 },
+  { id: "honey", label: "Honey", emoji: "🍯", serving: "1 tbsp (21 g)", kcal: 64, carbs: 17, protein: 0, fat: 0 },
   { id: "chocolate", label: "Dark chocolate", emoji: "🍫", serving: "1 oz", kcal: 170, carbs: 13, protein: 2, fat: 12 },
   { id: "ice_cream", label: "Ice cream", emoji: "🍦", serving: "1 scoop", kcal: 140, carbs: 17, protein: 2, fat: 7 },
   { id: "cookie", label: "Cookie", emoji: "🍪", serving: "1 cookie", kcal: 150, carbs: 22, protein: 2, fat: 7 },
@@ -85,7 +94,7 @@ const FOOD_PRESETS: FoodPreset[] = [
   { id: "popcorn", label: "Popcorn", emoji: "🍿", serving: "3 cups", kcal: 95, carbs: 19, protein: 3, fat: 1 },
   { id: "wine", label: "Wine", emoji: "🍷", serving: "5 oz", kcal: 125, carbs: 4, protein: 0, fat: 0 },
   { id: "beer", label: "Beer", emoji: "🍺", serving: "12 oz", kcal: 150, carbs: 13, protein: 2, fat: 0 },
-  { id: "water", label: "Water", emoji: "💧", serving: "1 cup", kcal: 0, carbs: 0, protein: 0, fat: 0 },
+  { id: "water", label: "Water", emoji: "💧", serving: "1 cup", kcal: 0, carbs: 0, protein: 0, fat: 0, category: "beverage" },
 ];
 
 const MEALS: { key: MealKey; label: string; emoji: string; share: number }[] = [
@@ -391,25 +400,64 @@ interface PickerProps {
   onAdd: (preset: FoodPreset, servings: number, meal: MealKey) => void;
 }
 
+type Mode = "search" | "camera" | "barcode" | "more";
+type CategoryFilter = "foods" | "beverages";
+type FrequencyFilter = "frequent" | "all";
+
 function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const colors = useColors();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<FoodPreset | null>(null);
   const [servings, setServings] = useState("1");
+  const [mode, setMode] = useState<Mode>("search");
+  const [catFilter, setCatFilter] = useState<CategoryFilter>("foods");
+  const [freqFilter, setFreqFilter] = useState<FrequencyFilter>("frequent");
+  const [pending, setPending] = useState<{ id: string; preset: FoodPreset; servings: number }[]>([]);
+  const [frequency, setFrequency] = useState<Record<string, number>>({});
+  const [catOpen, setCatOpen] = useState(false);
+  const [freqOpen, setFreqOpen] = useState(false);
 
   const open = meal !== null;
   const mealLabel = MEALS.find((m) => m.key === meal)?.label ?? "";
 
+  useEffect(() => {
+    if (open) {
+      AsyncStorage.getItem("food_frequency").then((v) => {
+        if (v) {
+          try {
+            setFrequency(JSON.parse(v));
+          } catch {}
+        }
+      });
+    }
+  }, [open]);
+
   const filtered = useMemo(() => {
-    if (!search.trim()) return FOOD_PRESETS;
-    const q = search.toLowerCase();
-    return FOOD_PRESETS.filter((p) => p.label.toLowerCase().includes(q));
-  }, [search]);
+    let list = FOOD_PRESETS;
+    if (catFilter === "foods") {
+      list = list.filter((p) => p.category !== "beverage");
+    } else {
+      list = list.filter((p) => p.category === "beverage");
+    }
+    if (freqFilter === "frequent") {
+      const sorted = [...list].sort((a, b) => (frequency[b.id] ?? 0) - (frequency[a.id] ?? 0));
+      list = sorted.slice(0, Math.max(8, sorted.filter((p) => (frequency[p.id] ?? 0) > 0).length));
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = FOOD_PRESETS.filter((p) => p.label.toLowerCase().includes(q));
+    }
+    return list;
+  }, [catFilter, freqFilter, search, frequency]);
 
   function reset() {
     setSearch("");
     setSelected(null);
     setServings("1");
+    setPending([]);
+    setMode("search");
+    setCatOpen(false);
+    setFreqOpen(false);
   }
 
   function handleClose() {
@@ -417,27 +465,77 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     onClose();
   }
 
-  function handleConfirm() {
-    if (!selected || !meal) return;
-    const s = Math.max(0.25, Math.min(20, Number(servings) || 1));
-    onAdd(selected, s, meal);
+  function handleQuickAdd(preset: FoodPreset) {
+    setPending((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, preset, servings: 1 },
+    ]);
+  }
+
+  function handleRemovePending(id: string) {
+    setPending((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  async function handleDone() {
+    if (!meal) return;
+    if (selected) {
+      const s = Math.max(0.25, Math.min(20, Number(servings) || 1));
+      onAdd(selected, s, meal);
+      bumpFrequency(selected.id);
+    }
+    for (const p of pending) {
+      onAdd(p.preset, p.servings, meal);
+      bumpFrequency(p.preset.id);
+    }
+    const updated = { ...frequency };
+    if (selected) updated[selected.id] = (updated[selected.id] ?? 0) + 1;
+    for (const p of pending) updated[p.preset.id] = (updated[p.preset.id] ?? 0) + 1;
+    await AsyncStorage.setItem("food_frequency", JSON.stringify(updated));
     reset();
     onClose();
   }
 
+  function bumpFrequency(id: string) {
+    setFrequency((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }));
+  }
+
+  function handleSelectMode(m: Mode) {
+    if (m === "search") {
+      setMode("search");
+      return;
+    }
+    setMode(m);
+    Alert.alert(
+      m === "camera" ? "Camera" : m === "barcode" ? "Barcode" : "More",
+      m === "camera"
+        ? "Snap a photo of your meal — coming soon."
+        : m === "barcode"
+        ? "Scan packaged food barcodes — coming soon."
+        : "Custom foods, recipes, and favorites — coming soon."
+    );
+  }
+
+  const totalCount = pending.length + (selected ? 1 : 0);
+
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
       <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
+        <Pressable style={[styles.sheet, styles.tallSheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
           <View style={styles.pickerHeader}>
-            <Pressable onPress={selected ? () => setSelected(null) : handleClose} hitSlop={10}>
-              <Feather name="chevron-left" size={22} color={colors.primary} />
-            </Pressable>
+            <View style={styles.countBadgeWrap}>
+              <View style={[styles.countBadge, { borderColor: totalCount > 0 ? colors.primary : colors.border }]}>
+                <Text style={[styles.countBadgeText, { color: totalCount > 0 ? colors.primary : colors.mutedForeground }]}>
+                  {totalCount}
+                </Text>
+              </View>
+            </View>
             <Text style={[styles.pickerTitle, { color: colors.foreground }]} numberOfLines={1}>
-              {selected ? "Servings" : `Add to ${mealLabel}`}
+              {mealLabel}
             </Text>
-            <View style={{ width: 22 }} />
+            <Pressable onPress={handleClose} hitSlop={10} style={styles.headerCloseBtn}>
+              <Feather name="x" size={22} color={colors.mutedForeground} />
+            </Pressable>
           </View>
 
           {selected ? (
@@ -463,56 +561,248 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
                 <TotalCol label="protein" value={`${Math.round(selected.protein * (Number(servings) || 0))}g`} colors={colors} />
                 <TotalCol label="fat" value={`${Math.round(selected.fat * (Number(servings) || 0))}g`} colors={colors} />
               </View>
-              <Pressable
-                onPress={handleConfirm}
-                style={({ pressed }) => [
-                  styles.confirmBtn,
-                  { backgroundColor: colors.primary },
-                  pressed && { opacity: 0.8 },
-                ]}
-              >
-                <Text style={styles.confirmBtnText}>Add to {mealLabel}</Text>
-              </Pressable>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <Pressable
+                  onPress={() => setSelected(null)}
+                  style={({ pressed }) => [
+                    styles.confirmBtn,
+                    { flex: 1, backgroundColor: colors.muted },
+                    pressed && { opacity: 0.7 },
+                  ]}
+                >
+                  <Text style={[styles.confirmBtnText, { color: colors.foreground }]}>Back</Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleDone}
+                  style={({ pressed }) => [
+                    styles.confirmBtn,
+                    { flex: 1, backgroundColor: colors.primary },
+                    pressed && { opacity: 0.8 },
+                  ]}
+                >
+                  <Text style={styles.confirmBtnText}>Add to {mealLabel}</Text>
+                </Pressable>
+              </View>
             </View>
           ) : (
             <>
-              <View style={[styles.searchWrap, { backgroundColor: colors.muted }]}>
+              <View style={styles.modeRow}>
+                {([
+                  { key: "search", label: "Search", icon: "search", color: "#10b981" },
+                  { key: "camera", label: "Camera", icon: "camera", color: "#ec4899" },
+                  { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444" },
+                  { key: "more", label: "More", icon: "more-horizontal", color: "#9ca3af" },
+                ] as const).map((m) => {
+                  const isActive = mode === m.key;
+                  return (
+                    <Pressable
+                      key={m.key}
+                      onPress={() => handleSelectMode(m.key as Mode)}
+                      style={styles.modeColumn}
+                    >
+                      <View
+                        style={[
+                          styles.modeTile,
+                          { backgroundColor: colors.muted, borderColor: isActive ? colors.primary : "transparent" },
+                        ]}
+                      >
+                        <View style={[styles.modeIconBubble, { backgroundColor: m.color + "33" }]}>
+                          <Feather name={m.icon} size={18} color={m.color} />
+                        </View>
+                      </View>
+                      <Text style={[styles.modeLabel, { color: isActive ? colors.foreground : colors.mutedForeground }]}>
+                        {m.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <View
+                style={[
+                  styles.searchWrap,
+                  styles.searchWrapBordered,
+                  { backgroundColor: colors.background, borderColor: colors.primary },
+                ]}
+              >
                 <Feather name="search" size={16} color={colors.mutedForeground} />
                 <TextInput
                   value={search}
                   onChangeText={setSearch}
-                  placeholder="Search food"
+                  placeholder={`What did you have for ${mealLabel.toLowerCase()}?`}
                   placeholderTextColor={colors.mutedForeground}
                   style={[styles.searchInput, { color: colors.foreground }]}
                 />
               </View>
+
+              <View style={styles.dropRow}>
+                <FilterDropdown
+                  label={catFilter === "foods" ? "Foods" : "Beverages"}
+                  open={catOpen}
+                  onToggle={() => {
+                    setCatOpen((v) => !v);
+                    setFreqOpen(false);
+                  }}
+                  options={[
+                    { key: "foods", label: "Foods" },
+                    { key: "beverages", label: "Beverages" },
+                  ]}
+                  onSelect={(k) => {
+                    setCatFilter(k as CategoryFilter);
+                    setCatOpen(false);
+                  }}
+                  active={catFilter}
+                  colors={colors}
+                />
+                <FilterDropdown
+                  label={freqFilter === "frequent" ? "Frequent" : "All"}
+                  open={freqOpen}
+                  onToggle={() => {
+                    setFreqOpen((v) => !v);
+                    setCatOpen(false);
+                  }}
+                  options={[
+                    { key: "frequent", label: "Frequent" },
+                    { key: "all", label: "All" },
+                  ]}
+                  onSelect={(k) => {
+                    setFreqFilter(k as FrequencyFilter);
+                    setFreqOpen(false);
+                  }}
+                  active={freqFilter}
+                  colors={colors}
+                />
+              </View>
+
               <ScrollView style={styles.pickerScroll} keyboardShouldPersistTaps="handled">
-                {filtered.map((p) => (
-                  <Pressable
-                    key={p.id}
-                    onPress={() => setSelected(p)}
-                    style={({ pressed }) => [
-                      styles.foodRow,
-                      { borderBottomColor: colors.border },
-                      pressed && { backgroundColor: colors.muted },
-                    ]}
-                  >
-                    <Text style={styles.foodEmoji}>{p.emoji}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.foodLabel, { color: colors.foreground }]}>{p.label}</Text>
-                      <Text style={[styles.foodSub, { color: colors.mutedForeground }]}>
-                        {p.serving} · {p.kcal} kcal
-                      </Text>
+                {filtered.length === 0 && (
+                  <Text style={[styles.empty, { color: colors.mutedForeground }]}>
+                    No results. Try another search.
+                  </Text>
+                )}
+                {filtered.map((p) => {
+                  const pendingCount = pending.filter((x) => x.preset.id === p.id).length;
+                  return (
+                    <View
+                      key={p.id}
+                      style={[styles.foodRow, { borderBottomColor: colors.border }]}
+                    >
+                      <Pressable
+                        onPress={() => setSelected(p)}
+                        style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 14 }}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.foodLabel, { color: colors.foreground }]}>
+                            {p.label}
+                            {pendingCount > 0 && (
+                              <Text style={{ color: colors.primary }}> · {pendingCount} added</Text>
+                            )}
+                          </Text>
+                          <Text style={[styles.foodSub, { color: colors.mutedForeground }]}>
+                            {p.serving}
+                          </Text>
+                        </View>
+                        <Text style={[styles.foodKcal, { color: colors.foreground }]}>{p.kcal} kcal</Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => handleQuickAdd(p)}
+                        onLongPress={() => {
+                          if (pendingCount > 0) {
+                            const last = [...pending].reverse().find((x) => x.preset.id === p.id);
+                            if (last) handleRemovePending(last.id);
+                          }
+                        }}
+                        hitSlop={6}
+                        style={({ pressed }) => [
+                          styles.plusBtn,
+                          { borderColor: colors.primary },
+                          pressed && { opacity: 0.6 },
+                        ]}
+                      >
+                        <Feather name="plus" size={18} color={colors.primary} />
+                      </Pressable>
                     </View>
-                    <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
-                  </Pressable>
-                ))}
+                  );
+                })}
+                <View style={{ height: 80 }} />
               </ScrollView>
+
+              <Pressable
+                onPress={handleDone}
+                disabled={totalCount === 0}
+                style={({ pressed }) => [
+                  styles.doneBtn,
+                  { backgroundColor: totalCount === 0 ? colors.muted : "#fff" },
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Text style={[styles.doneBtnText, { color: totalCount === 0 ? colors.mutedForeground : "#1a1a2e" }]}>
+                  Done{totalCount > 0 ? ` (${totalCount})` : ""}
+                </Text>
+              </Pressable>
             </>
           )}
         </Pressable>
       </Pressable>
     </Modal>
+  );
+}
+
+function FilterDropdown({
+  label,
+  open,
+  onToggle,
+  options,
+  onSelect,
+  active,
+  colors,
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  options: { key: string; label: string }[];
+  onSelect: (k: string) => void;
+  active: string;
+  colors: ReturnType<typeof useColors>;
+}) {
+  return (
+    <View style={{ flex: 1, position: "relative" }}>
+      <Pressable
+        onPress={onToggle}
+        style={({ pressed }) => [
+          styles.dropBtn,
+          { borderColor: colors.border, backgroundColor: colors.background },
+          pressed && { opacity: 0.7 },
+        ]}
+      >
+        <Text style={[styles.dropBtnText, { color: colors.foreground }]}>{label}</Text>
+        <Feather name={open ? "chevron-up" : "chevron-down"} size={16} color={colors.mutedForeground} />
+      </Pressable>
+      {open && (
+        <View style={[styles.dropMenu, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          {options.map((o) => (
+            <Pressable
+              key={o.key}
+              onPress={() => onSelect(o.key)}
+              style={({ pressed }) => [
+                styles.dropItem,
+                pressed && { backgroundColor: colors.muted },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.dropItemText,
+                  { color: o.key === active ? colors.primary : colors.foreground, fontFamily: o.key === active ? "Inter_700Bold" : "Inter_500Medium" },
+                ]}
+              >
+                {o.label}
+              </Text>
+              {o.key === active && <Feather name="check" size={16} color={colors.primary} />}
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -848,4 +1138,108 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   smallSheetBtnText: { fontSize: 14, fontFamily: "Inter_700Bold" },
+  tallSheet: { maxHeight: "92%", minHeight: "70%" },
+  countBadgeWrap: { width: 36, alignItems: "flex-start" },
+  countBadge: {
+    minWidth: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+  },
+  countBadgeText: { fontSize: 13, fontFamily: "Inter_700Bold" },
+  headerCloseBtn: { width: 36, alignItems: "flex-end" },
+  modeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 4,
+    marginTop: 2,
+  },
+  modeColumn: {
+    alignItems: "center",
+    gap: 6,
+    width: "23%",
+  },
+  modeTile: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: 16,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modeIconBubble: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modeLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
+  searchWrapBordered: { borderWidth: 2 },
+  dropRow: {
+    flexDirection: "row",
+    gap: 10,
+    zIndex: 5,
+  },
+  dropBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  dropBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  dropMenu: {
+    position: "absolute",
+    top: 44,
+    left: 0,
+    right: 0,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingVertical: 4,
+    zIndex: 10,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+  },
+  dropItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  dropItemText: { fontSize: 14 },
+  foodKcal: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  plusBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  doneBtn: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    paddingVertical: 16,
+    borderRadius: 28,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  doneBtnText: { fontSize: 16, fontFamily: "Inter_700Bold" },
 });
