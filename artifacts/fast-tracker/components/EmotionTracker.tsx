@@ -90,10 +90,11 @@ interface PickerProps {
   onClose: () => void;
 }
 
+const MAX_FEELINGS = 3;
+
 function EmotionPicker({ open, onClose }: PickerProps) {
   const colors = useColors();
-  const { emotionLog, customEmotions, logEmotion } = useFasting();
-  const [justAdded, setJustAdded] = useState<Set<string>>(new Set());
+  const { emotionLog, customEmotions, logEmotion, removeEmotionEntry } = useFasting();
 
   const presets = useMemo(
     () => [...DEFAULT_EMOTIONS, ...customEmotions].sort((a, b) => a.label.localeCompare(b.label)),
@@ -101,43 +102,47 @@ function EmotionPicker({ open, onClose }: PickerProps) {
   );
 
   const todayStr = getTodayStr();
-  const todayPresetIds = new Set(emotionLog.filter((e) => e.date === todayStr).map((e) => e.presetId));
-
-  function handleClose() {
-    setJustAdded(new Set());
-    onClose();
-  }
+  const todayEntries = emotionLog.filter((e) => e.date === todayStr);
+  const todayPresetIds = new Set(todayEntries.map((e) => e.presetId));
+  const isFull = todayEntries.length >= MAX_FEELINGS;
 
   async function handleSelect(preset: EmotionPreset) {
+    const isSelected = todayPresetIds.has(preset.id);
+    if (isSelected) {
+      if (Platform.OS !== "web") await Haptics.selectionAsync();
+      const entries = todayEntries.filter((e) => e.presetId === preset.id);
+      await Promise.all(entries.map((e) => removeEmotionEntry(e.id)));
+      return;
+    }
+    if (isFull) {
+      if (Platform.OS !== "web") await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
     if (Platform.OS !== "web") await Haptics.selectionAsync();
     await logEmotion(preset);
-    setJustAdded((prev) => {
-      const next = new Set(prev);
-      next.add(preset.id);
-      return next;
-    });
   }
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
-      <Pressable style={styles.backdrop} onPress={handleClose}>
+    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
 
           <View style={styles.pickerHeader}>
             <Text style={[styles.pickerTitle, { color: colors.foreground }]}>Add feelings</Text>
-            <Pressable onPress={handleClose} hitSlop={10}>
+            <Pressable onPress={onClose} hitSlop={10}>
               <Text style={[styles.doneText, { color: colors.primary }]}>Done</Text>
             </Pressable>
           </View>
 
           <Text style={[styles.pickerSubtitle, { color: colors.mutedForeground }]}>
-            Tap any feeling to log it for today
+            Pick up to {MAX_FEELINGS} · {todayEntries.length}/{MAX_FEELINGS} selected
           </Text>
 
           <ScrollView style={styles.pickerScroll} contentContainerStyle={styles.pickerGrid}>
             {presets.map((preset) => {
-              const selected = justAdded.has(preset.id) || todayPresetIds.has(preset.id);
+              const selected = todayPresetIds.has(preset.id);
+              const disabled = !selected && isFull;
               return (
                 <Pressable
                   key={preset.id}
@@ -147,8 +152,9 @@ function EmotionPicker({ open, onClose }: PickerProps) {
                     {
                       backgroundColor: selected ? colors.primary + "33" : colors.muted,
                       borderColor: selected ? colors.primary + "88" : "transparent",
+                      opacity: disabled ? 0.4 : 1,
                     },
-                    pressed && { opacity: 0.7 },
+                    pressed && !disabled && { opacity: 0.7 },
                   ]}
                 >
                   <Text style={styles.pillEmoji}>{preset.emoji}</Text>
