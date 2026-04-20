@@ -422,6 +422,7 @@ function todayStr(): string {
 }
 
 const MACRO_STREAK_KEY = "macro_streak_v1";
+const UNDER_KCAL_STREAK_KEY = "under_kcal_streak_v1";
 interface MacroStreak {
   count: number;
   lastDate: string | null;
@@ -446,6 +447,7 @@ export function NutritionTracker({ burned }: Props) {
   const [goalEditOpen, setGoalEditOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [macroStreak, setMacroStreak] = useState<MacroStreak>({ count: 0, lastDate: null, achievedToday: false });
+  const [underStreak, setUnderStreak] = useState<MacroStreak>({ count: 0, lastDate: null, achievedToday: false });
   const today = todayStr();
 
   useEffect(() => {
@@ -473,6 +475,25 @@ export function NutritionTracker({ burned }: Props) {
               const reset = { count: 0, lastDate: null, achievedToday: false };
               setMacroStreak(reset);
               await AsyncStorage.setItem(MACRO_STREAK_KEY, JSON.stringify(reset));
+            }
+          }
+        }
+      } catch {}
+      try {
+        const raw = await AsyncStorage.getItem(UNDER_KCAL_STREAK_KEY);
+        const t = todayStr();
+        if (raw) {
+          const parsed = JSON.parse(raw) as MacroStreak;
+          if (!parsed.lastDate) {
+            setUnderStreak({ count: 0, lastDate: null, achievedToday: false });
+          } else {
+            const gap = diffDays(parsed.lastDate, t);
+            if (gap === 0) setUnderStreak(parsed);
+            else if (gap === 1) setUnderStreak({ count: parsed.count, lastDate: parsed.lastDate, achievedToday: false });
+            else {
+              const reset = { count: 0, lastDate: null, achievedToday: false };
+              setUnderStreak(reset);
+              await AsyncStorage.setItem(UNDER_KCAL_STREAK_KEY, JSON.stringify(reset)).catch(() => {});
             }
           }
         }
@@ -522,6 +543,20 @@ export function NutritionTracker({ burned }: Props) {
     AsyncStorage.setItem(MACRO_STREAK_KEY, JSON.stringify(next)).catch(() => {});
   }, [loaded, macroTargetsHit, macroStreak]);
 
+  const underTarget = totals.kcal > 0 && totals.kcal < goal;
+
+  useEffect(() => {
+    if (!loaded) return;
+    if (!underTarget) return;
+    if (underStreak.achievedToday) return;
+    const t = todayStr();
+    const wasYesterday = underStreak.lastDate ? diffDays(underStreak.lastDate, t) === 1 : false;
+    const newCount = wasYesterday ? underStreak.count + 1 : 1;
+    const next: MacroStreak = { count: newCount, lastDate: t, achievedToday: true };
+    setUnderStreak(next);
+    AsyncStorage.setItem(UNDER_KCAL_STREAK_KEY, JSON.stringify(next)).catch(() => {});
+  }, [loaded, underTarget, underStreak]);
+
   function handleAddFood(preset: FoodPreset, servings: number, meal: MealKey) {
     const entry: FoodEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -554,6 +589,12 @@ export function NutritionTracker({ burned }: Props) {
           <View style={styles.macroRewardFloat} pointerEvents="none">
             <Feather name="award" size={12} color="#ffb84d" />
             <Text style={styles.macroRewardText}>Day {macroStreak.count}</Text>
+          </View>
+        )}
+        {underStreak.count > 0 && (
+          <View style={styles.underRewardFloat} pointerEvents="none">
+            <Feather name="trending-down" size={12} color="#ec4899" />
+            <Text style={styles.underRewardText}>Under × {underStreak.count}</Text>
           </View>
         )}
         <View style={styles.summaryTopRow}>
@@ -1562,6 +1603,27 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     letterSpacing: 0.2,
     color: "#ffb84d",
+  },
+  underRewardFloat: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: "#ec489922",
+    borderColor: "#ec489966",
+    zIndex: 5,
+  },
+  underRewardText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.2,
+    color: "#ec4899",
   },
   macroCol: { flex: 1, gap: 6, alignItems: "center" },
   macroLabel: { fontSize: 13, fontFamily: "Inter_500Medium" },
