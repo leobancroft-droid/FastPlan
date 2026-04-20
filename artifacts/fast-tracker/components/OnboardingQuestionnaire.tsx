@@ -14,6 +14,8 @@ import { useColors } from "@/hooks/useColors";
 
 const EAT_MONSTER = require("@/assets/images/eat-monster.png");
 const FAST_MONSTER = require("@/assets/images/fast-monster.png");
+const COMPLETE_MONSTER = require("@/assets/images/complete-monster.png");
+const SKIPPED_MONSTER = require("@/assets/images/skipped-monster.png");
 
 export type OnboardingAnswers = Record<string, string | string[]>;
 
@@ -234,6 +236,8 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
         <View style={styles.monsterRow}>
           <Image source={EAT_MONSTER} style={styles.monster} resizeMode="contain" />
           <Image source={FAST_MONSTER} style={styles.monster} resizeMode="contain" />
+          <Image source={COMPLETE_MONSTER} style={styles.monster} resizeMode="contain" />
+          <Image source={SKIPPED_MONSTER} style={styles.monster} resizeMode="contain" />
         </View>
 
         <ScrollView
@@ -357,13 +361,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 24,
+    gap: 12,
     paddingTop: 20,
     paddingBottom: 8,
   },
   monster: {
-    width: 64,
-    height: 64,
+    width: 56,
+    height: 56,
   },
   scrollContent: {
     paddingHorizontal: 20,
