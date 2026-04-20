@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
@@ -129,13 +130,35 @@ export function AiFoodScanner({ onAdded }: Props) {
     }
   }
 
-  function handleAssetSelected(asset: ImagePicker.ImagePickerAsset) {
+  async function handleAssetSelected(asset: ImagePicker.ImagePickerAsset) {
     setImageUri(asset.uri);
-    setImageBase64(asset.base64 ?? null);
     setResult(null);
     setExcluded(new Set());
+    setLoading(true);
+    try {
+      const manipulated = await ImageManipulator.manipulateAsync(
+        asset.uri,
+        [{ resize: { width: 1024 } }],
+        {
+          compress: 0.7,
+          format: ImageManipulator.SaveFormat.JPEG,
+          base64: true,
+        }
+      );
+      if (manipulated.base64) {
+        setImageBase64(manipulated.base64);
+        await runScan(manipulated.base64, "image/jpeg");
+        return;
+      }
+    } catch (err) {
+      // fall back to the original asset if manipulation fails
+    }
     if (asset.base64) {
-      void runScan(asset.base64, asset.mimeType ?? "image/jpeg");
+      setImageBase64(asset.base64);
+      await runScan(asset.base64, "image/jpeg");
+    } else {
+      setLoading(false);
+      Alert.alert("Could not read photo", "Please try a different image.");
     }
   }
 
