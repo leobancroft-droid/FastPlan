@@ -77,16 +77,16 @@ const colors = {
     border: "#2a2a50",
     input: "#2a2a50",
 
-    fastBg: "#0a0a18",
-    fastCard: "#141430",
+    fastBg: "#0d0d1a",
+    fastCard: "#181830",
     fastText: "#e8e5ff",
     fastMuted: "#5050a0",
     fastPrimary: "#a29bfe",
     fastAccent: "#ff9f43",
 
-    eatBg: "#130e00",
-    eatCard: "#1c1600",
-    eatText: "#f5e6c8",
+    eatBg: "#0d0d1a",
+    eatCard: "#181830",
+    eatText: "#e8e5ff",
     eatPrimary: "#ff9f43",
     eatAccent: "#a29bfe",
 
