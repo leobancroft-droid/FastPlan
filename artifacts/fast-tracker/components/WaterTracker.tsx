@@ -123,7 +123,13 @@ export function WaterTracker() {
             onPress={() => (i < filledGlasses ? handleRemove() : handleAdd())}
             style={({ pressed }) => [styles.cupBtn, pressed && { opacity: 0.6 }]}
           >
-            <Cup filled={filled} blue={blue} blueSoft={blueSoft} border={colors.border} />
+            <Cup
+              filled={filled}
+              isNext={i === filledGlasses}
+              blue={blue}
+              blueSoft={blueSoft}
+              border={colors.border}
+            />
           </Pressable>
         ))}
       </View>
@@ -156,14 +162,14 @@ export function WaterTracker() {
   );
 }
 
-function Cup({ filled, blue, blueSoft, border }: { filled: boolean; blue: string; blueSoft: string; border: string }) {
+function Cup({ filled, isNext, blue, blueSoft, border }: { filled: boolean; isNext: boolean; blue: string; blueSoft: string; border: string }) {
   return (
     <View style={cupStyles.outer}>
       <View
         style={[
           cupStyles.cup,
           {
-            borderColor: filled ? blue : border,
+            borderColor: filled ? blue : isNext ? blue : border,
             backgroundColor: "transparent",
           },
         ]}
@@ -173,6 +179,11 @@ function Cup({ filled, blue, blueSoft, border }: { filled: boolean; blue: string
         )}
         {!filled && (
           <View style={[cupStyles.fill, { backgroundColor: blueSoft, opacity: 0.35 }]} />
+        )}
+        {!filled && isNext && (
+          <View style={cupStyles.plusOverlay} pointerEvents="none">
+            <Feather name="plus" size={14} color={blue} />
+          </View>
         )}
       </View>
     </View>
@@ -198,6 +209,11 @@ const cupStyles = StyleSheet.create({
   fill: {
     width: "100%",
     height: "100%",
+  },
+  plusOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
