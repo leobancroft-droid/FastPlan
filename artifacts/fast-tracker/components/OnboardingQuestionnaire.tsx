@@ -167,10 +167,20 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
   const [unit, setUnit] = useState<"kg" | "lb">("kg");
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
+  const [timelineWeeks, setTimelineWeeks] = useState<number | null>(null);
 
-  const total = QUESTIONS.length + 1;
+  const TIMELINE_OPTIONS: { label: string; weeks: number }[] = [
+    { label: "1 month", weeks: 4 },
+    { label: "2 months", weeks: 8 },
+    { label: "3 months", weeks: 12 },
+    { label: "6 months", weeks: 26 },
+    { label: "1 year", weeks: 52 },
+  ];
+
+  const total = QUESTIONS.length + 2;
   const isWeightStep = step === QUESTIONS.length;
-  const question = isWeightStep ? null : QUESTIONS[step];
+  const isTimelineStep = step === QUESTIONS.length + 1;
+  const question = isWeightStep || isTimelineStep ? null : QUESTIONS[step];
   const progress = ((step + 1) / total) * 100;
 
   const currentAnswer = question ? answers[question.id] : undefined;
@@ -179,9 +189,11 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
   const weightsValid = !isNaN(curNum) && curNum > 0 && !isNaN(tgtNum) && tgtNum > 0;
   const isAnswered = isWeightStep
     ? weightsValid
-    : question?.type === "multi"
-      ? Array.isArray(currentAnswer) && currentAnswer.length > 0
-      : typeof currentAnswer === "string" && currentAnswer.length > 0;
+    : isTimelineStep
+      ? timelineWeeks !== null
+      : question?.type === "multi"
+        ? Array.isArray(currentAnswer) && currentAnswer.length > 0
+        : typeof currentAnswer === "string" && currentAnswer.length > 0;
 
   function selectSingle(opt: string) {
     if (!question) return;
@@ -209,11 +221,17 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
     } else {
       const curKg = unit === "lb" ? curNum / 2.2046226218 : curNum;
       const tgtKg = unit === "lb" ? tgtNum / 2.2046226218 : tgtNum;
+      const wks = timelineWeeks ?? 12;
+      const today = new Date();
+      const target = new Date(today.getTime() + wks * 7 * 24 * 60 * 60 * 1000);
+      const targetStr = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
       onComplete({
         ...answers,
         weightKg: String(Math.round(curKg * 10) / 10),
         weightGoalKg: String(Math.round(tgtKg * 10) / 10),
         weightUnit: unit,
+        weightTargetDate: targetStr,
+        timelineWeeks: String(wks),
       });
     }
   }
@@ -350,6 +368,53 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                     },
                   ]}
                 />
+              </View>
+            </Animated.View>
+          ) : isTimelineStep ? (
+            <Animated.View key="timeline" entering={FadeIn.duration(220)} exiting={FadeOut.duration(120)}>
+              <View style={styles.questionHeader}>
+                <View style={[styles.iconCircle, { backgroundColor: colors.primary + "15" }]}>
+                  <Feather name="calendar" size={20} color={colors.primary} />
+                </View>
+                <Text style={[styles.questionText, { color: colors.foreground }]}>
+                  How long do you want to take to reach your goal?
+                </Text>
+              </View>
+              <Text style={[styles.hintText, { color: colors.mutedForeground }]}>
+                We'll set a calorie target that fits this timeline.
+              </Text>
+              <View style={styles.options}>
+                {TIMELINE_OPTIONS.map((opt) => {
+                  const selected = timelineWeeks === opt.weeks;
+                  return (
+                    <Pressable
+                      key={opt.weeks}
+                      onPress={() => setTimelineWeeks(opt.weeks)}
+                      style={[
+                        styles.optionCard,
+                        {
+                          backgroundColor: selected ? colors.primary + "12" : colors.card,
+                          borderColor: selected ? colors.primary : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.optionText,
+                          {
+                            color: selected ? colors.primary : colors.foreground,
+                            fontFamily: selected ? "Inter_600SemiBold" : "Inter_400Regular",
+                          },
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                      {selected && (
+                        <Feather name="check-circle" size={18} color={colors.primary} />
+                      )}
+                    </Pressable>
+                  );
+                })}
               </View>
             </Animated.View>
           ) : question ? (

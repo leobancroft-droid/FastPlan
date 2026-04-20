@@ -186,20 +186,8 @@ export function WeightTracker({ onCalorieGoalChange }: WeightTrackerProps = {}) 
               const dailyDelta = (diff * KCAL_PER_KG) / days;
               const raw = maint - dailyDelta;
               const clamped = Math.max(1200, Math.min(4000, Math.round(raw / 10) * 10));
-              Alert.alert(
-                "Update calorie goal?",
-                `Update your new daily calorie intake to ${clamped} kcal now?`,
-                [
-                  { text: "No", style: "cancel" },
-                  {
-                    text: "Yes",
-                    onPress: async () => {
-                      await AsyncStorage.setItem("calorie_goal", String(clamped));
-                      onCalorieGoalChange?.(clamped);
-                    },
-                  },
-                ],
-              );
+              await AsyncStorage.setItem("calorie_goal", String(clamped));
+              onCalorieGoalChange?.(clamped);
             }
           }
         }}

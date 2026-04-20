@@ -45,7 +45,7 @@ function todayStr(): string {
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit } = useFasting();
+  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate } = useFasting();
   const scrollRef = useRef<ScrollView>(null);
   const [loading, setLoading] = useState(false);
   const [burned, setBurned] = useState(0);
@@ -184,9 +184,22 @@ export default function HomeScreen() {
           const wKg = typeof answers.weightKg === "string" ? parseFloat(answers.weightKg) : NaN;
           const gKg = typeof answers.weightGoalKg === "string" ? parseFloat(answers.weightGoalKg) : NaN;
           const u = answers.weightUnit === "lb" ? "lb" : "kg";
+          const tDate = typeof answers.weightTargetDate === "string" ? answers.weightTargetDate : null;
           if (!isNaN(wKg)) await setWeightKg(wKg);
           if (!isNaN(gKg)) await setWeightGoalKg(gKg);
           await setWeightUnit(u);
+          if (tDate) await setWeightTargetDate(tDate);
+          if (!isNaN(wKg) && !isNaN(gKg) && tDate) {
+            const today = new Date();
+            const target = new Date(tDate + "T00:00:00");
+            const days = Math.max(1, Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+            const diffKg = wKg - gKg;
+            const maint = Math.round(wKg * 30);
+            const dailyDelta = (diffKg * 7700) / days;
+            const raw = maint - dailyDelta;
+            const clamped = Math.max(1200, Math.min(4000, Math.round(raw / 10) * 10));
+            await AsyncStorage.setItem("calorie_goal", String(clamped));
+          }
           await completeOnboarding(answers);
           requestAnimationFrame(() => {
             scrollRef.current?.scrollTo({ y: 0, animated: false });
