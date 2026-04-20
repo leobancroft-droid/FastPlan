@@ -828,27 +828,55 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     setFrequency((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }));
   }
 
-  async function handleCameraScan() {
+  function handleAiScanPress() {
+    Alert.alert(
+      "AI Scan",
+      "Add a meal photo to identify foods.",
+      [
+        { text: "Take Photo", onPress: () => runScan("camera") },
+        { text: "Choose from Library", onPress: () => runScan("library") },
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: true },
+    );
+  }
+
+  async function runScan(source: "camera" | "library") {
     if (cameraBusy) return;
-    const perm = await ImagePicker.requestCameraPermissionsAsync();
-    if (!perm.granted) {
-      Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
-      return;
+    if (source === "camera") {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
+        return;
+      }
+    } else {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert("Photos permission needed", "Allow photo library access to pick a meal photo.");
+        return;
+      }
     }
     setCameraActive(true);
     await new Promise((r) => setTimeout(r, 350));
     let r;
     try {
-      r = await ImagePicker.launchCameraAsync({
-        mediaTypes: ["images"],
-        quality: 0.6,
-        base64: true,
-        allowsEditing: false,
-      });
+      r = source === "camera"
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ["images"],
+            quality: 0.6,
+            base64: true,
+            allowsEditing: false,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"],
+            quality: 0.6,
+            base64: true,
+            allowsEditing: false,
+          });
     } catch (err) {
       setCameraActive(false);
-      const msg = err instanceof Error ? err.message : "Could not open camera.";
-      Alert.alert("Camera unavailable", msg);
+      const msg = err instanceof Error ? err.message : "Could not open picker.";
+      Alert.alert("Unavailable", msg);
       return;
     }
     setCameraActive(false);
@@ -1000,7 +1028,7 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
             <>
               <View style={styles.modeRow}>
                 {([
-                  { key: "camera", label: "AI Scan", icon: "zap", color: "#ec4899", onPress: handleCameraScan },
+                  { key: "camera", label: "AI Scan", icon: "zap", color: "#ec4899", onPress: handleAiScanPress },
                   { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444", onPress: () => setBarcodeOpen(true) },
                 ] as const).map((m) => (
                   <Pressable
