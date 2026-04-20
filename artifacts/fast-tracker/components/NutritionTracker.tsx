@@ -421,6 +421,18 @@ function todayStr(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+const MACRO_STREAK_KEY = "macro_streak_v1";
+interface MacroStreak {
+  count: number;
+  lastDate: string | null;
+  achievedToday: boolean;
+}
+function diffDays(a: string, b: string): number {
+  const da = new Date(a + "T00:00:00").getTime();
+  const db = new Date(b + "T00:00:00").getTime();
+  return Math.round((db - da) / 86400000);
+}
+
 interface Props {
   burned: number;
 }
@@ -433,6 +445,7 @@ export function NutritionTracker({ burned }: Props) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [goalEditOpen, setGoalEditOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [macroStreak, setMacroStreak] = useState<MacroStreak>({ count: 0, lastDate: null, achievedToday: false });
   const today = todayStr();
 
   useEffect(() => {
@@ -444,6 +457,25 @@ export function NutritionTracker({ burned }: Props) {
         ]);
         if (f) setFoods(JSON.parse(f));
         if (g) setGoal(Number(g) || DEFAULT_GOAL);
+      } catch {}
+      try {
+        const raw = await AsyncStorage.getItem(MACRO_STREAK_KEY);
+        const t = todayStr();
+        if (raw) {
+          const parsed = JSON.parse(raw) as MacroStreak;
+          if (!parsed.lastDate) {
+            setMacroStreak({ count: 0, lastDate: null, achievedToday: false });
+          } else {
+            const gap = diffDays(parsed.lastDate, t);
+            if (gap === 0) setMacroStreak(parsed);
+            else if (gap === 1) setMacroStreak({ count: parsed.count, lastDate: parsed.lastDate, achievedToday: false });
+            else {
+              const reset = { count: 0, lastDate: null, achievedToday: false };
+              setMacroStreak(reset);
+              await AsyncStorage.setItem(MACRO_STREAK_KEY, JSON.stringify(reset));
+            }
+          }
+        }
       } catch {}
       setLoaded(true);
     })();
@@ -474,6 +506,21 @@ export function NutritionTracker({ burned }: Props) {
 
   const remaining = Math.max(0, goal - totals.kcal + burned);
   const consumedRatio = goal > 0 ? Math.min(1, totals.kcal / (goal + burned)) : 0;
+
+  const macroTargetsHit =
+    totals.carbs >= DEFAULT_CARBS && totals.protein >= DEFAULT_PROTEIN && totals.fat >= DEFAULT_FAT;
+
+  useEffect(() => {
+    if (!loaded) return;
+    if (!macroTargetsHit) return;
+    if (macroStreak.achievedToday) return;
+    const t = todayStr();
+    const wasYesterday = macroStreak.lastDate ? diffDays(macroStreak.lastDate, t) === 1 : false;
+    const newCount = wasYesterday ? macroStreak.count + 1 : 1;
+    const next: MacroStreak = { count: newCount, lastDate: t, achievedToday: true };
+    setMacroStreak(next);
+    AsyncStorage.setItem(MACRO_STREAK_KEY, JSON.stringify(next)).catch(() => {});
+  }, [loaded, macroTargetsHit, macroStreak]);
 
   function handleAddFood(preset: FoodPreset, servings: number, meal: MealKey) {
     const entry: FoodEntry = {
@@ -534,6 +581,17 @@ export function NutritionTracker({ burned }: Props) {
           <MacroCol label="Protein" current={totals.protein} goal={DEFAULT_PROTEIN} colors={colors} />
           <MacroCol label="Fat" current={totals.fat} goal={DEFAULT_FAT} colors={colors} />
         </View>
+
+        {macroStreak.count > 0 && (
+          <View style={styles.macroRewardWrap}>
+            <View style={styles.macroRewardChip}>
+              <Feather name="award" size={12} color="#ffb84d" />
+              <Text style={styles.macroRewardText}>
+                Macro target Day {macroStreak.count}
+              </Text>
+            </View>
+          </View>
+        )}
       </Pressable>
 
       <View style={styles.headerRow}>
@@ -1490,6 +1548,27 @@ const styles = StyleSheet.create({
   macrosRow: {
     flexDirection: "row",
     gap: 14,
+  },
+  macroRewardWrap: {
+    alignItems: "center",
+    marginTop: 4,
+  },
+  macroRewardChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: "#ffb84d22",
+    borderColor: "#ffb84d66",
+  },
+  macroRewardText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.2,
+    color: "#ffb84d",
   },
   macroCol: { flex: 1, gap: 6, alignItems: "center" },
   macroLabel: { fontSize: 13, fontFamily: "Inter_500Medium" },
