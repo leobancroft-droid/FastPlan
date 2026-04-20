@@ -147,9 +147,11 @@ interface FastingContextType {
   weightKg: number | null;
   weightGoalKg: number | null;
   weightUnit: "kg" | "lb";
+  weightTargetDate: string | null;
   setWeightKg: (kg: number | null) => Promise<void>;
   setWeightGoalKg: (kg: number | null) => Promise<void>;
   setWeightUnit: (unit: "kg" | "lb") => Promise<void>;
+  setWeightTargetDate: (dateStr: string | null) => Promise<void>;
   emotionLog: EmotionEntry[];
   customEmotions: EmotionPreset[];
   logEmotion: (preset: EmotionPreset) => Promise<void>;
@@ -198,6 +200,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [weightKg, setWeightKgState] = useState<number | null>(null);
   const [weightGoalKg, setWeightGoalKgState] = useState<number | null>(null);
   const [weightUnit, setWeightUnitState] = useState<"kg" | "lb">("kg");
+  const [weightTargetDate, setWeightTargetDateState] = useState<string | null>(null);
   const [emotionLog, setEmotionLog] = useState<EmotionEntry[]>([]);
   const [customEmotions, setCustomEmotions] = useState<EmotionPreset[]>([]);
   const [dayOverrides, setDayOverrides] = useState<Record<string, DayType>>({});
@@ -217,7 +220,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw, emoLogRaw, emoCustomRaw, overridesRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw, wTargetRaw, emoLogRaw, emoCustomRaw, overridesRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
@@ -229,6 +232,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem("weight_kg"),
         AsyncStorage.getItem("weight_goal_kg"),
         AsyncStorage.getItem("weight_unit"),
+        AsyncStorage.getItem("weight_target_date"),
         AsyncStorage.getItem("emotion_log"),
         AsyncStorage.getItem("emotion_custom"),
         AsyncStorage.getItem("day_overrides"),
@@ -253,6 +257,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       if (wRaw) setWeightKgState(Number(wRaw));
       if (wGoalRaw) setWeightGoalKgState(Number(wGoalRaw));
       if (wUnitRaw === "kg" || wUnitRaw === "lb") setWeightUnitState(wUnitRaw);
+      if (wTargetRaw) setWeightTargetDateState(wTargetRaw);
       if (emoLogRaw) setEmotionLog(JSON.parse(emoLogRaw));
       if (emoCustomRaw) setCustomEmotions(JSON.parse(emoCustomRaw));
       if (overridesRaw) setDayOverrides(JSON.parse(overridesRaw));
@@ -431,6 +436,12 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem("weight_unit", unit);
   }, []);
 
+  const setWeightTargetDate = useCallback(async (dateStr: string | null) => {
+    setWeightTargetDateState(dateStr);
+    if (dateStr === null) await AsyncStorage.removeItem("weight_target_date");
+    else await AsyncStorage.setItem("weight_target_date", dateStr);
+  }, []);
+
   const logEmotion = useCallback(async (preset: EmotionPreset) => {
     const entry: EmotionEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -516,6 +527,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("weight_kg"),
       AsyncStorage.removeItem("weight_goal_kg"),
       AsyncStorage.removeItem("weight_unit"),
+      AsyncStorage.removeItem("weight_target_date"),
       AsyncStorage.removeItem("emotion_log"),
       AsyncStorage.removeItem("emotion_custom"),
       AsyncStorage.removeItem("day_overrides"),
@@ -531,6 +543,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     setWeightKgState(null);
     setWeightGoalKgState(null);
     setWeightUnitState("kg");
+    setWeightTargetDateState(null);
     setEmotionLog([]);
     setCustomEmotions([]);
     setDayOverrides({});
@@ -539,7 +552,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, dayOverrides, toggleDayType, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, weightTargetDate, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate, emotionLog, customEmotions, logEmotion, removeEmotionEntry, addCustomEmotion, removeCustomEmotion, dayOverrides, toggleDayType, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );
