@@ -203,7 +203,7 @@ export default function HomeScreen() {
           >
             <DayBadge type={today?.type ?? "eat"} large completed={isCompleted} skipped={isSkipped} />
             {(isCompleted || isSkipped) && (
-              <Text style={[styles.dayPrefix, { color: primaryColor }]}>
+              <Text style={[styles.dayPrefix, { color: isCompleted ? "#22c55e" : "#f59e0b" }]}>
                 {isFastDay ? "FAST DAY" : "EAT DAY"}
               </Text>
             )}
