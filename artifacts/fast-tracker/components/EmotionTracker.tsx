@@ -37,17 +37,15 @@ export function EmotionTracker() {
         <Pressable
           onPress={() => setPickerOpen(true)}
           style={({ pressed }) => [
-            styles.addEmpty,
+            styles.tile,
             { backgroundColor: colors.muted, borderColor: colors.border },
             pressed && { opacity: 0.7 },
           ]}
         >
-          <View style={[styles.addCircle, { borderColor: colors.foreground + "60" }]}>
-            <Feather name="plus" size={22} color={colors.foreground} />
+          <View style={[styles.tileIcon, { borderColor: colors.foreground + "60" }]}>
+            <Feather name="plus" size={20} color={colors.foreground} />
           </View>
-          <Text style={[styles.addEmptyLabel, { color: colors.mutedForeground }]}>
-            Add a feeling
-          </Text>
+          <Text style={[styles.tileLabel, { color: colors.foreground }]}>Add</Text>
         </Pressable>
       ) : (
         <View style={styles.loggedWrap}>
@@ -345,27 +343,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
   },
-  addEmpty: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingVertical: 18,
+  tile: {
+    width: 78,
+    height: 92,
     borderRadius: 16,
     borderWidth: 1,
-    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
+    gap: 6,
   },
-  addCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  tileIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  addEmptyLabel: {
-    fontSize: 14,
+  tileLabel: {
+    fontSize: 11,
     fontFamily: "Inter_600SemiBold",
+    textAlign: "center",
   },
   loggedWrap: {
     gap: 8,
