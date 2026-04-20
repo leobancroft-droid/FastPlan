@@ -690,7 +690,7 @@ function MacroCol({ label, current, goal, colors }: { label: string; current: nu
     <View style={styles.macroCol}>
       <Text style={[styles.macroLabel, { color: colors.mutedForeground }]}>{label}</Text>
       <View style={[styles.macroTrack, { backgroundColor: colors.muted }]}>
-        <View style={[styles.macroFill, { width: `${Math.max(4, ratio * 100)}%`, backgroundColor: colors.primary }]} />
+        <View style={[styles.macroFill, { width: `${Math.max(4, ratio * 100)}%`, backgroundColor: "#22c55e" }]} />
       </View>
       <Text style={[styles.macroValue, { color: colors.foreground }]}>
         {current} / {goal} g
