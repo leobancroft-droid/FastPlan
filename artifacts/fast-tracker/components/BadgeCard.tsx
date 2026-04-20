@@ -39,9 +39,10 @@ export function BadgeCard({ badge }: BadgeCardProps) {
   }));
 
   const iconName = badge.icon as FeatherIconName;
-  const iconColor = badge.unlocked ? colors.streakGold : colors.mutedForeground;
-  const bgColor = badge.unlocked ? colors.streakGold + "15" : colors.muted;
-  const borderColor = badge.unlocked ? colors.streakGold + "40" : colors.border;
+  const unlockedAccent = "#22c55e";
+  const iconColor = badge.unlocked ? unlockedAccent : colors.mutedForeground;
+  const bgColor = badge.unlocked ? unlockedAccent + "20" : colors.muted;
+  const borderColor = badge.unlocked ? unlockedAccent + "60" : colors.border;
 
   return (
     <View
@@ -65,9 +66,9 @@ export function BadgeCard({ badge }: BadgeCardProps) {
         {badge.description}
       </Text>
       {badge.unlocked ? (
-        <View style={[styles.pill, { backgroundColor: colors.streakGold + "25" }]}>
-          <Feather name="check" size={10} color={colors.streakGold} />
-          <Text style={[styles.pillText, { color: colors.streakGold }]}>  Unlocked</Text>
+        <View style={[styles.pill, { backgroundColor: unlockedAccent + "30" }]}>
+          <Feather name="check" size={10} color={unlockedAccent} />
+          <Text style={[styles.pillText, { color: unlockedAccent }]}>  Unlocked</Text>
         </View>
       ) : (
         <View style={[styles.pill, { backgroundColor: colors.muted }]}>
