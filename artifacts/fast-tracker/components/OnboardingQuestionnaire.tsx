@@ -416,6 +416,40 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                   );
                 })}
               </View>
+              {(() => {
+                if (timelineWeeks === null || !weightsValid) return null;
+                const curKg = unit === "lb" ? curNum / 2.2046226218 : curNum;
+                const tgtKg = unit === "lb" ? tgtNum / 2.2046226218 : tgtNum;
+                const days = timelineWeeks * 7;
+                const diffKg = curKg - tgtKg;
+                const maint = Math.round(curKg * 30);
+                const dailyDelta = (diffKg * 7700) / days;
+                const raw = maint - dailyDelta;
+                const clamped = Math.max(1200, Math.min(4000, Math.round(raw / 10) * 10));
+                const weeklyKg = (diffKg / days) * 7;
+                const weeklyDisp = unit === "lb" ? weeklyKg * 2.2046226218 : weeklyKg;
+                const direction = diffKg > 0 ? "lose" : diffKg < 0 ? "gain" : "maintain";
+                return (
+                  <View
+                    style={[
+                      styles.calorieCard,
+                      { backgroundColor: colors.primary + "14", borderColor: colors.primary + "55" },
+                    ]}
+                  >
+                    <Text style={[styles.calorieLabel, { color: colors.mutedForeground }]}>
+                      Suggested daily intake
+                    </Text>
+                    <Text style={[styles.calorieValue, { color: colors.foreground }]}>
+                      {clamped} kcal
+                    </Text>
+                    {direction !== "maintain" && (
+                      <Text style={[styles.calorieSub, { color: colors.mutedForeground }]}>
+                        ≈ {Math.abs(weeklyDisp).toFixed(2)} {unit}/wk to {direction}
+                      </Text>
+                    )}
+                  </View>
+                );
+              })()}
             </Animated.View>
           ) : question ? (
           <Animated.View key={question.id} entering={FadeIn.duration(220)} exiting={FadeOut.duration(120)}>
@@ -583,6 +617,30 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_500Medium",
     marginBottom: 16,
+  },
+  calorieCard: {
+    marginTop: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    gap: 4,
+  },
+  calorieLabel: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  calorieValue: {
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: -0.4,
+  },
+  calorieSub: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
   },
   logoWrap: {
     alignItems: "center",
