@@ -19,7 +19,6 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AiFoodScanner } from "@/components/AiFoodScanner";
 import { BadgeCard } from "@/components/BadgeCard";
 import { DayBadge } from "@/components/DayBadge";
 import { NutritionTracker } from "@/components/NutritionTracker";
@@ -200,10 +199,6 @@ export default function HomeScreen() {
           key={nutritionRefresh}
           burned={burned}
         />
-
-        <View style={styles.spacing} />
-
-        <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
 
         {startDate && (
           <>
