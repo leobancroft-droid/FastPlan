@@ -78,6 +78,12 @@ interface FastingContextType {
   addGlass: () => Promise<void>;
   removeGlass: () => Promise<void>;
   setWaterGoal: (ml: number) => Promise<void>;
+  weightKg: number | null;
+  weightGoalKg: number | null;
+  weightUnit: "kg" | "lb";
+  setWeightKg: (kg: number | null) => Promise<void>;
+  setWeightGoalKg: (kg: number | null) => Promise<void>;
+  setWeightUnit: (unit: "kg" | "lb") => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
@@ -115,6 +121,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [waterToday, setWaterToday] = useState(0);
   const [waterDate, setWaterDate] = useState<string>(getTodayStr());
   const [waterGoal, setWaterGoalState] = useState(2000);
+  const [weightKg, setWeightKgState] = useState<number | null>(null);
+  const [weightGoalKg, setWeightGoalKgState] = useState<number | null>(null);
+  const [weightUnit, setWeightUnitState] = useState<"kg" | "lb">("kg");
   const [loaded, setLoaded] = useState(false);
   const glassSize = 250;
 
@@ -131,7 +140,7 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw, wRaw, wGoalRaw, wUnitRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
@@ -140,6 +149,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem("plan_intro_seen"),
         AsyncStorage.getItem("water_today"),
         AsyncStorage.getItem("water_goal"),
+        AsyncStorage.getItem("weight_kg"),
+        AsyncStorage.getItem("weight_goal_kg"),
+        AsyncStorage.getItem("weight_unit"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
@@ -158,6 +170,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
         }
       }
       if (goalRaw) setWaterGoalState(Number(goalRaw) || 2000);
+      if (wRaw) setWeightKgState(Number(wRaw));
+      if (wGoalRaw) setWeightGoalKgState(Number(wGoalRaw));
+      if (wUnitRaw === "kg" || wUnitRaw === "lb") setWeightUnitState(wUnitRaw);
     } catch {}
     setLoaded(true);
   }
@@ -288,6 +303,23 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem("water_goal", String(clamped));
   }, []);
 
+  const setWeightKg = useCallback(async (kg: number | null) => {
+    setWeightKgState(kg);
+    if (kg === null) await AsyncStorage.removeItem("weight_kg");
+    else await AsyncStorage.setItem("weight_kg", String(kg));
+  }, []);
+
+  const setWeightGoalKg = useCallback(async (kg: number | null) => {
+    setWeightGoalKgState(kg);
+    if (kg === null) await AsyncStorage.removeItem("weight_goal_kg");
+    else await AsyncStorage.setItem("weight_goal_kg", String(kg));
+  }, []);
+
+  const setWeightUnit = useCallback(async (unit: "kg" | "lb") => {
+    setWeightUnitState(unit);
+    await AsyncStorage.setItem("weight_unit", unit);
+  }, []);
+
   const setDayStatus = useCallback(async (dateStr: string, status: DayStatus | "clear") => {
     const filtered = history.filter((d) => d.date !== dateStr);
     let newHistory: DayRecord[];
@@ -326,6 +358,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("plan_intro_seen"),
       AsyncStorage.removeItem("water_today"),
       AsyncStorage.removeItem("water_goal"),
+      AsyncStorage.removeItem("weight_kg"),
+      AsyncStorage.removeItem("weight_goal_kg"),
+      AsyncStorage.removeItem("weight_unit"),
     ]);
     setHistory([]);
     setBadges(BADGES);
@@ -335,12 +370,15 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     setPlanIntroSeen(false);
     setWaterToday(0);
     setWaterGoalState(2000);
+    setWeightKgState(null);
+    setWeightGoalKgState(null);
+    setWeightUnitState("kg");
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, weightKg, weightGoalKg, weightUnit, setWeightKg, setWeightGoalKg, setWeightUnit, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

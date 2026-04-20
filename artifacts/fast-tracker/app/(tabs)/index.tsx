@@ -25,6 +25,7 @@ import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
 import { WaterTracker } from "@/components/WaterTracker";
+import { WeightTracker } from "@/components/WeightTracker";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -130,6 +131,10 @@ export default function HomeScreen() {
         <View style={styles.spacing} />
 
         <WaterTracker />
+
+        <View style={styles.spacing} />
+
+        <WeightTracker />
 
         <View style={styles.spacing} />
 
