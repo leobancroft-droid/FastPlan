@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { DEFAULT_EMOTIONS, useFasting, type EmotionPreset } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -33,7 +33,11 @@ export function EmotionTracker() {
         </Pressable>
       </View>
 
-      {todayEntries.length === 0 ? (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
+      >
         <Pressable
           onPress={() => setPickerOpen(true)}
           style={({ pressed }) => [
@@ -47,33 +51,33 @@ export function EmotionTracker() {
           </View>
           <Text style={[styles.tileLabel, { color: colors.foreground }]}>Add</Text>
         </Pressable>
-      ) : (
-        <View style={styles.loggedWrap}>
-          <View style={styles.chips}>
-            {todayEntries.map((entry) => (
-              <Pressable
-                key={entry.id}
-                onLongPress={() => removeEmotionEntry(entry.id)}
-                style={[styles.chip, { backgroundColor: colors.primary + "22" }]}
-              >
-                <Text style={styles.chipEmoji}>{entry.emoji}</Text>
-                <Text style={[styles.chipLabel, { color: colors.foreground }]}>{entry.label}</Text>
-              </Pressable>
-            ))}
-            <Pressable
-              onPress={() => setPickerOpen(true)}
-              style={({ pressed }) => [
-                styles.chipAdd,
-                { backgroundColor: colors.muted, borderColor: colors.border },
-                pressed && { opacity: 0.7 },
-              ]}
-            >
-              <Feather name="plus" size={14} color={colors.foreground} />
-              <Text style={[styles.chipLabel, { color: colors.foreground }]}>Add</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
+
+        {todayEntries.map((entry) => (
+          <Pressable
+            key={entry.id}
+            onLongPress={() => {
+              if (Platform.OS === "web") {
+                removeEmotionEntry(entry.id);
+              } else {
+                Alert.alert("Remove feeling", `Remove ${entry.label}?`, [
+                  { text: "Cancel", style: "cancel" },
+                  { text: "Remove", style: "destructive", onPress: () => removeEmotionEntry(entry.id) },
+                ]);
+              }
+            }}
+            style={({ pressed }) => [
+              styles.tile,
+              { backgroundColor: colors.muted, borderColor: colors.border },
+              pressed && { opacity: 0.7 },
+            ]}
+          >
+            <Text style={styles.tileEmoji}>{entry.emoji}</Text>
+            <Text style={[styles.tileLabel, { color: colors.foreground }]} numberOfLines={1}>
+              {entry.label}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
 
       <EmotionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
       <EmotionsManager open={historyOpen} onClose={() => setHistoryOpen(false)} />
@@ -361,10 +365,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  tileEmoji: {
+    fontSize: 28,
+    lineHeight: 34,
+  },
   tileLabel: {
     fontSize: 11,
     fontFamily: "Inter_600SemiBold",
     textAlign: "center",
+  },
+  scroll: {
+    gap: 10,
+    paddingVertical: 4,
+    paddingRight: 4,
   },
   loggedWrap: {
     gap: 8,
