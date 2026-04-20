@@ -198,7 +198,7 @@ export default function HomeScreen() {
 
 function getDaySubtitle(isFastDay: boolean, tone: "supportive" | "balanced" | "strict" | undefined): string {
   if (isFastDay) {
-    if (tone === "strict") return "Zero calories. Stay disciplined and execute the plan.";
+    if (tone === "strict") return "Stay disciplined and execute the plan.";
     if (tone === "balanced") return "Stay focused. You committed to today — see it through.";
     return "No calories today. Be kind to yourself — you've got this.";
   }
