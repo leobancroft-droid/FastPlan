@@ -1,8 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   Platform,
@@ -19,14 +18,9 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BadgeCard } from "@/components/BadgeCard";
 import { DayBadge } from "@/components/DayBadge";
-import { NutritionTracker } from "@/components/NutritionTracker";
 import { OnboardingQuestionnaire } from "@/components/OnboardingQuestionnaire";
-import { PlanCard } from "@/components/PlanCard";
-import { PlannedCalendar } from "@/components/PlannedCalendar";
 import { PlanReadyIntro } from "@/components/PlanReadyIntro";
-import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
 import { WaterTracker } from "@/components/WaterTracker";
@@ -35,53 +29,12 @@ import { EmotionTracker } from "@/components/EmotionTracker";
 import { useFasting, getTodayStr } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
-const KCAL_PER_STEP = 0.04;
-
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate } = useFasting();
+  const { today, streak, longestStreak, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit, setWeightTargetDate } = useFasting();
   const scrollRef = useRef<ScrollView>(null);
   const [loading, setLoading] = useState(false);
-  const [burned, setBurned] = useState(0);
-  const [nutritionRefresh, setNutritionRefresh] = useState(0);
-
-  useFocusEffect(
-    useCallback(() => {
-      let cancelled = false;
-      (async () => {
-        try {
-          const [s, sDate, a] = await Promise.all([
-            AsyncStorage.getItem("steps_today"),
-            AsyncStorage.getItem("steps_date"),
-            AsyncStorage.getItem("activities_log"),
-          ]);
-          if (cancelled) return;
-          const today = todayStr();
-          const steps = s && sDate === today ? Number(s) || 0 : 0;
-          const stepKcal = Math.round(steps * KCAL_PER_STEP);
-          const acts: { kcal: number; date: string }[] = a ? JSON.parse(a) : [];
-          const actKcal = acts
-            .filter((x) => x.date === today)
-            .reduce((sum, x) => sum + (x.kcal || 0), 0);
-          setBurned(stepKcal + actKcal);
-        } catch {}
-      })();
-      return () => {
-        cancelled = true;
-      };
-    }, [nutritionRefresh])
-  );
-
-  const recentBadges = badges
-    .slice()
-    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked))
-    .slice(0, 4);
 
   const btnScale = useSharedValue(1);
   const checkScale = useSharedValue(0);
@@ -270,7 +223,7 @@ export default function HomeScreen() {
 
         <View style={styles.spacing} />
 
-        <WeightTracker onCalorieGoalChange={() => setNutritionRefresh((n) => n + 1)} />
+        <WeightTracker onCalorieGoalChange={() => {}} />
 
         {!isFastDay && (
           <>
@@ -280,35 +233,6 @@ export default function HomeScreen() {
               <Text style={[styles.tipsText, { color: textColor }]}>
                 Enjoy balanced meals. Tomorrow is a fast day — stay mindful and don't overindulge.
               </Text>
-            </View>
-          </>
-        )}
-
-        <View style={styles.spacing} />
-
-        <Text style={[styles.sectionTitle, { color: textColor }]}>Summary</Text>
-
-        <NutritionTracker
-          key={nutritionRefresh}
-          burned={burned}
-        />
-
-        {startDate && (
-          <>
-            <View style={styles.spacing} />
-            <Text style={[styles.sectionTitle, { color: textColor }]}>Fasting Plan</Text>
-            <PlannedCalendar startDate={startDate} history={history} />
-          </>
-        )}
-
-        {recentBadges.length > 0 && (
-          <>
-            <View style={styles.spacing} />
-            <Text style={[styles.sectionTitle, { color: textColor }]}>Rewards</Text>
-            <View style={styles.badgeRow}>
-              {recentBadges.map((b) => (
-                <BadgeCard key={b.id} badge={b} />
-              ))}
             </View>
           </>
         )}
