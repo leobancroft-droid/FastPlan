@@ -118,7 +118,7 @@ export default function HomeScreen() {
           <Text style={[styles.daySubtitle, { color: mutedColor }]}>
             {getDaySubtitle(isFastDay, userProfile?.tone)}
           </Text>
-          {isFastDay && <QuoteCard quote={fastQuote} isFastDay={isFastDay} />}
+          <QuoteCard quote={fastQuote} isFastDay={isFastDay} />
         </View>
 
         <StreakCounter streak={streak} longestStreak={longestStreak} isFastDay={isFastDay} />
