@@ -1,6 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,6 +11,7 @@ import { useColors } from "@/hooks/useColors";
 import type { DayType } from "@/context/FastingContext";
 
 const EAT_MONSTER = require("@/assets/images/eat-monster.png");
+const FAST_MONSTER = require("@/assets/images/fast-monster.png");
 
 interface DayBadgeProps {
   type: DayType;
@@ -38,47 +38,20 @@ export function DayBadge({ type, large = false }: DayBadgeProps) {
     transform: [{ scale: scale.value }],
   }));
 
-  const size = large ? 120 : 56;
-  const iconSize = large ? 52 : 24;
   const fontSize = large ? 14 : 10;
   const imgSize = large ? 140 : 56;
-
-  if (!isFast) {
-    return (
-      <Animated.View style={[animStyle, styles.monsterWrap]}>
-        <Image
-          source={EAT_MONSTER}
-          style={{ width: imgSize, height: imgSize }}
-          resizeMode="contain"
-        />
-        {large && (
-          <Text style={[styles.label, { fontSize, color: colors.eatPrimary }]}>
-            EAT DAY
-          </Text>
-        )}
-      </Animated.View>
-    );
-  }
+  const labelColor = isFast ? colors.fastPrimary : colors.eatPrimary;
 
   return (
-    <Animated.View
-      style={[
-        animStyle,
-        styles.badge,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: colors.fastPrimary + "20",
-          borderColor: colors.fastPrimary,
-          borderWidth: 2,
-        },
-      ]}
-    >
-      <Feather name="moon" size={iconSize} color={colors.fastPrimary} />
+    <Animated.View style={[animStyle, styles.wrap]}>
+      <Image
+        source={isFast ? FAST_MONSTER : EAT_MONSTER}
+        style={{ width: imgSize, height: imgSize }}
+        resizeMode="contain"
+      />
       {large && (
-        <Text style={[styles.label, { fontSize, color: colors.fastPrimary, marginTop: 4 }]}>
-          FAST DAY
+        <Text style={[styles.label, { fontSize, color: labelColor }]}>
+          {isFast ? "FAST DAY" : "EAT DAY"}
         </Text>
       )}
     </Animated.View>
@@ -86,11 +59,7 @@ export function DayBadge({ type, large = false }: DayBadgeProps) {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  monsterWrap: {
+  wrap: {
     alignItems: "center",
   },
   label: {
