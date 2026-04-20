@@ -515,13 +515,15 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
               })}
             </View>
 
-            <View style={styles.logoWrap}>
-              <Image
-                source={require("@/assets/images/fastplan-logo-white.png")}
-                style={styles.logoImg}
-                resizeMode="contain"
-              />
-            </View>
+            {step === 0 && (
+              <View style={styles.logoWrap}>
+                <Image
+                  source={require("@/assets/images/fastplan-logo-white.png")}
+                  style={styles.logoImg}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
           </Animated.View>
           ) : null}
         </ScrollView>
