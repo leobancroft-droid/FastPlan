@@ -657,6 +657,7 @@ export function NutritionTracker({ burned }: Props) {
         meal={pickerMeal}
         onClose={() => setPickerMeal(null)}
         onAdd={handleAddFood}
+        recentFoods={foods}
       />
 
       <DetailsSheet
@@ -752,18 +753,20 @@ interface PickerProps {
   meal: MealKey | null;
   onClose: () => void;
   onAdd: (preset: FoodPreset, servings: number, meal: MealKey) => void;
+  recentFoods: FoodEntry[];
 }
 
-type CategoryFilter = "foods" | "beverages";
-type FrequencyFilter = "frequent" | "all";
+type SortMode = "frequent" | "recent" | "all";
 
-function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
+function FoodPicker({ meal, onClose, onAdd, recentFoods }: PickerProps) {
   const colors = useColors();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<FoodPreset | null>(null);
   const [servings, setServings] = useState("1");
   const [pending, setPending] = useState<{ id: string; preset: FoodPreset; servings: number }[]>([]);
   const [frequency, setFrequency] = useState<Record<string, number>>({});
+  const [sortMode, setSortMode] = useState<SortMode>("frequent");
+  const [sortOpen, setSortOpen] = useState(false);
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [cameraBusy, setCameraBusy] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
@@ -785,13 +788,35 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     }
   }, [open]);
 
+  const recencyMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const f of recentFoods) {
+      const t = new Date(f.timestamp).getTime();
+      const key = f.label.toLowerCase();
+      if (!m[key] || t > m[key]) m[key] = t;
+    }
+    return m;
+  }, [recentFoods]);
+
   const filtered = useMemo(() => {
     if (search.trim()) {
       const q = search.toLowerCase();
       return FOOD_PRESETS.filter((p) => p.label.toLowerCase().includes(q));
     }
-    return [...FOOD_PRESETS].sort((a, b) => (frequency[b.id] ?? 0) - (frequency[a.id] ?? 0));
-  }, [search, frequency]);
+    if (sortMode === "frequent") {
+      return [...FOOD_PRESETS].sort(
+        (a, b) => (frequency[b.id] ?? 0) - (frequency[a.id] ?? 0),
+      );
+    }
+    if (sortMode === "recent") {
+      return [...FOOD_PRESETS].sort(
+        (a, b) =>
+          (recencyMap[b.label.toLowerCase()] ?? 0) -
+          (recencyMap[a.label.toLowerCase()] ?? 0),
+      );
+    }
+    return FOOD_PRESETS;
+  }, [search, frequency, sortMode, recencyMap]);
 
   useEffect(() => {
     const q = search.trim();
@@ -1112,6 +1137,31 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
                   placeholder={`What did you have for ${mealLabel.toLowerCase()}?`}
                   placeholderTextColor={colors.mutedForeground}
                   style={[styles.searchInput, { color: colors.foreground }]}
+                />
+              </View>
+
+              <View style={styles.dropRow}>
+                <FilterDropdown
+                  label={
+                    sortMode === "frequent"
+                      ? "Frequent"
+                      : sortMode === "recent"
+                        ? "Recent"
+                        : "All"
+                  }
+                  open={sortOpen}
+                  onToggle={() => setSortOpen((v) => !v)}
+                  options={[
+                    { key: "frequent", label: "Frequent" },
+                    { key: "recent", label: "Recent" },
+                    { key: "all", label: "All" },
+                  ]}
+                  onSelect={(k) => {
+                    setSortMode(k as SortMode);
+                    setSortOpen(false);
+                  }}
+                  active={sortMode}
+                  colors={colors}
                 />
               </View>
 
