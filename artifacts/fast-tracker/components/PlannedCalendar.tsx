@@ -40,13 +40,14 @@ function addMonths(dateStr: string, months: number): string {
 }
 
 function buildMonthGroups(
-  startDate: string,
+  rangeStartStr: string,
   endDateStr: string,
   todayStr: string,
   recordMap: Record<string, DayRecord>,
   resolveType: (dateStr: string) => DayType,
+  planStartDate: string,
 ): MonthGroup[] {
-  const start = new Date(startDate + "T00:00:00");
+  const start = new Date(rangeStartStr + "T00:00:00");
   const end = new Date(endDateStr + "T00:00:00");
 
   const groups: MonthGroup[] = [];
@@ -68,7 +69,7 @@ function buildMonthGroups(
         days.push(null);
         continue;
       }
-      const diff = getDiffDays(startDate, dateStr);
+      const diff = getDiffDays(planStartDate, dateStr);
       const isBeforeStart = diff < 0;
       const type: DayType = isBeforeStart ? "eat" : resolveType(dateStr);
       days.push({
@@ -106,11 +107,19 @@ export function PlannedCalendar({ startDate, history }: PlannedCalendarProps) {
     return map;
   }, [history]);
 
-  const endDateStr = useMemo(() => addMonths(startDate, RANGE_MONTHS[range]), [startDate, range]);
+  const { rangeStartStr, endDateStr } = useMemo(() => {
+    const today = new Date(todayStr + "T00:00:00");
+    const months = RANGE_MONTHS[range];
+    const firstOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + months, 0);
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return { rangeStartStr: fmt(firstOfThisMonth), endDateStr: fmt(lastDay) };
+  }, [todayStr, range]);
 
   const groups = useMemo(
-    () => buildMonthGroups(startDate, endDateStr, todayStr, recordMap, getTypeForDate),
-    [startDate, endDateStr, todayStr, recordMap, getTypeForDate]
+    () => buildMonthGroups(rangeStartStr, endDateStr, todayStr, recordMap, getTypeForDate, startDate),
+    [rangeStartStr, endDateStr, todayStr, recordMap, getTypeForDate, startDate]
   );
 
   const opacity = isDark
