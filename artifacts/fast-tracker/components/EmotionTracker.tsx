@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
-import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { DEFAULT_EMOTIONS, useFasting, type EmotionPreset } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -125,6 +125,11 @@ function EmotionPicker({ open, onClose }: PickerProps) {
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
 
@@ -164,6 +169,7 @@ function EmotionPicker({ open, onClose }: PickerProps) {
             })}
           </ScrollView>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );
@@ -201,6 +207,11 @@ function EmotionsManager({ open, onClose }: ManagerProps) {
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
 
@@ -305,6 +316,7 @@ function EmotionsManager({ open, onClose }: ManagerProps) {
             <Text style={[styles.closeText, { color: colors.foreground }]}>Done</Text>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );

@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
-import { Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFasting, getTodayStr, getDiffDays } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
@@ -276,6 +276,11 @@ function WeightEditor({ open, onClose, weightKg, goalKg, unit, targetDate, onSav
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
           <Text style={[styles.sheetTitle, { color: colors.foreground }]}>Update Weight</Text>
@@ -369,6 +374,7 @@ function WeightEditor({ open, onClose, weightKg, goalKg, unit, targetDate, onSav
             </Pressable>
           </View>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );

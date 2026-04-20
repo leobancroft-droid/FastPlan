@@ -5,7 +5,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -913,6 +915,11 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
       <Pressable style={styles.backdrop} onPress={handleClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.sheet, styles.tallSheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
           <View style={styles.pickerHeader}>
@@ -1205,6 +1212,7 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
             </>
           )}
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
       <BarcodeScannerModal
         visible={barcodeOpen}
@@ -1287,6 +1295,11 @@ function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClo
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <View style={styles.sheetHandle} />
           <View style={styles.pickerHeader}>
@@ -1335,6 +1348,7 @@ function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClo
             })}
           </ScrollView>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );
@@ -1354,6 +1368,11 @@ function GoalEditor({ open, onClose, goal, onSave }: { open: boolean; onClose: (
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ width: "100%" }}
+          pointerEvents="box-none"
+        >
         <Pressable style={[styles.smallSheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
           <Text style={[styles.smallSheetTitle, { color: colors.foreground }]}>Daily calorie goal</Text>
           <Text style={[styles.smallSheetDesc, { color: colors.mutedForeground }]}>
@@ -1381,6 +1400,7 @@ function GoalEditor({ open, onClose, goal, onSave }: { open: boolean; onClose: (
             </Pressable>
           </View>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );
