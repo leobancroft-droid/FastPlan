@@ -22,8 +22,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     AsyncStorage.getItem("theme_mode").then((val) => {
-      if (val === "light" || val === "dark" || val === "system") {
+      if (val === "light" || val === "dark") {
         setThemeModeState(val);
+      } else {
+        setThemeModeState("system");
+        AsyncStorage.setItem("theme_mode", "system");
       }
     });
   }, []);
