@@ -158,6 +158,11 @@ export default function HomeScreen() {
 
         <View style={styles.hero}>
           <DayBadge type={today?.type ?? "eat"} large completed={isCompleted} skipped={isSkipped} />
+          {(isCompleted || isSkipped) && (
+            <Text style={[styles.dayPrefix, { color: primaryColor }]}>
+              {isFastDay ? "FAST DAY" : "EAT DAY"}
+            </Text>
+          )}
           <Text style={[styles.dayTitle, { color: textColor }]}>
             {isSkipped ? "Day Skipped" : isCompleted ? "Day Complete" : isFastDay ? "Fast Day" : "Eat Day"}
           </Text>
@@ -278,6 +283,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, gap: 0 },
   dateLabel: { fontSize: 13, fontFamily: "Inter_500Medium", textAlign: "center", marginBottom: 24, letterSpacing: 0.5 },
   hero: { alignItems: "center", marginBottom: 32, gap: 12 },
+  dayPrefix: { fontSize: 12, fontFamily: "Inter_700Bold", letterSpacing: 1.5, marginTop: -4, marginBottom: -4 },
   dayTitle: { fontSize: 36, fontFamily: "Inter_700Bold", letterSpacing: -0.5 },
   daySubtitle: { fontSize: 15, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 22, paddingHorizontal: 16 },
   spacing: { height: 20 },
