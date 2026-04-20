@@ -716,6 +716,7 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const [freqOpen, setFreqOpen] = useState(false);
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [cameraBusy, setCameraBusy] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const [remoteResults, setRemoteResults] = useState<FoodPreset[]>([]);
   const [remoteLoading, setRemoteLoading] = useState(false);
 
@@ -834,12 +835,23 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
       Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
       return;
     }
-    const r = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      quality: 0.6,
-      base64: true,
-      allowsEditing: false,
-    });
+    setCameraActive(true);
+    await new Promise((r) => setTimeout(r, 350));
+    let r;
+    try {
+      r = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 0.6,
+        base64: true,
+        allowsEditing: false,
+      });
+    } catch (err) {
+      setCameraActive(false);
+      const msg = err instanceof Error ? err.message : "Could not open camera.";
+      Alert.alert("Camera unavailable", msg);
+      return;
+    }
+    setCameraActive(false);
     if (r.canceled || !r.assets?.[0]?.base64) return;
     setCameraBusy(true);
     try {
@@ -913,7 +925,7 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const totalCount = pending.length + (selected ? 1 : 0);
 
   return (
-    <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
+    <Modal visible={open && !cameraActive} transparent animationType="fade" onRequestClose={handleClose}>
       <Pressable style={styles.backdrop} onPress={handleClose}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
