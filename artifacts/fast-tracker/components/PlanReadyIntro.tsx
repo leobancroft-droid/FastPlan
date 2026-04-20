@@ -39,26 +39,26 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
             entering={FadeInDown.duration(400).delay(220)}
             style={[styles.lead, { color: colors.mutedForeground }]}
           >
-            Schedule your fasts on your own terms — pick a length, pick a time, hit start.
+            Alternate Day Fasting works because it's simple.
           </Animated.Text>
 
           <Animated.View entering={FadeInDown.duration(400).delay(320)} style={styles.bullets}>
-            <Bullet text="Pick from common presets or any custom length." color={colors.foreground} />
-            <Bullet text="Schedule ahead or start a fast right now." color={colors.foreground} />
-            <Bullet text="Track your streak, water, mood, and meals." color={colors.foreground} />
+            <Bullet text="No constant decisions." color={colors.foreground} />
+            <Bullet text="No overthinking." color={colors.foreground} />
+            <Bullet text="No endless rules." color={colors.foreground} />
           </Animated.View>
 
           <Animated.View
             entering={FadeInDown.duration(400).delay(440)}
             style={[styles.rhythmBox, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}
           >
-            <Text style={[styles.rhythmLabel, { color: colors.primary }]}>YOUR RHYTHM, YOUR WAY</Text>
+            <Text style={[styles.rhythmLabel, { color: colors.primary }]}>JUST A CLEAR RHYTHM</Text>
             <View style={styles.rhythmRow}>
-              <RhythmWord text="Plan" color={colors.foreground} />
+              <RhythmWord text="Eat" color={colors.foreground} />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
               <RhythmWord text="Fast" color={colors.foreground} />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
-              <RhythmWord text="Track" color={colors.foreground} />
+              <RhythmWord text="Repeat" color={colors.foreground} />
             </View>
           </Animated.View>
         </View>
