@@ -3,7 +3,7 @@ import SwiftUI
 
 private let APP_GROUP = "group.com.altfast.shared"
 
-struct AltFastEntry: TimelineEntry {
+struct FastPlanEntry: TimelineEntry {
     let date: Date
     let dayType: String       // "fast" or "eat"
     let streak: Int
@@ -13,28 +13,28 @@ struct AltFastEntry: TimelineEntry {
 }
 
 struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> AltFastEntry {
-        AltFastEntry(date: Date(), dayType: "fast", streak: 1, dateLabel: shortDate(Date()), kcalGoal: 2000, kcalConsumed: 0)
+    func placeholder(in context: Context) -> FastPlanEntry {
+        FastPlanEntry(date: Date(), dayType: "fast", streak: 1, dateLabel: shortDate(Date()), kcalGoal: 2000, kcalConsumed: 0)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (AltFastEntry) -> Void) {
+    func getSnapshot(in context: Context, completion: @escaping (FastPlanEntry) -> Void) {
         completion(readEntry())
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<AltFastEntry>) -> Void) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<FastPlanEntry>) -> Void) {
         let entry = readEntry()
         let next = Calendar.current.date(byAdding: .minute, value: 30, to: Date()) ?? Date().addingTimeInterval(1800)
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 
-    private func readEntry() -> AltFastEntry {
+    private func readEntry() -> FastPlanEntry {
         let defaults = UserDefaults(suiteName: APP_GROUP)
         let dayType = defaults?.string(forKey: "dayType") ?? "fast"
         let streak = defaults?.integer(forKey: "streak") ?? 0
         let dateLabel = defaults?.string(forKey: "dateLabel") ?? shortDate(Date())
         let kcalGoal = defaults?.integer(forKey: "kcalGoal") ?? 0
         let kcalConsumed = defaults?.integer(forKey: "kcalConsumed") ?? 0
-        return AltFastEntry(
+        return FastPlanEntry(
             date: Date(),
             dayType: dayType,
             streak: streak,
@@ -51,8 +51,8 @@ struct Provider: TimelineProvider {
     }
 }
 
-struct AltFastWidgetView: View {
-    var entry: AltFastEntry
+struct FastPlanWidgetView: View {
+    var entry: FastPlanEntry
 
     private var isFast: Bool { entry.dayType == "fast" }
     private var label: String { isFast ? "Fast Day" : "Eat Day" }
@@ -64,7 +64,7 @@ struct AltFastWidgetView: View {
             Color(red: 0.10, green: 0.06, blue: 0.18)
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("AltFast")
+                    Text("FastPlan")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.white.opacity(0.7))
                     Spacer()
@@ -121,27 +121,27 @@ struct AltFastWidgetView: View {
     }
 }
 
-struct AltFastWidget: Widget {
-    let kind: String = "AltFastWidget"
+struct FastPlanWidget: Widget {
+    let kind: String = "FastPlanWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             if #available(iOS 17.0, *) {
-                AltFastWidgetView(entry: entry)
+                FastPlanWidgetView(entry: entry)
                     .containerBackground(.fill.tertiary, for: .widget)
             } else {
-                AltFastWidgetView(entry: entry)
+                FastPlanWidgetView(entry: entry)
             }
         }
-        .configurationDisplayName("AltFast")
+        .configurationDisplayName("FastPlan")
         .description("Today's fasting day at a glance.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
 @main
-struct AltFastWidgetBundle: WidgetBundle {
+struct FastPlanWidgetBundle: WidgetBundle {
     var body: some Widget {
-        AltFastWidget()
+        FastPlanWidget()
     }
 }

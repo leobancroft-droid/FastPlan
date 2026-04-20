@@ -90,7 +90,7 @@ export async function lookupBarcode(barcode: string): Promise<ScannedProduct | n
     barcode
   )}.json?fields=product_name,product_name_en,brands,serving_size,serving_quantity,nutriments`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "AltFast/1.0 (replit)" },
+    headers: { "User-Agent": "FastPlan/1.0 (replit)" },
   });
   if (!res.ok) return null;
   const data = (await res.json()) as OffResponse;

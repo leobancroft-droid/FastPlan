@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -109,12 +110,18 @@ export function AiFoodScanner({ onAdded }: Props) {
   async function pickFromCamera() {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert(
-        "Camera permission needed",
-        perm.canAskAgain
-          ? "Allow camera access to scan a meal."
-          : "Camera access is blocked. Enable it in Settings → AltFast → Camera.",
-      );
+      if (perm.canAskAgain) {
+        Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
+      } else {
+        Alert.alert(
+          "Camera access is blocked",
+          "Enable it in Settings → FastPlan → Camera.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() },
+          ],
+        );
+      }
       return;
     }
     try {
@@ -149,12 +156,18 @@ export function AiFoodScanner({ onAdded }: Props) {
   async function pickFromLibrary() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert(
-        "Photos permission needed",
-        perm.canAskAgain
-          ? "Allow photo access to scan a meal."
-          : "Photo access is blocked. Enable it in Settings → AltFast → Photos.",
-      );
+      if (perm.canAskAgain) {
+        Alert.alert("Photos permission needed", "Allow photo access to scan a meal.");
+      } else {
+        Alert.alert(
+          "Photo access is blocked",
+          "Enable it in Settings → FastPlan → Photos.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() },
+          ],
+        );
+      }
       return;
     }
     try {

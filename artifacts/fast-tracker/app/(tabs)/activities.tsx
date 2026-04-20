@@ -121,7 +121,7 @@ export default function ActivitiesScreen() {
     if (Platform.OS === "ios") {
       Alert.alert(
         "Connect Apple Health",
-        "AltFast would like to read your Steps, Walking + Running Distance, and Active Energy from Apple Health.",
+        "FastPlan would like to read your Steps, Walking + Running Distance, and Active Energy from Apple Health.",
         [
           { text: "Not Now", style: "cancel" },
           {
@@ -138,7 +138,7 @@ export default function ActivitiesScreen() {
     if (Platform.OS === "android") {
       Alert.alert(
         "Connect Health Connect",
-        "AltFast would like to read your Steps, Distance, and Active Calories from Health Connect.",
+        "FastPlan would like to read your Steps, Distance, and Active Calories from Health Connect.",
         [
           { text: "Not Now", style: "cancel" },
           {
