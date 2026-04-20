@@ -41,10 +41,10 @@ const colors = {
     eatAccent: "#6c63ff",
 
     success: "#00b894",
-    warning: "#fdcb6e",
+    warning: "#2ecc71",
     info: "#74b9ff",
 
-    streakGold: "#f9ca24",
+    streakGold: "#2ecc71",
     streakSilver: "#b2bec3",
     streakBronze: "#e17055",
   },
@@ -91,10 +91,10 @@ const colors = {
     eatAccent: "#a29bfe",
 
     success: "#00cec9",
-    warning: "#fdcb6e",
+    warning: "#2ecc71",
     info: "#74b9ff",
 
-    streakGold: "#f9ca24",
+    streakGold: "#2ecc71",
     streakSilver: "#b2bec3",
     streakBronze: "#e17055",
   },
