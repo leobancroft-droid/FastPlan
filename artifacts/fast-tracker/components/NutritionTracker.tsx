@@ -1132,38 +1132,6 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods }: PickerProps) {
             </View>
           ) : (
             <>
-              <View style={styles.modeRow}>
-                {([
-                  { key: "camera", label: "AI Scan", icon: "zap", color: "#ec4899", onPress: handleAiScanPress },
-                  { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444", onPress: () => setBarcodeOpen(true) },
-                ] as const).map((m) => (
-                  <Pressable
-                    key={m.key}
-                    onPress={m.onPress}
-                    disabled={cameraBusy && m.key === "camera"}
-                    style={styles.modeColumn}
-                  >
-                    <View
-                      style={[
-                        styles.modeTile,
-                        { backgroundColor: colors.muted, borderColor: "transparent" },
-                      ]}
-                    >
-                      <View style={[styles.modeIconBubble, { backgroundColor: m.color + "33" }]}>
-                        {cameraBusy && m.key === "camera" ? (
-                          <ActivityIndicator color={m.color} />
-                        ) : (
-                          <Feather name={m.icon} size={18} color={m.color} />
-                        )}
-                      </View>
-                    </View>
-                    <Text style={[styles.modeLabel, { color: colors.mutedForeground }]}>
-                      {m.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
               <View
                 style={[
                   styles.searchWrap,
