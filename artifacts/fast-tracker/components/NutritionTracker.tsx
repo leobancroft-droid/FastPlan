@@ -1,7 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Modal,
   Pressable,
@@ -13,6 +15,7 @@ import {
 } from "react-native";
 import Svg, { Path, Circle } from "react-native-svg";
 import { useColors } from "@/hooks/useColors";
+import { BarcodeScannerModal, type ScannedProduct } from "./BarcodeScannerModal";
 
 export type MealKey = "breakfast" | "lunch" | "dinner" | "snacks";
 
@@ -400,7 +403,6 @@ interface PickerProps {
   onAdd: (preset: FoodPreset, servings: number, meal: MealKey) => void;
 }
 
-type Mode = "search" | "camera" | "barcode" | "more";
 type CategoryFilter = "foods" | "beverages";
 type FrequencyFilter = "frequent" | "all";
 
@@ -409,13 +411,14 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<FoodPreset | null>(null);
   const [servings, setServings] = useState("1");
-  const [mode, setMode] = useState<Mode>("search");
   const [catFilter, setCatFilter] = useState<CategoryFilter>("foods");
   const [freqFilter, setFreqFilter] = useState<FrequencyFilter>("frequent");
   const [pending, setPending] = useState<{ id: string; preset: FoodPreset; servings: number }[]>([]);
   const [frequency, setFrequency] = useState<Record<string, number>>({});
   const [catOpen, setCatOpen] = useState(false);
   const [freqOpen, setFreqOpen] = useState(false);
+  const [barcodeOpen, setBarcodeOpen] = useState(false);
+  const [cameraBusy, setCameraBusy] = useState(false);
 
   const open = meal !== null;
   const mealLabel = MEALS.find((m) => m.key === meal)?.label ?? "";
@@ -455,9 +458,10 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     setSelected(null);
     setServings("1");
     setPending([]);
-    setMode("search");
     setCatOpen(false);
     setFreqOpen(false);
+    setBarcodeOpen(false);
+    setCameraBusy(false);
   }
 
   function handleClose() {
@@ -499,20 +503,87 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
     setFrequency((prev) => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }));
   }
 
-  function handleSelectMode(m: Mode) {
-    if (m === "search") {
-      setMode("search");
+  async function handleCameraScan() {
+    if (cameraBusy) return;
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert("Camera permission needed", "Allow camera access to scan a meal.");
       return;
     }
-    setMode(m);
-    Alert.alert(
-      m === "camera" ? "Camera" : m === "barcode" ? "Barcode" : "More",
-      m === "camera"
-        ? "Snap a photo of your meal — coming soon."
-        : m === "barcode"
-        ? "Scan packaged food barcodes — coming soon."
-        : "Custom foods, recipes, and favorites — coming soon."
-    );
+    const r = await ImagePicker.launchCameraAsync({
+      mediaTypes: ["images"],
+      quality: 0.6,
+      base64: true,
+      allowsEditing: false,
+    });
+    if (r.canceled || !r.assets?.[0]?.base64) return;
+    setCameraBusy(true);
+    try {
+      const domain = (process.env.EXPO_PUBLIC_DOMAIN as string | undefined) ?? "";
+      const apiBase = domain
+        ? domain.startsWith("http")
+          ? `${domain.replace(/\/$/, "")}/api`
+          : `https://${domain}/api`
+        : "/api";
+      const res = await fetch(`${apiBase}/scan-food`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageBase64: r.assets[0].base64,
+          mimeType: r.assets[0].mimeType ?? "image/jpeg",
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as {
+        items: { label: string; emoji: string; serving: string; kcal: number; carbs: number; protein: number; fat: number }[];
+        note?: string;
+      };
+      if (!data.items || data.items.length === 0) {
+        Alert.alert("No food detected", data.note || "Try another photo.");
+        return;
+      }
+      const newPending = data.items.map((it, i) => ({
+        id: `${Date.now()}-cam-${i}-${Math.random().toString(36).slice(2, 6)}`,
+        preset: {
+          id: `cam_${Date.now()}_${i}`,
+          label: it.label,
+          emoji: it.emoji || "🍽️",
+          serving: it.serving || "1 serving",
+          kcal: it.kcal,
+          carbs: it.carbs,
+          protein: it.protein,
+          fat: it.fat,
+        } as FoodPreset,
+        servings: 1,
+      }));
+      setPending((prev) => [...prev, ...newPending]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Could not analyze photo.";
+      Alert.alert("Scan failed", msg);
+    } finally {
+      setCameraBusy(false);
+    }
+  }
+
+  function handleBarcodeResult(p: ScannedProduct) {
+    setBarcodeOpen(false);
+    setPending((prev) => [
+      ...prev,
+      {
+        id: `${Date.now()}-bc-${Math.random().toString(36).slice(2, 6)}`,
+        preset: {
+          id: `bc_${p.barcode}`,
+          label: p.label,
+          emoji: p.emoji,
+          serving: p.serving,
+          kcal: p.kcal,
+          carbs: p.carbs,
+          protein: p.protein,
+          fat: p.fat,
+        } as FoodPreset,
+        servings: 1,
+      },
+    ]);
   }
 
   const totalCount = pending.length + (selected ? 1 : 0);
@@ -588,34 +659,34 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
             <>
               <View style={styles.modeRow}>
                 {([
-                  { key: "search", label: "Search", icon: "search", color: "#10b981" },
-                  { key: "camera", label: "Camera", icon: "camera", color: "#ec4899" },
-                  { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444" },
-                  { key: "more", label: "More", icon: "more-horizontal", color: "#9ca3af" },
-                ] as const).map((m) => {
-                  const isActive = mode === m.key;
-                  return (
-                    <Pressable
-                      key={m.key}
-                      onPress={() => handleSelectMode(m.key as Mode)}
-                      style={styles.modeColumn}
+                  { key: "camera", label: "Camera", icon: "camera", color: "#ec4899", onPress: handleCameraScan },
+                  { key: "barcode", label: "Barcode", icon: "bar-chart-2", color: "#ef4444", onPress: () => setBarcodeOpen(true) },
+                ] as const).map((m) => (
+                  <Pressable
+                    key={m.key}
+                    onPress={m.onPress}
+                    disabled={cameraBusy && m.key === "camera"}
+                    style={styles.modeColumn}
+                  >
+                    <View
+                      style={[
+                        styles.modeTile,
+                        { backgroundColor: colors.muted, borderColor: "transparent" },
+                      ]}
                     >
-                      <View
-                        style={[
-                          styles.modeTile,
-                          { backgroundColor: colors.muted, borderColor: isActive ? colors.primary : "transparent" },
-                        ]}
-                      >
-                        <View style={[styles.modeIconBubble, { backgroundColor: m.color + "33" }]}>
+                      <View style={[styles.modeIconBubble, { backgroundColor: m.color + "33" }]}>
+                        {cameraBusy && m.key === "camera" ? (
+                          <ActivityIndicator color={m.color} />
+                        ) : (
                           <Feather name={m.icon} size={18} color={m.color} />
-                        </View>
+                        )}
                       </View>
-                      <Text style={[styles.modeLabel, { color: isActive ? colors.foreground : colors.mutedForeground }]}>
-                        {m.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                    </View>
+                    <Text style={[styles.modeLabel, { color: colors.mutedForeground }]}>
+                      {m.label}
+                    </Text>
+                  </Pressable>
+                ))}
               </View>
 
               <View
@@ -744,6 +815,11 @@ function FoodPicker({ meal, onClose, onAdd }: PickerProps) {
           )}
         </Pressable>
       </Pressable>
+      <BarcodeScannerModal
+        visible={barcodeOpen}
+        onClose={() => setBarcodeOpen(false)}
+        onResult={handleBarcodeResult}
+      />
     </Modal>
   );
 }
@@ -1160,7 +1236,7 @@ const styles = StyleSheet.create({
   modeColumn: {
     alignItems: "center",
     gap: 6,
-    width: "23%",
+    width: "48%",
   },
   modeTile: {
     width: "100%",
