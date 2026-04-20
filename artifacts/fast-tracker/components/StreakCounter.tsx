@@ -36,12 +36,12 @@ export function StreakCounter({ streak, longestStreak, isFastDay }: StreakCounte
     <View style={[styles.container, { backgroundColor: cardBg }]}>
       <View style={styles.item}>
         <Animated.Text
-          style={[animStyle, styles.number, { color: colors.streakGold }]}
+          style={[animStyle, styles.number, { color: "#22c55e" }]}
         >
           {streak}
         </Animated.Text>
         <View style={styles.labelRow}>
-          <Feather name="zap" size={12} color={colors.streakGold} />
+          <Feather name="zap" size={12} color="#22c55e" />
           <Text style={[styles.label, { color: mutedColor }]}>  Current Streak</Text>
         </View>
       </View>
