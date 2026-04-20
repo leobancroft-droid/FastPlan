@@ -1,8 +1,13 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "Jo3BbHCMQgwx7XMhLKBQ2"
 uri = "file://artifacts/fast-tracker/assets/images/icon.png"
 type = "image"
 title = "altfast app icon"
+
+[[outputs]]
+id = "pHDS1UaobNykn76SmL0Iz"
+uri = "file://artifacts/fast-tracker/assets/images/fastplan-logo-white.png"
+type = "image"
+title = "FastPlan logo (dark parts whitened)"

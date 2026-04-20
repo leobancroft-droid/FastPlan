@@ -415,7 +415,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
 
             <View style={styles.logoWrap}>
               <Image
-                source={require("@/assets/images/fastplan-logo.png")}
+                source={require("@/assets/images/fastplan-logo-white.png")}
                 style={styles.logoImg}
                 resizeMode="contain"
               />
