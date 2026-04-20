@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Alert,
   Platform,
@@ -46,6 +46,7 @@ export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { today, history, streak, longestStreak, badges, fastQuote, markComplete, markSkipped, setDayStatus, startDate, setStartDateExplicit, onboardingComplete, completeOnboarding, userProfile, planIntroSeen, markPlanIntroSeen, setWeightKg, setWeightGoalKg, setWeightUnit } = useFasting();
+  const scrollRef = useRef<ScrollView>(null);
   const [loading, setLoading] = useState(false);
   const [burned, setBurned] = useState(0);
   const [nutritionRefresh, setNutritionRefresh] = useState(0);
@@ -187,6 +188,9 @@ export default function HomeScreen() {
           if (!isNaN(gKg)) await setWeightGoalKg(gKg);
           await setWeightUnit(u);
           await completeOnboarding(answers);
+          requestAnimationFrame(() => {
+            scrollRef.current?.scrollTo({ y: 0, animated: false });
+          });
         }}
       />
       <PlanReadyIntro visible={showPlanIntro} onContinue={markPlanIntroSeen} />
@@ -196,6 +200,7 @@ export default function HomeScreen() {
       />
 
       <ScrollView
+        ref={scrollRef}
         style={[styles.scroll, { backgroundColor: bg }]}
         contentContainerStyle={[styles.content, { paddingTop: topPadding, paddingBottom: bottomPadding }]}
         showsVerticalScrollIndicator={false}
