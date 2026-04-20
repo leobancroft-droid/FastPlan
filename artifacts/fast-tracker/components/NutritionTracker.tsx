@@ -1110,10 +1110,10 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods, onAiAdded }: PickerProp
                 maxLength={5}
               />
               <View style={styles.totalRow}>
-                <TotalCol label="kcal" value={Math.round(selected.kcal * (Number(servings) || 0))} colors={colors} />
-                <TotalCol label="carbs" value={`${Math.round(selected.carbs * (Number(servings) || 0))}g`} colors={colors} />
-                <TotalCol label="protein" value={`${Math.round(selected.protein * (Number(servings) || 0))}g`} colors={colors} />
-                <TotalCol label="fat" value={`${Math.round(selected.fat * (Number(servings) || 0))}g`} colors={colors} />
+                <TotalCol label="kcal" value={Math.round(selected.kcal * (Number(servings) || 0))} colors={colors} accent="#ec4899" />
+                <TotalCol label="carbs" value={`${Math.round(selected.carbs * (Number(servings) || 0))}g`} colors={colors} accent="#22c55e" />
+                <TotalCol label="protein" value={`${Math.round(selected.protein * (Number(servings) || 0))}g`} colors={colors} accent="#22c55e" />
+                <TotalCol label="fat" value={`${Math.round(selected.fat * (Number(servings) || 0))}g`} colors={colors} accent="#22c55e" />
               </View>
               <View style={{ flexDirection: "row", gap: 10 }}>
                 <Pressable
@@ -1214,7 +1214,7 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods, onAiAdded }: PickerProp
                             {p.serving}
                           </Text>
                         </View>
-                        <Text style={[styles.foodKcal, { color: colors.foreground }]}>{p.kcal} kcal</Text>
+                        <Text style={[styles.foodKcal, { color: "#ec4899" }]}>{p.kcal} kcal</Text>
                       </Pressable>
                       <Pressable
                         onPress={() => handleQuickAdd(p)}
@@ -1284,7 +1284,7 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods, onAiAdded }: PickerProp
                                   {p.serving}
                                 </Text>
                               </View>
-                              <Text style={[styles.foodKcal, { color: colors.foreground }]}>{p.kcal} kcal</Text>
+                              <Text style={[styles.foodKcal, { color: "#ec4899" }]}>{p.kcal} kcal</Text>
                             </Pressable>
                             <Pressable
                               onPress={() => handleQuickAdd(p)}
@@ -1391,11 +1391,11 @@ function FilterDropdown({
   );
 }
 
-function TotalCol({ label, value, colors }: { label: string; value: number | string; colors: ReturnType<typeof useColors> }) {
+function TotalCol({ label, value, colors, accent }: { label: string; value: number | string; colors: ReturnType<typeof useColors>; accent?: string }) {
   return (
     <View style={styles.totalCol}>
-      <Text style={[styles.totalValue, { color: colors.foreground }]}>{value}</Text>
-      <Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>{label}</Text>
+      <Text style={[styles.totalValue, { color: accent ?? colors.foreground }]}>{value}</Text>
+      <Text style={[styles.totalLabel, { color: accent ?? colors.mutedForeground }]}>{label}</Text>
     </View>
   );
 }
