@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { DEFAULT_EMOTIONS, useFasting, type EmotionPreset } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
@@ -12,17 +12,12 @@ function getTodayStr(): string {
 
 export function EmotionTracker() {
   const colors = useColors();
-  const { emotionLog, customEmotions, logEmotion } = useFasting();
-  const [more, setMore] = useState(false);
+  const { emotionLog, removeEmotionEntry } = useFasting();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
-  const allPresets = [...DEFAULT_EMOTIONS, ...customEmotions];
   const todayStr = getTodayStr();
   const todayEntries = emotionLog.filter((e) => e.date === todayStr);
-
-  async function handleLog(preset: EmotionPreset) {
-    if (Platform.OS !== "web") await Haptics.selectionAsync();
-    await logEmotion(preset);
-  }
 
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -33,67 +28,136 @@ export function EmotionTracker() {
           </View>
           <Text style={[styles.title, { color: colors.foreground }]}>Feelings</Text>
         </View>
-        <Pressable onPress={() => setMore(true)} hitSlop={10}>
-          <Text style={[styles.moreBtn, { color: colors.primary }]}>More</Text>
+        <Pressable onPress={() => setHistoryOpen(true)} hitSlop={10}>
+          <Text style={[styles.moreBtn, { color: colors.primary }]}>History</Text>
         </Pressable>
       </View>
 
-      <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-        Tap to log how you're feeling
-      </Text>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
+      {todayEntries.length === 0 ? (
         <Pressable
-          onPress={() => setMore(true)}
-          style={({ pressed }) => [styles.tile, { backgroundColor: colors.muted, borderColor: colors.border }, pressed && { opacity: 0.7 }]}
+          onPress={() => setPickerOpen(true)}
+          style={({ pressed }) => [
+            styles.addEmpty,
+            { backgroundColor: colors.muted, borderColor: colors.border },
+            pressed && { opacity: 0.7 },
+          ]}
         >
-          <View style={[styles.tileIcon, { borderColor: colors.foreground + "60" }]}>
-            <Feather name="plus" size={20} color={colors.foreground} />
+          <View style={[styles.addCircle, { borderColor: colors.foreground + "60" }]}>
+            <Feather name="plus" size={22} color={colors.foreground} />
           </View>
-          <Text style={[styles.tileLabel, { color: colors.foreground }]}>Add</Text>
-        </Pressable>
-
-        {allPresets.map((preset) => (
-          <Pressable
-            key={preset.id}
-            onPress={() => handleLog(preset)}
-            style={({ pressed }) => [styles.tile, { backgroundColor: colors.muted, borderColor: colors.border }, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.tileEmoji}>{preset.emoji}</Text>
-            <Text style={[styles.tileLabel, { color: colors.foreground }]} numberOfLines={1}>
-              {preset.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
-      {todayEntries.length > 0 && (
-        <View style={styles.todayWrap}>
-          <Text style={[styles.todayLabel, { color: colors.mutedForeground }]}>
-            Today · {todayEntries.length}
+          <Text style={[styles.addEmptyLabel, { color: colors.mutedForeground }]}>
+            Add a feeling
           </Text>
+        </Pressable>
+      ) : (
+        <View style={styles.loggedWrap}>
           <View style={styles.chips}>
-            {todayEntries.slice(0, 6).map((entry) => (
-              <View key={entry.id} style={[styles.chip, { backgroundColor: colors.primary + "18" }]}>
+            {todayEntries.map((entry) => (
+              <Pressable
+                key={entry.id}
+                onLongPress={() => removeEmotionEntry(entry.id)}
+                style={[styles.chip, { backgroundColor: colors.primary + "22" }]}
+              >
                 <Text style={styles.chipEmoji}>{entry.emoji}</Text>
                 <Text style={[styles.chipLabel, { color: colors.foreground }]}>{entry.label}</Text>
-              </View>
+              </Pressable>
             ))}
-            {todayEntries.length > 6 && (
-              <View style={[styles.chip, { backgroundColor: colors.muted }]}>
-                <Text style={[styles.chipLabel, { color: colors.mutedForeground }]}>+{todayEntries.length - 6} more</Text>
-              </View>
-            )}
+            <Pressable
+              onPress={() => setPickerOpen(true)}
+              style={({ pressed }) => [
+                styles.chipAdd,
+                { backgroundColor: colors.muted, borderColor: colors.border },
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Feather name="plus" size={14} color={colors.foreground} />
+              <Text style={[styles.chipLabel, { color: colors.foreground }]}>Add</Text>
+            </Pressable>
           </View>
         </View>
       )}
 
-      <EmotionsManager open={more} onClose={() => setMore(false)} />
+      <EmotionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      <EmotionsManager open={historyOpen} onClose={() => setHistoryOpen(false)} />
     </View>
+  );
+}
+
+interface PickerProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+function EmotionPicker({ open, onClose }: PickerProps) {
+  const colors = useColors();
+  const { emotionLog, customEmotions, logEmotion } = useFasting();
+  const [justAdded, setJustAdded] = useState<Set<string>>(new Set());
+
+  const presets = useMemo(
+    () => [...DEFAULT_EMOTIONS, ...customEmotions].sort((a, b) => a.label.localeCompare(b.label)),
+    [customEmotions]
+  );
+
+  const todayStr = getTodayStr();
+  const todayPresetIds = new Set(emotionLog.filter((e) => e.date === todayStr).map((e) => e.presetId));
+
+  function handleClose() {
+    setJustAdded(new Set());
+    onClose();
+  }
+
+  async function handleSelect(preset: EmotionPreset) {
+    if (Platform.OS !== "web") await Haptics.selectionAsync();
+    await logEmotion(preset);
+    setJustAdded((prev) => {
+      const next = new Set(prev);
+      next.add(preset.id);
+      return next;
+    });
+  }
+
+  return (
+    <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
+      <Pressable style={styles.backdrop} onPress={handleClose}>
+        <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation?.()}>
+          <View style={styles.sheetHandle} />
+
+          <View style={styles.pickerHeader}>
+            <Text style={[styles.pickerTitle, { color: colors.foreground }]}>Add feelings</Text>
+            <Pressable onPress={handleClose} hitSlop={10}>
+              <Text style={[styles.doneText, { color: colors.primary }]}>Done</Text>
+            </Pressable>
+          </View>
+
+          <Text style={[styles.pickerSubtitle, { color: colors.mutedForeground }]}>
+            Tap any feeling to log it for today
+          </Text>
+
+          <ScrollView style={styles.pickerScroll} contentContainerStyle={styles.pickerGrid}>
+            {presets.map((preset) => {
+              const selected = justAdded.has(preset.id) || todayPresetIds.has(preset.id);
+              return (
+                <Pressable
+                  key={preset.id}
+                  onPress={() => handleSelect(preset)}
+                  style={({ pressed }) => [
+                    styles.pill,
+                    {
+                      backgroundColor: selected ? colors.primary + "33" : colors.muted,
+                      borderColor: selected ? colors.primary + "88" : "transparent",
+                    },
+                    pressed && { opacity: 0.7 },
+                  ]}
+                >
+                  <Text style={styles.pillEmoji}>{preset.emoji}</Text>
+                  <Text style={[styles.pillLabel, { color: colors.foreground }]}>{preset.label}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 }
 
@@ -150,7 +214,7 @@ function EmotionsManager({ open, onClose }: ManagerProps) {
             <ScrollView style={styles.scrollArea} contentContainerStyle={{ gap: 16, paddingBottom: 8 }}>
               {grouped.length === 0 && (
                 <Text style={[styles.empty, { color: colors.mutedForeground }]}>
-                  No emotions logged yet. Tap a tile to start tracking.
+                  No feelings logged yet. Tap Add to start tracking.
                 </Text>
               )}
               {grouped.map(([date, entries]) => (
@@ -253,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 18,
     borderWidth: 1,
-    gap: 10,
+    gap: 12,
   },
   header: {
     flexDirection: "row",
@@ -281,71 +345,60 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_600SemiBold",
   },
-  subtitle: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
-  scroll: {
-    gap: 10,
-    paddingVertical: 4,
-    paddingRight: 4,
-  },
-  tile: {
-    width: 78,
-    height: 92,
-    borderRadius: 16,
-    borderWidth: 1,
+  addEmpty: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
-    gap: 6,
+    gap: 12,
+    paddingVertical: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: "dashed",
   },
-  tileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  addCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  tileEmoji: {
-    fontSize: 28,
-    lineHeight: 34,
-  },
-  tileLabel: {
-    fontSize: 11,
+  addEmptyLabel: {
+    fontSize: 14,
     fontFamily: "Inter_600SemiBold",
-    textAlign: "center",
   },
-  todayWrap: {
-    gap: 6,
-    marginTop: 4,
-  },
-  todayLabel: {
-    fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
+  loggedWrap: {
+    gap: 8,
   },
   chips: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 8,
   },
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 999,
   },
+  chipAdd: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
   chipEmoji: {
-    fontSize: 13,
+    fontSize: 15,
   },
   chipLabel: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
   },
   backdrop: {
     flex: 1,
@@ -367,6 +420,50 @@ const styles = StyleSheet.create({
     backgroundColor: "#999",
     opacity: 0.3,
     alignSelf: "center",
+  },
+  pickerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  pickerTitle: {
+    fontSize: 20,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: -0.3,
+  },
+  doneText: {
+    fontSize: 15,
+    fontFamily: "Inter_700Bold",
+  },
+  pickerSubtitle: {
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    marginTop: -6,
+  },
+  pickerScroll: {
+    maxHeight: 480,
+  },
+  pickerGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingBottom: 8,
+  },
+  pill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1.5,
+  },
+  pillEmoji: {
+    fontSize: 16,
+  },
+  pillLabel: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
   },
   tabs: {
     flexDirection: "row",
