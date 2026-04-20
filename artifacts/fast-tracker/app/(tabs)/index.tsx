@@ -296,19 +296,29 @@ export default function HomeScreen() {
             </Pressable>
           </>
         ) : isCompleted ? (
-          <View style={[styles.doneCard, { backgroundColor: colors.success + "20", borderColor: colors.success + "40" }]}>
-            <Feather name="check-circle" size={32} color={colors.success} />
-            <Text style={[styles.doneTitle, { color: colors.success }]}>Day Complete!</Text>
-            <Text style={[styles.doneDesc, { color: mutedColor }]}>
-              Great work. Come back tomorrow for your {isFastDay ? "eat" : "fast"} day.
-            </Text>
-          </View>
+          <>
+            <View style={[styles.doneCard, { backgroundColor: colors.success + "20", borderColor: colors.success + "40" }]}>
+              <Feather name="check-circle" size={32} color={colors.success} />
+              <Text style={[styles.doneTitle, { color: colors.success }]}>Day Complete!</Text>
+              <Text style={[styles.doneDesc, { color: mutedColor }]}>
+                Great work. Come back tomorrow for your {isFastDay ? "eat" : "fast"} day.
+              </Text>
+            </View>
+            <Pressable style={styles.skipBtn} onPress={handleStatusChange}>
+              <Text style={[styles.skipText, { color: mutedColor }]}>Change status</Text>
+            </Pressable>
+          </>
         ) : (
-          <View style={[styles.doneCard, { backgroundColor: colors.destructive + "15", borderColor: colors.destructive + "30" }]}>
-            <Feather name="x-circle" size={32} color={colors.destructive} />
-            <Text style={[styles.doneTitle, { color: colors.destructive }]}>Day Skipped</Text>
-            <Text style={[styles.doneDesc, { color: mutedColor }]}>No worries. Start fresh tomorrow.</Text>
-          </View>
+          <>
+            <View style={[styles.doneCard, { backgroundColor: colors.destructive + "15", borderColor: colors.destructive + "30" }]}>
+              <Feather name="x-circle" size={32} color={colors.destructive} />
+              <Text style={[styles.doneTitle, { color: colors.destructive }]}>Day Skipped</Text>
+              <Text style={[styles.doneDesc, { color: mutedColor }]}>No worries. Start fresh tomorrow.</Text>
+            </View>
+            <Pressable style={styles.skipBtn} onPress={handleStatusChange}>
+              <Text style={[styles.skipText, { color: mutedColor }]}>Change status</Text>
+            </Pressable>
+          </>
         )}
       </ScrollView>
     </>
