@@ -72,6 +72,12 @@ interface FastingContextType {
   markComplete: () => Promise<void>;
   markSkipped: () => Promise<void>;
   setDayStatus: (dateStr: string, status: DayStatus | "clear") => Promise<void>;
+  waterToday: number;
+  waterGoal: number;
+  glassSize: number;
+  addGlass: () => Promise<void>;
+  removeGlass: () => Promise<void>;
+  setWaterGoal: (ml: number) => Promise<void>;
   resetAll: () => Promise<void>;
   getTodayType: () => DayType;
   getTypeForDate: (dateStr: string) => DayType;
@@ -106,7 +112,11 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [onboardingAnswers, setOnboardingAnswers] = useState<Record<string, string | string[]> | null>(null);
   const [planIntroSeen, setPlanIntroSeen] = useState(false);
+  const [waterToday, setWaterToday] = useState(0);
+  const [waterDate, setWaterDate] = useState<string>(getTodayStr());
+  const [waterGoal, setWaterGoalState] = useState(2000);
   const [loaded, setLoaded] = useState(false);
+  const glassSize = 250;
 
   const userProfile = useMemo(() => derivePersonalProfile(onboardingAnswers), [onboardingAnswers]);
 
@@ -121,13 +131,15 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
 
   async function loadData() {
     try {
-      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw] = await Promise.all([
+      const [histRaw, badgeRaw, startRaw, onboardRaw, answersRaw, introRaw, waterRaw, goalRaw] = await Promise.all([
         AsyncStorage.getItem("fasting_history"),
         AsyncStorage.getItem("fasting_badges"),
         AsyncStorage.getItem("fasting_start"),
         AsyncStorage.getItem("onboarding_complete"),
         AsyncStorage.getItem("onboarding_answers"),
         AsyncStorage.getItem("plan_intro_seen"),
+        AsyncStorage.getItem("water_today"),
+        AsyncStorage.getItem("water_goal"),
       ]);
       setHistory(histRaw ? JSON.parse(histRaw) : []);
       setBadges(badgeRaw ? JSON.parse(badgeRaw) : BADGES);
@@ -135,6 +147,17 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       setOnboardingComplete(onboardRaw === "true");
       setOnboardingAnswers(answersRaw ? JSON.parse(answersRaw) : null);
       setPlanIntroSeen(introRaw === "true");
+      if (waterRaw) {
+        const parsed = JSON.parse(waterRaw) as { date: string; ml: number };
+        if (parsed.date === getTodayStr()) {
+          setWaterToday(parsed.ml);
+          setWaterDate(parsed.date);
+        } else {
+          setWaterToday(0);
+          setWaterDate(getTodayStr());
+        }
+      }
+      if (goalRaw) setWaterGoalState(Number(goalRaw) || 2000);
     } catch {}
     setLoaded(true);
   }
@@ -240,6 +263,31 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     await checkAndUnlockBadges(streak + 1);
   }, [history, startDate, streak, badges]);
 
+  const persistWater = useCallback(async (ml: number) => {
+    const today = getTodayStr();
+    setWaterToday(ml);
+    setWaterDate(today);
+    await AsyncStorage.setItem("water_today", JSON.stringify({ date: today, ml }));
+  }, []);
+
+  const addGlass = useCallback(async () => {
+    const todayStr = getTodayStr();
+    const base = waterDate === todayStr ? waterToday : 0;
+    await persistWater(Math.min(base + glassSize, waterGoal * 2));
+  }, [waterToday, waterDate, waterGoal, persistWater]);
+
+  const removeGlass = useCallback(async () => {
+    const todayStr = getTodayStr();
+    const base = waterDate === todayStr ? waterToday : 0;
+    await persistWater(Math.max(base - glassSize, 0));
+  }, [waterToday, waterDate, persistWater]);
+
+  const setWaterGoal = useCallback(async (ml: number) => {
+    const clamped = Math.max(500, Math.min(ml, 6000));
+    setWaterGoalState(clamped);
+    await AsyncStorage.setItem("water_goal", String(clamped));
+  }, []);
+
   const setDayStatus = useCallback(async (dateStr: string, status: DayStatus | "clear") => {
     const filtered = history.filter((d) => d.date !== dateStr);
     let newHistory: DayRecord[];
@@ -276,6 +324,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("onboarding_complete"),
       AsyncStorage.removeItem("onboarding_answers"),
       AsyncStorage.removeItem("plan_intro_seen"),
+      AsyncStorage.removeItem("water_today"),
+      AsyncStorage.removeItem("water_goal"),
     ]);
     setHistory([]);
     setBadges(BADGES);
@@ -283,12 +333,14 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
     setOnboardingComplete(false);
     setOnboardingAnswers(null);
     setPlanIntroSeen(false);
+    setWaterToday(0);
+    setWaterGoalState(2000);
   }, []);
 
   if (!loaded) return null;
 
   return (
-    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
+    <FastingContext.Provider value={{ today, history, streak, longestStreak, badges, startDate, fastQuote, onboardingComplete, onboardingAnswers, userProfile, planIntroSeen, markPlanIntroSeen, markComplete, markSkipped, setDayStatus, waterToday: waterDate === getTodayStr() ? waterToday : 0, waterGoal, glassSize, addGlass, removeGlass, setWaterGoal, resetAll, getTodayType, getTypeForDate, setStartDateExplicit, completeOnboarding }}>
       {children}
     </FastingContext.Provider>
   );

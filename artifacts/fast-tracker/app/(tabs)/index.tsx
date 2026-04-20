@@ -24,6 +24,7 @@ import { PlanReadyIntro } from "@/components/PlanReadyIntro";
 import { QuoteCard } from "@/components/QuoteCard";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { StreakCounter } from "@/components/StreakCounter";
+import { WaterTracker } from "@/components/WaterTracker";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
 
@@ -125,6 +126,10 @@ export default function HomeScreen() {
             <PlanCard profile={userProfile} isFastDay={isFastDay} />
           </>
         )}
+
+        <View style={styles.spacing} />
+
+        <WaterTracker />
 
         <View style={styles.spacing} />
 
