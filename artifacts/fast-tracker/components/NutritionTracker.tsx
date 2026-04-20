@@ -889,8 +889,6 @@ function FoodPicker({ meal, onClose, onAdd, recentFoods }: PickerProps) {
     setSelected(null);
     setServings("1");
     setPending([]);
-    setCatOpen(false);
-    setFreqOpen(false);
     setBarcodeOpen(false);
     setCameraBusy(false);
   }
