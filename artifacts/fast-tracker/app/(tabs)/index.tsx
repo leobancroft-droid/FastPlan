@@ -308,7 +308,10 @@ export default function HomeScreen() {
           <>
             <View style={[styles.doneCard, { backgroundColor: colors.success + "20", borderColor: colors.success + "40" }]}>
               <Feather name="check-circle" size={32} color={colors.success} />
-              <Text style={[styles.doneTitle, { color: colors.success }]}>Day Complete!</Text>
+              <Text style={[styles.doneSubtitle, { color: mutedColor }]}>
+                {isFastDay ? "Fast Day" : "Eat Day"}
+              </Text>
+              <Text style={[styles.doneTitle, { color: colors.success }]}>Complete Day</Text>
               <Text style={[styles.doneDesc, { color: mutedColor }]}>
                 Great work. Come back tomorrow for your {isFastDay ? "eat" : "fast"} day.
               </Text>
@@ -371,5 +374,6 @@ const styles = StyleSheet.create({
   skipText: { fontSize: 14, fontFamily: "Inter_400Regular" },
   doneCard: { borderRadius: 20, padding: 28, alignItems: "center", gap: 10, borderWidth: 1.5 },
   doneTitle: { fontSize: 22, fontFamily: "Inter_700Bold" },
+  doneSubtitle: { fontSize: 13, fontFamily: "Inter_500Medium", letterSpacing: 0.4, textTransform: "uppercase", marginTop: -2 },
   doneDesc: { fontSize: 14, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 21 },
 });
