@@ -155,15 +155,9 @@ export default function ActivitiesScreen() {
     }
     if (Platform.OS === "ios" && isHealthAvailable()) {
       const ok = await requestHealthPermissions();
-      if (!ok) {
-        Alert.alert("Health permission denied", "Open Settings → Privacy → Health → FastPlan to enable access.");
-        return;
-      }
+      if (!ok) return;
       await persistConnected(true);
-      const synced = await syncFromHealth();
-      if (!synced) {
-        Alert.alert("No data yet", "Apple Health didn't return any step or energy data for today yet.");
-      }
+      await syncFromHealth();
       return;
     }
     await persistConnected(true);
