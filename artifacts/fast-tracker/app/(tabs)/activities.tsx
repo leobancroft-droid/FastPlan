@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as Linking from "expo-linking";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -295,6 +296,27 @@ export default function ActivitiesScreen() {
             ]}
           >
             <Text style={styles.connectBtnText}>Connect</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              if (Platform.OS === "ios") {
+                Linking.openURL("x-apple-health://").catch(() => {
+                  Linking.openSettings().catch(() => {});
+                });
+              } else {
+                Linking.openSettings().catch(() => {});
+              }
+            }}
+            style={({ pressed }) => [
+              styles.settingsBtn,
+              { borderColor: colors.border },
+              pressed && { opacity: 0.7 },
+            ]}
+          >
+            <Feather name="settings" size={16} color={colors.foreground} />
+            <Text style={[styles.settingsBtnText, { color: colors.foreground }]}>
+              Open {Platform.OS === "android" ? "Health Connect" : "Health"} Settings
+            </Text>
           </Pressable>
           <Text style={[styles.connectHint, { color: colors.mutedForeground }]}>
             You can change this any time in your device settings.
@@ -692,6 +714,21 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     textAlign: "center",
     paddingHorizontal: 16,
+  },
+  settingsBtn: {
+    alignSelf: "stretch",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginTop: 8,
+  },
+  settingsBtnText: {
+    fontSize: 14,
+    fontFamily: "Inter_600SemiBold",
   },
   stepsCard: {
     borderRadius: 20,
