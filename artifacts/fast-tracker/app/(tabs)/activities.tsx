@@ -298,7 +298,8 @@ export default function ActivitiesScreen() {
             <Text style={styles.connectBtnText}>Connect</Text>
           </Pressable>
           <Pressable
-            onPress={() => {
+            onPress={async () => {
+              await handleConnect();
               if (Platform.OS === "ios") {
                 Linking.openURL("x-apple-health://").catch(() => {
                   Linking.openSettings().catch(() => {});
