@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Modal,
@@ -17,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NutritionTracker } from "@/components/NutritionTracker";
 import { AiFoodScanner } from "@/components/AiFoodScanner";
 import { useColors } from "@/hooks/useColors";
+import { fetchTodayHealthSnapshot, isHealthAvailable, requestHealthPermissions } from "@/lib/healthSync";
 
 interface Activity {
   id: string;
@@ -126,11 +128,44 @@ export default function ActivitiesScreen() {
     ]);
   }
 
+  async function syncFromHealth(): Promise<boolean> {
+    const snap = await fetchTodayHealthSnapshot();
+    if (!snap) return false;
+    await persistSteps(snap.steps);
+    await persistHealthKcal(snap.activeKcal);
+    return true;
+  }
+
+  useEffect(() => {
+    if (!loaded || !connected) return;
+    void syncFromHealth();
+  }, [loaded, connected, todayStr]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!loaded || !connected) return;
+      void syncFromHealth();
+    }, [loaded, connected, todayStr])
+  );
+
   async function handleConnect() {
     if (Platform.OS !== "web") {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
     if (Platform.OS === "ios") {
+      if (isHealthAvailable()) {
+        const ok = await requestHealthPermissions();
+        if (!ok) {
+          Alert.alert("Health permission denied", "You can enable access in Settings → Privacy → Health → FastPlan.");
+          return;
+        }
+        await persistConnected(true);
+        const synced = await syncFromHealth();
+        if (!synced) {
+          Alert.alert("No data yet", "Apple Health didn't return any step or energy data for today yet.");
+        }
+        return;
+      }
       Alert.alert(
         "Connect Apple Health",
         "FastPlan would like to read your Steps, Walking + Running Distance, and Active Energy from Apple Health.",

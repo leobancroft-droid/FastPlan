@@ -59,7 +59,15 @@
           "cameraPermission": "FastPlan uses your camera to scan barcodes on packaged foods."
         }
       ],
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      [
+        "react-native-health",
+        {
+          "isClinicalDataEnabled": false,
+          "healthSharePermission": "FastPlan reads your steps, distance and active energy from Apple Health to track activity automatically.",
+          "healthUpdatePermission": "FastPlan can write workouts you log into Apple Health so all your activity stays in sync."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
