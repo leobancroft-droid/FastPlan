@@ -274,7 +274,7 @@ export default function ActivitiesScreen() {
           >
             <Feather name="settings" size={16} color={colors.foreground} />
             <Text style={[styles.settingsBtnText, { color: colors.foreground }]}>
-              Open {Platform.OS === "android" ? "Health Connect" : "Health"} Settings
+              Open Health App
             </Text>
           </Pressable>
           <Text style={[styles.connectHint, { color: colors.mutedForeground }]}>
