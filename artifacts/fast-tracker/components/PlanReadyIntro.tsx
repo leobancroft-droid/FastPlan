@@ -58,7 +58,7 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
             <View style={styles.rhythmRow}>
               <RhythmWord text="Eat" color="#fff" />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
-              <RhythmWord text="Fast" color={pink} />
+              <RhythmWord text="Fast" color="#a855f7" />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
               <RhythmWord text="Repeat" color={colors.foreground} />
             </View>
@@ -67,7 +67,7 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
 
         <View style={styles.footer}>
           <Pressable
-            style={[styles.continueBtn, { backgroundColor: colors.primary }]}
+            style={[styles.continueBtn, { backgroundColor: pink }]}
             onPress={onContinue}
           >
             <Text style={styles.continueBtnText}>Let's Go</Text>
