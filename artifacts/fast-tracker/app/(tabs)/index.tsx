@@ -232,7 +232,7 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              {isSkipped ? "Day Skipped" : isCompleted ? "Day Complete" : isFastDay ? "Fast Day" : "Eat Day"}
+              {isFastDay ? "Fast Day" : "Eat Day"}
             </Text>
             {(isCompleted || isSkipped) && (
               <Text style={[styles.dayHint, { color: mutedColor }]}>Tap to change status</Text>
