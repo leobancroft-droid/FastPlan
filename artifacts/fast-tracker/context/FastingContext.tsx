@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { derivePersonalProfile, type UserProfile } from "@/lib/personalization";
 import { syncWidgetState } from "@/lib/widgetSync";
+import { scheduleDailyReminders } from "@/lib/notifications";
 
 export type DayType = "eat" | "fast";
 export type DayStatus = "pending" | "completed" | "skipped";
@@ -361,7 +362,8 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       kcalGoal: goal,
       kcalConsumed: 0,
     });
-  }, [loaded, today, streak, weightKg]);
+    scheduleDailyReminders((dateStr) => getTypeForDate(dateStr));
+  }, [loaded, today, streak, weightKg, getTypeForDate]);
 
   const longestStreak = React.useMemo((): number => {
     const completed = history

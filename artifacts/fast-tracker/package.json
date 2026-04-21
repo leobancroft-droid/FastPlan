@@ -59,6 +59,7 @@
     "@bacons/apple-targets": "^4.0.6",
     "expo-camera": "~17.0.10",
     "expo-image-manipulator": "^55.0.15",
+    "expo-notifications": "^55.0.19",
     "react-native-health": "^1.19.0",
     "react-native-shared-group-preferences": "^1.1.24"
   }

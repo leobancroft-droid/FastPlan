@@ -61,6 +61,13 @@
       ],
       "@bacons/apple-targets",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#a855f7"
+        }
+      ],
+      [
         "react-native-health",
         {
           "isClinicalDataEnabled": false,

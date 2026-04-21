@@ -1,11 +1,12 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
@@ -13,12 +14,44 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
+import {
+  cancelAllReminders,
+  isNotificationsEnabled,
+  requestNotificationPermissions,
+  scheduleDailyReminders,
+  setNotificationsEnabled,
+} from "@/lib/notifications";
 
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { startDate, streak, longestStreak, history, resetAll, setStartDateExplicit } = useFasting();
+  const { startDate, streak, longestStreak, history, resetAll, setStartDateExplicit, getTypeForDate } = useFasting();
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+
+  useEffect(() => {
+    isNotificationsEnabled().then(setNotifEnabled);
+  }, []);
+
+  async function handleNotifToggle(next: boolean) {
+    if (next) {
+      const granted = await requestNotificationPermissions();
+      if (!granted) {
+        Alert.alert(
+          "Notifications disabled",
+          "Enable notifications for FastPlan in your device Settings to get daily reminders.",
+        );
+        return;
+      }
+      await setNotificationsEnabled(true);
+      setNotifEnabled(true);
+      await scheduleDailyReminders((d) => getTypeForDate(d));
+    } else {
+      await setNotificationsEnabled(false);
+      setNotifEnabled(false);
+      await cancelAllReminders();
+    }
+  }
 
   const topPadding = Platform.OS === "web" ? 67 + 16 : insets.top + 16;
   const bottomPadding = Platform.OS === "web" ? 34 + 24 : 24;
@@ -64,6 +97,26 @@ export default function SettingsScreen() {
         <StatRow label="Current streak" value={`${streak} days`} icon="zap" colors={colors} />
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <StatRow label="Longest streak" value={`${longestStreak} days`} icon="award" colors={colors} />
+      </View>
+
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>NOTIFICATIONS</Text>
+        <View style={styles.notifRow}>
+          <View style={styles.notifLeft}>
+            <Feather name="bell" size={16} color={colors.mutedForeground} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.statLabel, { color: colors.foreground }]}>Daily reminder</Text>
+              <Text style={[styles.infoDesc, { color: colors.mutedForeground }]}>
+                Get a 9am alert telling you if it's a fast or eat day.
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={notifEnabled}
+            onValueChange={handleNotifToggle}
+            trackColor={{ false: colors.border, true: colors.primary }}
+          />
+        </View>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.card }]}>
@@ -225,4 +278,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   resetText: { fontSize: 16, fontFamily: "Inter_600SemiBold" },
+  notifRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  notifLeft: { flex: 1, flexDirection: "row", alignItems: "flex-start", gap: 10 },
 });
