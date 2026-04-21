@@ -56,7 +56,7 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
           >
             <Text style={[styles.rhythmLabel, { color: green }]}>JUST A CLEAR RHYTHM</Text>
             <View style={styles.rhythmRow}>
-              <RhythmWord text="Eat" color={green} />
+              <RhythmWord text="Eat" color="#fff" />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
               <RhythmWord text="Fast" color={pink} />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
