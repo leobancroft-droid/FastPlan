@@ -437,7 +437,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                     ]}
                   >
                     <Text style={[styles.calorieLabel, { color: "#fff" }]}>
-                      Suggested daily intake without fasting
+                      Daily intake without fasting
                     </Text>
                     <Text style={[styles.calorieValue, { color: "#ec4899" }]}>
                       {clamped} kcal
