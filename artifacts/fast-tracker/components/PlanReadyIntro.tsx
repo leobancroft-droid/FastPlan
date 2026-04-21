@@ -67,7 +67,7 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
 
         <View style={styles.footer}>
           <Pressable
-            style={[styles.continueBtn, { backgroundColor: pink }]}
+            style={[styles.continueBtn, { backgroundColor: green }]}
             onPress={onContinue}
           >
             <Text style={styles.continueBtnText}>Let's Go</Text>
