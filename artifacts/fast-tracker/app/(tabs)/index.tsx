@@ -311,7 +311,7 @@ export default function HomeScreen() {
               <Text style={[styles.doneSubtitle, { color: mutedColor }]}>
                 {isFastDay ? "Fast Day" : "Eat Day"}
               </Text>
-              <Text style={[styles.doneTitle, { color: colors.success }]}>Complete Day</Text>
+              <Text style={[styles.doneTitle, { color: colors.success }]}>Day Complete</Text>
               <Text style={[styles.doneDesc, { color: mutedColor }]}>
                 Great work. Come back tomorrow for your {isFastDay ? "eat" : "fast"} day.
               </Text>
