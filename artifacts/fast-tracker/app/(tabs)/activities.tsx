@@ -153,53 +153,17 @@ export default function ActivitiesScreen() {
     if (Platform.OS !== "web") {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
-    if (Platform.OS === "ios") {
-      if (isHealthAvailable()) {
-        const ok = await requestHealthPermissions();
-        if (!ok) {
-          Alert.alert("Health permission denied", "You can enable access in Settings → Privacy → Health → FastPlan.");
-          return;
-        }
-        await persistConnected(true);
-        const synced = await syncFromHealth();
-        if (!synced) {
-          Alert.alert("No data yet", "Apple Health didn't return any step or energy data for today yet.");
-        }
+    if (Platform.OS === "ios" && isHealthAvailable()) {
+      const ok = await requestHealthPermissions();
+      if (!ok) {
+        Alert.alert("Health permission denied", "Open Settings → Privacy → Health → FastPlan to enable access.");
         return;
       }
-      Alert.alert(
-        "Connect Apple Health",
-        "FastPlan would like to read your Steps, Walking + Running Distance, and Active Energy from Apple Health.",
-        [
-          { text: "Not Now", style: "cancel" },
-          {
-            text: "Allow",
-            onPress: async () => {
-              await persistConnected(true);
-              if (steps === 0) await persistSteps(8005);
-              if (healthKcal === 0) await persistHealthKcal(285);
-            },
-          },
-        ]
-      );
-      return;
-    }
-    if (Platform.OS === "android") {
-      Alert.alert(
-        "Connect Health Connect",
-        "FastPlan would like to read your Steps, Distance, and Active Calories from Health Connect.",
-        [
-          { text: "Not Now", style: "cancel" },
-          {
-            text: "Allow",
-            onPress: async () => {
-              await persistConnected(true);
-              if (steps === 0) await persistSteps(8005);
-              if (healthKcal === 0) await persistHealthKcal(285);
-            },
-          },
-        ]
-      );
+      await persistConnected(true);
+      const synced = await syncFromHealth();
+      if (!synced) {
+        Alert.alert("No data yet", "Apple Health didn't return any step or energy data for today yet.");
+      }
       return;
     }
     await persistConnected(true);
