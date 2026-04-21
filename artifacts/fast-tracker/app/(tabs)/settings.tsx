@@ -11,9 +11,11 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Paywall } from "@/components/Paywall";
 import { StartDatePicker } from "@/components/StartDatePicker";
 import { useFasting } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
+import { useSubscription } from "@/lib/revenuecat";
 import {
   cancelAllReminders,
   isNotificationsEnabled,
@@ -28,6 +30,8 @@ export default function SettingsScreen() {
   const { startDate, streak, longestStreak, history, resetAll, setStartDateExplicit, getTypeForDate } = useFasting();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const { isSubscribed } = useSubscription();
 
   useEffect(() => {
     isNotificationsEnabled().then(setNotifEnabled);
@@ -87,6 +91,34 @@ export default function SettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={[styles.pageTitle, { color: colors.foreground }]}>Settings</Text>
+
+      <Pressable
+        onPress={() => setPaywallOpen(true)}
+        style={({ pressed }) => [
+          styles.premiumCard,
+          {
+            backgroundColor: isSubscribed ? colors.card : colors.primary,
+            borderColor: isSubscribed ? colors.primary : "transparent",
+            borderWidth: isSubscribed ? 1 : 0,
+          },
+          pressed && { opacity: 0.9 },
+        ]}
+      >
+        <View style={[styles.premiumIcon, { backgroundColor: isSubscribed ? colors.primary + "22" : "rgba(255,255,255,0.18)" }]}>
+          <Feather name="award" size={20} color={isSubscribed ? colors.primary : "#fff"} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.premiumTitle, { color: isSubscribed ? colors.foreground : "#fff" }]}>
+            {isSubscribed ? "FastPlan Premium active" : "Get FastPlan Premium"}
+          </Text>
+          <Text style={[styles.premiumDesc, { color: isSubscribed ? colors.mutedForeground : "rgba(255,255,255,0.85)" }]}>
+            {isSubscribed
+              ? "Tap to manage or restore"
+              : "AI scans, full nutrition, and more"}
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={20} color={isSubscribed ? colors.mutedForeground : "#fff"} />
+      </Pressable>
 
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>YOUR STATS</Text>
@@ -166,6 +198,7 @@ export default function SettingsScreen() {
         <Text style={[styles.resetText, { color: colors.destructive }]}>Reset All Data</Text>
       </Pressable>
     </ScrollView>
+    <Paywall visible={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </>
   );
 }
@@ -279,5 +312,9 @@ const styles = StyleSheet.create({
   },
   resetText: { fontSize: 16, fontFamily: "Inter_600SemiBold" },
   notifRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  premiumCard: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16, borderRadius: 16, marginBottom: 16 },
+  premiumIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  premiumTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
+  premiumDesc: { fontSize: 12, fontFamily: "Inter_400Regular" },
   notifLeft: { flex: 1, flexDirection: "row", alignItems: "flex-start", gap: 10 },
 });

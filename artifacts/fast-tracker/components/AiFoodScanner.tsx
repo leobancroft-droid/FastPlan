@@ -18,6 +18,8 @@ import {
   View,
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { useSubscription } from "@/lib/revenuecat";
+import { Paywall } from "./Paywall";
 import type { FoodEntry, MealKey } from "./NutritionTracker";
 
 interface ScannedItem {
@@ -69,7 +71,9 @@ const MEALS: { key: MealKey; label: string; emoji: string }[] = [
 
 export function AiFoodScanner({ onAdded }: Props) {
   const colors = useColors();
+  const { isSubscribed } = useSubscription();
   const [open, setOpen] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -93,6 +97,10 @@ export function AiFoodScanner({ onAdded }: Props) {
   }
 
   async function handleOpen() {
+    if (!isSubscribed) {
+      setPaywallOpen(true);
+      return;
+    }
     reset();
     setOpen(true);
   }
@@ -342,11 +350,22 @@ export function AiFoodScanner({ onAdded }: Props) {
             Scan a meal with AI
           </Text>
           <Text style={[styles.launcherDesc, { color: colors.mutedForeground }]}>
-            Snap a photo and we'll estimate the calories.
+            {isSubscribed ? "Snap a photo and we'll estimate the calories." : "Premium feature — tap to unlock."}
           </Text>
         </View>
-        <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
+        {isSubscribed ? (
+          <Feather name="chevron-right" size={20} color={colors.mutedForeground} />
+        ) : (
+          <Feather name="lock" size={18} color={colors.primary} />
+        )}
       </Pressable>
+
+      <Paywall
+        visible={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        title="Unlock AI Food Scanner"
+        subtitle="Scan any meal with your camera and get instant nutrition estimates."
+      />
 
       <Modal
         visible={open}

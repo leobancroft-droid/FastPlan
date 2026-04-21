@@ -16,8 +16,15 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FastingProvider } from "@/context/FastingContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 
 SplashScreen.preventAutoHideAsync();
+
+try {
+  initializeRevenueCat();
+} catch (err: any) {
+  console.warn("RevenueCat unavailable:", err?.message ?? "Unknown error");
+}
 
 const queryClient = new QueryClient();
 
@@ -50,13 +57,15 @@ export default function RootLayout() {
       <ErrorBoundary>
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
-            <GestureHandlerRootView>
-              <KeyboardProvider>
-                <FastingProvider>
-                  <RootLayoutNav />
-                </FastingProvider>
-              </KeyboardProvider>
-            </GestureHandlerRootView>
+            <SubscriptionProvider>
+              <GestureHandlerRootView>
+                <KeyboardProvider>
+                  <FastingProvider>
+                    <RootLayoutNav />
+                  </FastingProvider>
+                </KeyboardProvider>
+              </GestureHandlerRootView>
+            </SubscriptionProvider>
           </QueryClientProvider>
         </ThemeProvider>
       </ErrorBoundary>
