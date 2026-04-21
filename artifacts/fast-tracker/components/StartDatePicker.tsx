@@ -147,7 +147,7 @@ export function StartDatePicker({ visible, onConfirm }: StartDatePickerProps) {
           </View>
 
           <Pressable
-            style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
+            style={[styles.confirmBtn, { backgroundColor: "#a855f7" }]}
             onPress={() => onConfirm(selected)}
           >
             <Feather name="check" size={18} color="#fff" />
