@@ -72,6 +72,7 @@ export default function ActivitiesScreen() {
   const [connected, setConnected] = useState(false);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [steps, setSteps] = useState(0);
+  const [healthKcal, setHealthKcal] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [stepsEditOpen, setStepsEditOpen] = useState(false);
@@ -82,15 +83,18 @@ export default function ActivitiesScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const [c, a, s, sDate] = await Promise.all([
+        const [c, a, s, sDate, hk, hkDate] = await Promise.all([
           AsyncStorage.getItem("health_connected"),
           AsyncStorage.getItem("activities_log"),
           AsyncStorage.getItem("steps_today"),
           AsyncStorage.getItem("steps_date"),
+          AsyncStorage.getItem("health_active_kcal_today"),
+          AsyncStorage.getItem("health_active_kcal_date"),
         ]);
         setConnected(c === "true");
         if (a) setActivities(JSON.parse(a));
         if (s && sDate === todayStr) setSteps(Number(s) || 0);
+        if (hk && hkDate === todayStr) setHealthKcal(Number(hk) || 0);
       } catch {}
       setLoaded(true);
     })();
@@ -114,6 +118,14 @@ export default function ActivitiesScreen() {
     ]);
   }
 
+  async function persistHealthKcal(v: number) {
+    setHealthKcal(v);
+    await AsyncStorage.multiSet([
+      ["health_active_kcal_today", String(v)],
+      ["health_active_kcal_date", todayStr],
+    ]);
+  }
+
   async function handleConnect() {
     if (Platform.OS !== "web") {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -129,6 +141,7 @@ export default function ActivitiesScreen() {
             onPress: async () => {
               await persistConnected(true);
               if (steps === 0) await persistSteps(8005);
+              if (healthKcal === 0) await persistHealthKcal(285);
             },
           },
         ]
@@ -146,6 +159,7 @@ export default function ActivitiesScreen() {
             onPress: async () => {
               await persistConnected(true);
               if (steps === 0) await persistSteps(8005);
+              if (healthKcal === 0) await persistHealthKcal(285);
             },
           },
         ]
@@ -154,6 +168,7 @@ export default function ActivitiesScreen() {
     }
     await persistConnected(true);
     if (steps === 0) await persistSteps(8005);
+    if (healthKcal === 0) await persistHealthKcal(285);
   }
 
   function handleAddActivity(preset: ActivityPreset, minutes: number) {
@@ -205,7 +220,7 @@ export default function ActivitiesScreen() {
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Summary</Text>
           <NutritionTracker
             key={nutritionRefresh}
-            burned={stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
+            burned={healthKcal + stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
           />
           <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
         </>

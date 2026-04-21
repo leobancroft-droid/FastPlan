@@ -45,10 +45,12 @@ export default function HomeScreen() {
       let cancelled = false;
       (async () => {
         try {
-          const [s, sDate, a] = await Promise.all([
+          const [s, sDate, a, hk, hkDate] = await Promise.all([
             AsyncStorage.getItem("steps_today"),
             AsyncStorage.getItem("steps_date"),
             AsyncStorage.getItem("activities_log"),
+            AsyncStorage.getItem("health_active_kcal_today"),
+            AsyncStorage.getItem("health_active_kcal_date"),
           ]);
           if (cancelled) return;
           const d = new Date();
@@ -59,7 +61,8 @@ export default function HomeScreen() {
           const actKcal = acts
             .filter((x) => x.date === today)
             .reduce((sum, x) => sum + (x.kcal || 0), 0);
-          setBurned(stepKcal + actKcal);
+          const healthKcal = hk && hkDate === today ? Number(hk) || 0 : 0;
+          setBurned(healthKcal + stepKcal + actKcal);
         } catch {}
       })();
       return () => {

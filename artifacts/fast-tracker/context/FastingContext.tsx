@@ -554,6 +554,9 @@ export function FastingProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.removeItem("activities_log"),
       AsyncStorage.removeItem("macro_streak_v1"),
       AsyncStorage.removeItem("under_kcal_streak_v1"),
+      AsyncStorage.removeItem("health_connected"),
+      AsyncStorage.removeItem("health_active_kcal_today"),
+      AsyncStorage.removeItem("health_active_kcal_date"),
     ]);
     setHistory([]);
     setBadges(BADGES);
