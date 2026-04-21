@@ -17,7 +17,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.altfast.app",
       "entitlements": {
-        "com.apple.security.application-groups": ["group.com.altfast.shared"]
+        "com.apple.security.application-groups": [
+          "group.com.altfast.shared"
+        ]
       },
       "infoPlist": {
         "NSCameraUsageDescription": "FastPlan uses your camera to scan meals and food barcodes so it can log calories and macros for you.",
