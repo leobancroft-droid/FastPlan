@@ -17,14 +17,16 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
     mutedForeground: c.fastMuted,
     primary: c.fastPrimary,
   };
+  const green = "#22c55e";
+  const pink = "#ec4899";
 
   return (
     <Modal visible={visible} animationType="fade" transparent={false}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.content}>
           <Animated.View entering={FadeIn.duration(400)}>
-            <View style={[styles.iconCircle, { backgroundColor: colors.primary + "18" }]}>
-              <Feather name="zap" size={36} color={colors.primary} />
+            <View style={[styles.iconCircle, { backgroundColor: green + "1f" }]}>
+              <Feather name="zap" size={36} color={green} />
             </View>
           </Animated.View>
 
@@ -43,20 +45,20 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
           </Animated.Text>
 
           <Animated.View entering={FadeInDown.duration(400).delay(320)} style={styles.bullets}>
-            <Bullet text="No constant decisions." color={colors.foreground} />
-            <Bullet text="No overthinking." color={colors.foreground} />
-            <Bullet text="No endless rules." color={colors.foreground} />
+            <Bullet text="No constant decisions." color={colors.foreground} dotColor={green} />
+            <Bullet text="No overthinking." color={colors.foreground} dotColor={pink} />
+            <Bullet text="No endless rules." color={colors.foreground} dotColor={green} />
           </Animated.View>
 
           <Animated.View
             entering={FadeInDown.duration(400).delay(440)}
-            style={[styles.rhythmBox, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}
+            style={[styles.rhythmBox, { backgroundColor: green + "10", borderColor: green + "40" }]}
           >
-            <Text style={[styles.rhythmLabel, { color: colors.primary }]}>JUST A CLEAR RHYTHM</Text>
+            <Text style={[styles.rhythmLabel, { color: green }]}>JUST A CLEAR RHYTHM</Text>
             <View style={styles.rhythmRow}>
-              <RhythmWord text="Eat" color={colors.foreground} />
+              <RhythmWord text="Eat" color={green} />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
-              <RhythmWord text="Fast" color={colors.foreground} />
+              <RhythmWord text="Fast" color={pink} />
               <Feather name="arrow-right" size={18} color={colors.mutedForeground} />
               <RhythmWord text="Repeat" color={colors.foreground} />
             </View>
@@ -77,10 +79,10 @@ export function PlanReadyIntro({ visible, onContinue }: PlanReadyIntroProps) {
   );
 }
 
-function Bullet({ text, color }: { text: string; color: string }) {
+function Bullet({ text, color, dotColor }: { text: string; color: string; dotColor?: string }) {
   return (
     <View style={styles.bulletRow}>
-      <View style={[styles.bulletDot, { backgroundColor: color }]} />
+      <View style={[styles.bulletDot, { backgroundColor: dotColor ?? color }]} />
       <Text style={[styles.bulletText, { color }]}>{text}</Text>
     </View>
   );
