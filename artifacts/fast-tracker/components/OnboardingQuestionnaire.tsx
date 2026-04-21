@@ -103,7 +103,7 @@ const QUESTIONS: Question[] = [
     emoji: "sun",
     title: "When would you prefer to eat on eating days?",
     type: "single",
-    options: ["Morning + afternoon", "Afternoon + evening", "Evening only", "Flexible"],
+    options: ["Morning + afternoon", "Afternoon + evening", "Evening only", "All day", "Flexible"],
   },
   {
     id: "structure",
