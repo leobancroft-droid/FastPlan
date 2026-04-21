@@ -209,16 +209,12 @@ export default function ActivitiesScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      {connected && (
-        <>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Summary</Text>
-          <NutritionTracker
-            key={nutritionRefresh}
-            burned={healthKcal + stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
-          />
-          <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
-        </>
-      )}
+      <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Summary</Text>
+      <NutritionTracker
+        key={nutritionRefresh}
+        burned={healthKcal + stepKcal + todayActivities.reduce((s, a) => s + a.kcal, 0)}
+      />
+      <AiFoodScanner onAdded={() => setNutritionRefresh((n) => n + 1)} />
 
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.foreground }]}>Steps</Text>
