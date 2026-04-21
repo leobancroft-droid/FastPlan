@@ -437,7 +437,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                     ]}
                   >
                     <Text style={[styles.calorieLabel, { color: "#fff" }]}>
-                      Suggested daily intake
+                      Suggested daily intake without fasting
                     </Text>
                     <Text style={[styles.calorieValue, { color: "#ec4899" }]}>
                       {clamped} kcal
@@ -448,7 +448,7 @@ export function OnboardingQuestionnaire({ visible, onComplete }: OnboardingQuest
                       </Text>
                     )}
                     <Text style={[styles.calorieNote, { color: "#fff" }]}>
-                      Remember — you can exceed your calorie suggestion when fasting regularly! Especially alternate day fasting!
+                      Remember — you can eat limitless calories on your eat day when fasting on alternate days.
                     </Text>
                   </View>
                 );
