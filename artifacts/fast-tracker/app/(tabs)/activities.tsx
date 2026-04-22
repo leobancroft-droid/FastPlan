@@ -288,6 +288,10 @@ export default function ActivitiesScreen() {
           </Pressable>
           <Pressable
             onPress={async () => {
+              if (!isSubscribed) {
+                setPaywallOpen(true);
+                return;
+              }
               await handleConnect();
               if (Platform.OS === "ios") {
                 Linking.openURL("x-apple-health://").catch(() => {
