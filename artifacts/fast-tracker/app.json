@@ -17,6 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.altfast.app",
       "buildNumber": "1",
+      "appleTeamId": "J64439MLDY",
       "entitlements": {
         "com.apple.security.application-groups": [
           "group.com.altfast.shared"
