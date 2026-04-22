@@ -18,8 +18,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NutritionTracker } from "@/components/NutritionTracker";
 import { AiFoodScanner } from "@/components/AiFoodScanner";
+import { Paywall } from "@/components/Paywall";
 import { useColors } from "@/hooks/useColors";
 import { fetchTodayHealthSnapshot, isHealthAvailable, requestHealthPermissions } from "@/lib/healthSync";
+import { useSubscription } from "@/lib/revenuecat";
 
 interface Activity {
   id: string;
@@ -80,6 +82,8 @@ export default function ActivitiesScreen() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [stepsEditOpen, setStepsEditOpen] = useState(false);
   const [nutritionRefresh, setNutritionRefresh] = useState(0);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const { isSubscribed } = useSubscription();
 
   const todayStr = getTodayStr();
 
@@ -201,6 +205,7 @@ export default function ActivitiesScreen() {
   if (!loaded) return null;
 
   return (
+    <>
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={[
@@ -209,6 +214,32 @@ export default function ActivitiesScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
+      <Pressable
+        onPress={() => setPaywallOpen(true)}
+        style={({ pressed }) => [
+          styles.premiumCard,
+          {
+            backgroundColor: isSubscribed ? colors.card : colors.primary,
+            borderColor: isSubscribed ? colors.primary : "transparent",
+            borderWidth: isSubscribed ? 1 : 0,
+          },
+          pressed && { opacity: 0.9 },
+        ]}
+      >
+        <View style={[styles.premiumIcon, { backgroundColor: isSubscribed ? colors.primary + "22" : "rgba(255,255,255,0.18)" }]}>
+          <Feather name="award" size={20} color={isSubscribed ? colors.primary : "#fff"} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.premiumTitle, { color: isSubscribed ? colors.foreground : "#fff" }]}>
+            {isSubscribed ? "FastPlan Premium active" : "Get FastPlan Premium"}
+          </Text>
+          <Text style={[styles.premiumDesc, { color: isSubscribed ? colors.mutedForeground : "rgba(255,255,255,0.85)" }]}>
+            {isSubscribed ? "Tap to manage or restore" : "AI scans, full nutrition, and more"}
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={20} color={isSubscribed ? colors.mutedForeground : "#fff"} />
+      </Pressable>
+
       <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Summary</Text>
       <NutritionTracker
         key={nutritionRefresh}
@@ -371,6 +402,8 @@ export default function ActivitiesScreen() {
         onSave={persistSteps}
       />
     </ScrollView>
+    <Paywall visible={paywallOpen} onClose={() => setPaywallOpen(false)} />
+    </>
   );
 }
 
@@ -601,6 +634,10 @@ function StepsEditor({ open, onClose, steps, onSave }: StepsEditorProps) {
 const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingHorizontal: 20, gap: 16 },
+  premiumCard: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16, borderRadius: 16 },
+  premiumIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  premiumTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
+  premiumDesc: { fontSize: 12, fontFamily: "Inter_400Regular" },
   header: {
     flexDirection: "row",
     alignItems: "center",
