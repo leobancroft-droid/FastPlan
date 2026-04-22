@@ -1407,6 +1407,15 @@ function TotalCol({ label, value, colors, accent }: { label: string; value: numb
   );
 }
 
+function MacroPill({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <View style={[styles.macroPill, { backgroundColor: color + "22" }]}>
+      <Text style={[styles.macroPillLabel, { color }]}>{label}</Text>
+      <Text style={[styles.macroPillValue, { color }]}>{Math.round(value)}g</Text>
+    </View>
+  );
+}
+
 function SwipeableFoodRow({
   food,
   colors,
@@ -1457,6 +1466,16 @@ function SwipeableFoodRow({
 
 function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClose: () => void; foods: FoodEntry[]; onRemove: (id: string) => void }) {
   const colors = useColors();
+  const totals = foods.reduce(
+    (acc, f) => {
+      acc.kcal += f.kcal;
+      acc.carbs += f.carbs;
+      acc.protein += f.protein;
+      acc.fat += f.fat;
+      return acc;
+    },
+    { kcal: 0, carbs: 0, protein: 0, fat: 0 },
+  );
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -1474,7 +1493,7 @@ function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClo
             <Text style={[styles.pickerTitle, { color: colors.foreground }]}>Today's food</Text>
             <View style={{ width: 22 }} />
           </View>
-          <ScrollView style={styles.pickerScroll}>
+          <ScrollView style={styles.pickerScroll} contentContainerStyle={{ paddingBottom: 8 }}>
             {foods.length === 0 && (
               <Text style={[styles.empty, { color: colors.mutedForeground }]}>
                 Nothing logged yet today. Tap + on any meal to add food.
@@ -1495,6 +1514,21 @@ function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClo
               );
             })}
           </ScrollView>
+          {foods.length > 0 && (
+            <View style={[styles.totalsFooter, { borderTopColor: colors.border, backgroundColor: colors.card }]}>
+              <View style={styles.totalsLeft}>
+                <Text style={[styles.totalsLabel, { color: colors.mutedForeground }]}>TODAY'S TOTAL</Text>
+                <Text style={[styles.totalsKcal, { color: colors.foreground }]}>
+                  {Math.round(totals.kcal)} <Text style={[styles.totalsKcalUnit, { color: colors.mutedForeground }]}>kcal</Text>
+                </Text>
+              </View>
+              <View style={styles.totalsRight}>
+                <MacroPill label="C" value={totals.carbs} color={colors.eatPrimary} />
+                <MacroPill label="P" value={totals.protein} color={colors.primary} />
+                <MacroPill label="F" value={totals.fat} color={colors.fastPrimary} />
+              </View>
+            </View>
+          )}
         </Pressable>
         </KeyboardAvoidingView>
       </Pressable>
@@ -1742,6 +1776,15 @@ const styles = StyleSheet.create({
   foodEmoji: { fontSize: 24 },
   swipeAction: { width: 88, justifyContent: "center", alignItems: "center", gap: 4 },
   swipeActionText: { color: "#fff", fontSize: 12, fontFamily: "Inter_600SemiBold" },
+  totalsFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, borderTopWidth: StyleSheet.hairlineWidth, gap: 12 },
+  totalsLeft: { flex: 1 },
+  totalsRight: { flexDirection: "row", gap: 8 },
+  totalsLabel: { fontSize: 10, fontFamily: "Inter_700Bold", letterSpacing: 0.6, marginBottom: 2 },
+  totalsKcal: { fontSize: 22, fontFamily: "Inter_700Bold" },
+  totalsKcalUnit: { fontSize: 12, fontFamily: "Inter_500Medium" },
+  macroPill: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8 },
+  macroPillLabel: { fontSize: 10, fontFamily: "Inter_700Bold" },
+  macroPillValue: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
   foodLabel: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   foodSub: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 2 },
   servingsWrap: { gap: 12 },
