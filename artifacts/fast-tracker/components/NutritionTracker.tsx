@@ -646,7 +646,7 @@ export function NutritionTracker({ burned, summaryOnly = false }: Props) {
       <View style={styles.headerRow}>
         <Text style={[styles.sectionHeading, { color: colors.foreground }]}>Calories</Text>
         <Pressable onPress={() => setDetailsOpen(true)} hitSlop={10}>
-          <Text style={[styles.linkBtn, { color: colors.primary }]}>Today</Text>
+          <Text style={[styles.linkBtn, { color: colors.primary }]}>Edit Today</Text>
         </Pressable>
       </View>
       )}
