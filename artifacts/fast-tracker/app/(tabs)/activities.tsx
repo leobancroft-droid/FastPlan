@@ -154,6 +154,10 @@ export default function ActivitiesScreen() {
   );
 
   async function handleConnect() {
+    if (!isSubscribed) {
+      setPaywallOpen(true);
+      return;
+    }
     if (Platform.OS !== "web") {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
