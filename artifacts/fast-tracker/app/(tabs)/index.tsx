@@ -30,6 +30,8 @@ import { WeightTracker } from "@/components/WeightTracker";
 import { EmotionTracker } from "@/components/EmotionTracker";
 import { useFasting, getTodayStr } from "@/context/FastingContext";
 import { useColors } from "@/hooks/useColors";
+import { Paywall } from "@/components/Paywall";
+import { useSubscription } from "@/lib/revenuecat";
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -39,6 +41,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [burned, setBurned] = useState(0);
   const [nutritionRefresh, setNutritionRefresh] = useState(0);
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const { isSubscribed } = useSubscription();
 
   useFocusEffect(
     useCallback(() => {
@@ -332,7 +336,27 @@ export default function HomeScreen() {
             </Pressable>
           </>
         )}
+        {!isSubscribed && (
+          <Pressable
+            onPress={() => setPaywallOpen(true)}
+            style={({ pressed }) => [
+              styles.premiumCard,
+              { backgroundColor: colors.primary },
+              pressed && { opacity: 0.9 },
+            ]}
+          >
+            <View style={styles.premiumIcon}>
+              <Feather name="award" size={20} color="#fff" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.premiumTitle}>Get FastPlan Premium</Text>
+              <Text style={styles.premiumDesc}>AI scans, full nutrition, and more</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#fff" />
+          </Pressable>
+        )}
       </ScrollView>
+      <Paywall visible={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </>
   );
 }
@@ -350,6 +374,10 @@ function getDaySubtitle(isFastDay: boolean, tone: "supportive" | "balanced" | "s
 
 const styles = StyleSheet.create({
   scroll: { flex: 1 },
+  premiumCard: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16, borderRadius: 16, marginTop: 8 },
+  premiumIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,0.18)" },
+  premiumTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold", marginBottom: 2, color: "#fff" },
+  premiumDesc: { fontSize: 12, fontFamily: "Inter_400Regular", color: "rgba(255,255,255,0.85)" },
   content: { paddingHorizontal: 20, gap: 0 },
   dateLabel: { fontSize: 13, fontFamily: "Inter_500Medium", textAlign: "center", marginBottom: 24, letterSpacing: 0.5 },
   hero: { alignItems: "center", marginBottom: 32, gap: 12 },
