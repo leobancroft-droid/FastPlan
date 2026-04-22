@@ -1737,10 +1737,11 @@ const styles = StyleSheet.create({
   sheet: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 32,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 0,
     gap: 14,
-    maxHeight: "85%",
+    maxHeight: "90%",
   },
   sheetHandle: {
     width: 40,
@@ -1765,7 +1766,7 @@ const styles = StyleSheet.create({
     height: 42,
   },
   searchInput: { flex: 1, fontSize: 15, fontFamily: "Inter_500Medium" },
-  pickerScroll: { maxHeight: 460 },
+  pickerScroll: { flexShrink: 1 },
   foodRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1776,7 +1777,7 @@ const styles = StyleSheet.create({
   foodEmoji: { fontSize: 24 },
   swipeAction: { width: 88, justifyContent: "center", alignItems: "center", gap: 4 },
   swipeActionText: { color: "#fff", fontSize: 12, fontFamily: "Inter_600SemiBold" },
-  totalsFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, borderTopWidth: StyleSheet.hairlineWidth, gap: 12 },
+  totalsFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: -20, paddingHorizontal: 20, paddingTop: 12, paddingBottom: Platform.OS === "ios" ? 32 : 20, borderTopWidth: StyleSheet.hairlineWidth, gap: 12 },
   totalsLeft: { flex: 1 },
   totalsRight: { flexDirection: "row", gap: 8 },
   totalsLabel: { fontSize: 10, fontFamily: "Inter_700Bold", letterSpacing: 0.6, marginBottom: 2 },
