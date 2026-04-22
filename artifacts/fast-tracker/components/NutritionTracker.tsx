@@ -16,6 +16,8 @@ import {
   View,
 } from "react-native";
 import Svg, { Path, Circle } from "react-native-svg";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Reanimated, { SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { useColors } from "@/hooks/useColors";
 import { AiFoodScanner } from "./AiFoodScanner";
 import { BarcodeScannerModal, type ScannedProduct } from "./BarcodeScannerModal";
@@ -1405,6 +1407,54 @@ function TotalCol({ label, value, colors, accent }: { label: string; value: numb
   );
 }
 
+function SwipeableFoodRow({
+  food,
+  colors,
+  onRemove,
+}: {
+  food: FoodEntry;
+  colors: ReturnType<typeof useColors>;
+  onRemove: (id: string) => void;
+}) {
+  const renderRightActions = (
+    _progress: SharedValue<number>,
+    drag: SharedValue<number>,
+  ) => {
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ translateX: drag.value + 88 }],
+    }));
+    return (
+      <Reanimated.View style={[styles.swipeAction, { backgroundColor: colors.destructive }, animatedStyle]}>
+        <Feather name="trash-2" size={18} color="#fff" />
+        <Text style={styles.swipeActionText}>Delete</Text>
+      </Reanimated.View>
+    );
+  };
+
+  return (
+    <ReanimatedSwipeable
+      friction={2}
+      rightThreshold={48}
+      overshootRight={false}
+      renderRightActions={renderRightActions}
+      onSwipeableOpen={(direction) => {
+        if (direction === "right") onRemove(food.id);
+      }}
+    >
+      <View style={[styles.foodRow, { borderBottomColor: colors.border, backgroundColor: colors.card }]}>
+        <Text style={styles.foodEmoji}>{food.emoji}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.foodLabel, { color: colors.foreground }]}>{food.label}</Text>
+          <Text style={[styles.foodSub, { color: colors.mutedForeground }]}>
+            {food.kcal} kcal · {food.carbs}c / {food.protein}p / {food.fat}f
+          </Text>
+        </View>
+        <Feather name="chevron-left" size={14} color={colors.mutedForeground + "80"} />
+      </View>
+    </ReanimatedSwipeable>
+  );
+}
+
 function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClose: () => void; foods: FoodEntry[]; onRemove: (id: string) => void }) {
   const colors = useColors();
   return (
@@ -1439,24 +1489,7 @@ function DetailsSheet({ open, onClose, foods, onRemove }: { open: boolean; onClo
                     {m.label.toUpperCase()}
                   </Text>
                   {mealFoods.map((f) => (
-                    <Pressable
-                      key={f.id}
-                      onLongPress={() => {
-                        Alert.alert("Remove food", `Remove ${f.label}?`, [
-                          { text: "Cancel", style: "cancel" },
-                          { text: "Remove", style: "destructive", onPress: () => onRemove(f.id) },
-                        ]);
-                      }}
-                      style={[styles.foodRow, { borderBottomColor: colors.border }]}
-                    >
-                      <Text style={styles.foodEmoji}>{f.emoji}</Text>
-                      <View style={{ flex: 1 }}>
-                        <Text style={[styles.foodLabel, { color: colors.foreground }]}>{f.label}</Text>
-                        <Text style={[styles.foodSub, { color: colors.mutedForeground }]}>
-                          {f.kcal} kcal · {f.carbs}c / {f.protein}p / {f.fat}f
-                        </Text>
-                      </View>
-                    </Pressable>
+                    <SwipeableFoodRow key={f.id} food={f} colors={colors} onRemove={onRemove} />
                   ))}
                 </View>
               );
@@ -1707,6 +1740,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   foodEmoji: { fontSize: 24 },
+  swipeAction: { width: 88, justifyContent: "center", alignItems: "center", gap: 4 },
+  swipeActionText: { color: "#fff", fontSize: 12, fontFamily: "Inter_600SemiBold" },
   foodLabel: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   foodSub: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 2 },
   servingsWrap: { gap: 12 },
